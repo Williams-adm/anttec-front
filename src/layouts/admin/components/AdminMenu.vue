@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { useUIStore } from '@/stores/useUIStore';
 import type { adminMenuInterface } from '../interface/adminMenuInterface';
+import { computed, ref } from 'vue';
+import { useClickOutside } from '@/composables/useClickOutside';
 
-const ui = useUIStore()
-const toggleMenu = ui.toggleMenu
+const ui = useUIStore();
+const toggleMenu = ui.toggleMenu;
+
+const menuRef = ref(null);
+useClickOutside(menuRef, () => {ui.isMenuOpen = false}, computed(() => ui.isMenuOpen));
 
 const links: adminMenuInterface[] = [
   {
@@ -21,7 +26,7 @@ const links: adminMenuInterface[] = [
   <div class="flex items-center">
     <div class="flex items-center ms-3">
       <div>
-        <button
+        <button ref="menuRef"
           type="button"
           class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
           @click="toggleMenu()"

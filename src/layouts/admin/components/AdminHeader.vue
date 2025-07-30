@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import logo from '@/assets/img/logo.png'
+import { useClickOutside } from '@/composables/useClickOutside';
 import AdminMenu from '@/layouts/admin/components/AdminMenu.vue';
 import { useUIStore } from '@/stores/useUIStore';
+import { computed, ref } from 'vue';
 
 const ui = useUIStore()
 const toggleSidebar = ui.toggleSidebar
+
+const asideRef = ref(null);
+useClickOutside(asideRef, () => {ui.isSidebarOpen = false}, computed(() => ui.isSidebarOpen));
 </script>
 
 <template>
@@ -12,7 +17,7 @@ const toggleSidebar = ui.toggleSidebar
     <div class="px-3 py-3 lg:px-5 lg:pl-3">
       <div class="flex items-center justify-between">
         <div class="flex items-center justify-start rtl:justify-end">
-          <button @click="toggleSidebar()" type="button" class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+          <button ref="asideRef" @click="toggleSidebar()" type="button" class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
               <span class="sr-only">Open sidebar</span>
               <font-awesome-icon icon="fa-solid fa-bars-staggered" size="xl"/>
           </button>

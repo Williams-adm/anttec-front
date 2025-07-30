@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import { useBreadcrumb } from '@/composables/useBreadcrumb';
 
+useBreadcrumb([
+  { name: 'Dashboard', route: 'admin.dashboard' },
+  { name: 'Category'}
+])
 </script>
 
 <template>
