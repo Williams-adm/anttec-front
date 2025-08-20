@@ -1,6 +1,6 @@
 import type { adminBreadcrumbInterface } from "@/layouts/admin/interface/adminBreadcrumbInterface";
 import { useBreadcrumbStore } from "@/stores/useBreadcrumbStore";
-import { onMounted, watchEffect } from "vue";
+import { onBeforeUnmount, onMounted, watchEffect } from "vue";
 
 export function useBreadcrumb(breadcrumbs: adminBreadcrumbInterface[] | (() => adminBreadcrumbInterface[])) {
   const breadcrumbStore = useBreadcrumbStore()
@@ -16,7 +16,7 @@ export function useBreadcrumb(breadcrumbs: adminBreadcrumbInterface[] | (() => a
     updateBreadcrumbs()
   })
 
-  /* onBeforeUnmount(() => {
-     breadcrumbStore.setBreadcrumb([]) // Descomenta si quieres limpiar
-  }) */
+  onBeforeUnmount(() => {
+     breadcrumbStore.setBreadcrumb([])
+  })
 }

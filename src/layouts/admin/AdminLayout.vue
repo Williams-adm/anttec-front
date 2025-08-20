@@ -13,7 +13,7 @@ const breadcrumbStore = useBreadcrumbStore()
   <div class="p-4 sm:ml-64">
     <div class="mt-15">
       <AdminBreadcrumb :breadcrumbs="breadcrumbStore.items" />
-      <div class="mt-3 p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
+      <div class="mt-3 p-3 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
         <router-view></router-view>
       </div>
     </div>
