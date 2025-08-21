@@ -6,7 +6,6 @@ export function handleApiError(error: unknown): never {
       console.error('❌ Error de red o configuración de Axios:', error.message)
     } else if (error.response?.status === 422) {
       console.error('❌ Error de validación:', error.response.data);
-      throw error;
     }else {
       console.error(`❌ Error en API [${error.response.status}]:`, error.response.data)
     }
