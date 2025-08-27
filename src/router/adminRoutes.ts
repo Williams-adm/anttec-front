@@ -1,9 +1,5 @@
 import AdminLayout from "@/layouts/admin/AdminLayout.vue";
 
-const DashboardView = () => import('@/views/admin/DashboardView.vue')
-const CategoryList = () => import('@/views/admin/Category/CategoryViewList.vue')
-const CategoryCreate = () => import('@/views/admin/Category/CategoryViewCreate.vue')
-
 const adminRoutes = [
   {
     path: '/admin',
@@ -12,7 +8,7 @@ const adminRoutes = [
       {
         path: '',
         name: 'admin.dashboard',
-        component: DashboardView,
+        component: () => import('@/views/admin/DashboardView.vue'),
       },
       {
         path: 'categories',
@@ -20,14 +16,19 @@ const adminRoutes = [
           {
             path: '',
             name: 'admin.categories',
-            component: CategoryList
+            component: () => import('@/views/admin/Category/CategoryListView.vue'),
           },
           {
             path: 'create',
             name: 'admin.categories.create',
-            component: CategoryCreate
-          }
-        ]
+            component: () => import('@/views/admin/Category/CategoryCreateView.vue'),
+          },
+          {
+            path: 'edit/:id',
+            name: 'admin.categories.edit',
+            component: () => import('@/views/admin/Category/CategoryEditView.vue'),
+          },
+        ],
       },
     ],
   },

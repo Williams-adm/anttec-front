@@ -1,0 +1,63 @@
+<script setup lang="ts">
+import { useBreadcrumb } from '@/composables/useBreadcrumb';
+import AnimationLoader from '@/components/AnimationLoader.vue';
+import CategoryService from '@/services/admin/CategoryService';
+import { type categoryI } from '@/services/admin/interfaces/CategoryInterface'
+import { onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { editCategorySchema } from './schemas/editValidationSchema';
+import { useForm } from 'vee-validate';
+import ButtonSave from '@/components/Admin/ButtonSave.vue';
+
+useBreadcrumb([
+  { name: 'Dashboard', route: 'admin.dashboard' },
+  { name: 'Categorías', route: 'admin.categories' },
+  { name: 'Editar' },
+])
+
+const route = useRoute();
+const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id;
+
+const isLoading = ref(true);
+const category = ref<categoryI | null>(null);
+
+const { meta, handleSubmit, errors, defineField, resetForm } = useForm({
+  validationSchema: editCategorySchema,
+});
+const [name, nameAttrs] = defineField('name');
+
+const loadCategories = async () => {
+  try {
+    category.value = await CategoryService.getById(id);
+    resetForm({ values: { name: category.value.name } });
+  } catch (error) {
+    console.error(error);
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+onMounted(() => {
+  loadCategories()
+})
+
+const onSubmit = handleSubmit(async (values) => {
+  console.log(values);
+});
+</script>
+
+<template>
+  <AnimationLoader v-if="isLoading"/>
+  <div v-else class="block p-5 border rounded-lg shadow-sm bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+    <form action="" method="POST" @submit.prevent="onSubmit">
+      <div class="mb-4">
+        <label for="name" class="block mb-2 font-medium text-gray-900 dark:text-gray-200">Nombre</label>
+        <input v-model="name" v-bind="nameAttrs" id="name" type="text" class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1" placeholder="Ingrese el nombre de la categoría"/>
+        <span class="text-red-400">{{ errors.name }}</span>
+      </div>
+      <div class="flex justify-end">
+        <ButtonSave name="Actualizar" :disabled="!meta.valid"/>
+      </div>
+    </form>
+  </div>
+</template>

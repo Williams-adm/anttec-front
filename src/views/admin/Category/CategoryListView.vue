@@ -65,9 +65,9 @@ onMounted(() => {
               {{ category.name }}
             </td>
             <td class="px-6 py-4 text-right">
-              <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                >Edit</a
-              >
+              <router-link :to="{ name: 'admin.categories.edit', params: { id: category.id   } }">
+                <font-awesome-icon icon="fa-solid fa-pen-to-square" size="xl" class="text-amber-400"/>
+              </router-link>
             </td>
             <td class="px-6 py-4">
               {{ category.status }}

@@ -23,6 +23,15 @@ class CategoryService {
     }
   }
 
+  async getById(id: string): Promise<categoryI> {
+    try {
+      const res = await this.api.get(`/${id}`)
+      return res.data.data as categoryI
+    } catch (error) {
+      handleApiError(error)
+    }
+  }
+
   async create(data: categoryCreateDTO): Promise<categoryI> {
     try {
       const res = await this.api.post('', data)
