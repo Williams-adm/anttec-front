@@ -1,36 +1,63 @@
 <script setup lang="ts">
-import CategoryService from '@/services/admin/CategoryService'
-import type { categoriesI } from '@/services/admin/interfaces/CategoryInterface'
-import { computed, onMounted, ref } from 'vue'
-import InfoAlert from '@/components/Admin/InfoAlert.vue'
-import AnimationLoader from '@/components/AnimationLoader.vue'
-import { useBreadcrumb } from '@/composables/useBreadcrumb'
-import ButtonCreate from '@/components/Admin/ButtonCreate.vue'
+import CategoryService from '@/services/admin/CategoryService';
+import type { categoriesI } from '@/services/admin/interfaces/CategoryInterface';
+import { computed, onMounted, ref } from 'vue';
+import InfoAlert from '@/components/Admin/InfoAlert.vue';
+import AnimationLoader from '@/components/AnimationLoader.vue';
+import { useBreadcrumb } from '@/composables/useBreadcrumb';
+import ButtonCreate from '@/components/Admin/ButtonCreate.vue';
+import ToggleSwitch from '@/components/Admin/ToggleSwitch.vue';
+import { handleApiError } from '@/utils/handleApiError';
+import { useSweetAlert } from '@/composables/useSweetAlert';
+import Swal from 'sweetalert2';
 
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
-  { name: 'Categorías'}
-])
+  { name: 'Categorías' }
+]);
 
-const categories = ref<categoriesI | null>(null)
-const error = ref<string | null>(null)
-const categoriesList = computed(() => categories.value?.data ?? [])
+const categories = ref<categoriesI | null>(null);
+const error = ref<string | null>(null);
+const categoriesList = computed(() => categories.value?.data ?? []);
 const isLoading = ref(true);
 
 const loadCategories = async () => {
   try {
-    categories.value = await CategoryService.getAll()
+    categories.value = await CategoryService.getAll();
   } catch (err) {
-    error.value = 'No se pudieron cargar las categorías.'
-    console.error(err)
+    useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 });
+    error.value = 'No se pudieron cargar las categorías.';
+    console.error(err);
   } finally {
     isLoading.value = false;
   }
 }
 
 onMounted(() => {
-  loadCategories()
+  loadCategories();
 })
+
+const updateStatus = async (id: number, currentStatus: boolean) => {
+  try {
+    const newStatus = !currentStatus;
+    useSweetAlert({
+      title: 'Enviando...',
+      text: 'Actualizando estado',
+      icon: 'loading'
+    });
+    await CategoryService.update({ status: newStatus }, String(id));
+
+    const category = categoriesList.value.find((c) => c.id === id);
+    if (category) {
+      category.status = newStatus;
+    }
+
+    Swal.close();
+  } catch (error) {
+    useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 });
+    handleApiError(error);
+  }
+}
 </script>
 
 <template>
@@ -50,7 +77,7 @@ onMounted(() => {
           </tr>
         </thead>
         <tbody>
-          <tr :class="['bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600',
+          <tr :class="['bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900',
             index != categoriesList.length - 1  ? 'border-b dark:border-gray-700 border-gray-200' : '']"
             v-for="(category, index) in categoriesList"
             :key="index"
@@ -70,7 +97,7 @@ onMounted(() => {
               </router-link>
             </td>
             <td class="px-6 py-4">
-              {{ category.status }}
+              <ToggleSwitch :status="category.status" @update:status="() => updateStatus(category.id, category.status)"/>
             </td>
           </tr>
         </tbody>

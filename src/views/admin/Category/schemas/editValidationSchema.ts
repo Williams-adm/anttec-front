@@ -1,4 +1,4 @@
-import { boolean, object, string } from 'yup'
+import { boolean, object, string } from 'yup';
 
 export const editCategorySchema = object({
   name: string()
@@ -10,4 +10,4 @@ export const editCategorySchema = object({
     .min(3, 'Debe de contener más de 3 caracteres')
     .max(80, 'Debe contener menos de 80 caracteres'),
   status: boolean().optional()
-})
+});

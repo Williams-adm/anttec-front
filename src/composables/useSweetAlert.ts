@@ -11,23 +11,31 @@ interface sweetAlertI {
 }
 
 export function useSweetAlert(options: sweetAlertI) {
-  if (options.icon == 'loading') {
+  const {
+    title,
+    text,
+    icon,
+    timer = 1500,
+    timerProgressBar = true
+  } = options;
+
+  if (icon == 'loading') {
     Swal.fire({
-      title: options.title,
-      text: options.text,
+      title,
+      text,
       allowOutsideClick: false,
       showConfirmButton: false,
       didOpen: () => {
         Swal.showLoading();
       }
-    })
+    });
   } else {
     Swal.fire({
-      title: options.title,
-      text: options.text,
-      icon: options.icon as sweetAlertIcon,
-      timer: options.timer,
-      timerProgressBar: options.timerProgressBar,
+      title,
+      text,
+      icon: icon as sweetAlertIcon,
+      timer,
+      timerProgressBar,
     })
   }
 }

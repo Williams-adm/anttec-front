@@ -19,7 +19,7 @@ const links: adminMenuInterface[] = [
     'name': 'Cerrar sesión',
     'route': 'home'
   }
-]
+];
 </script>
 
 <template>
@@ -28,7 +28,8 @@ const links: adminMenuInterface[] = [
       <div>
         <button ref="menuRef"
           type="button"
-          class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+          class="flex text-sm bg-gray-800 rounded-full focus:ring-4
+          focus:ring-gray-300 dark:focus:ring-gray-600"
           @click="toggleMenu()"
           aria-expanded="false"
         >
@@ -41,7 +42,8 @@ const links: adminMenuInterface[] = [
         </button>
       </div>
       <div
-        class="z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-sm shadow-sm dark:bg-gray-700 dark:divide-gray-600"
+        class="z-50 my-4 text-base list-none bg-white divide-y
+        divide-gray-100 rounded-sm shadow-sm dark:bg-gray-700 dark:divide-gray-600"
         :class="
           ui.isMenuOpen
             ? 'block absolute -top-4 right-23 m-0 translate-x-[80px] translate-y-[58px]'
@@ -51,7 +53,9 @@ const links: adminMenuInterface[] = [
         </div>
         <ul class="py-1" role="none">
           <li v-for="link in links" :key="link.name">
-            <router-link :to="{ name: link.route}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
+            <router-link :to="{ name: link.route}" class="block px-4 py-2 text-sm text-gray-700
+            hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
+              role="menuitem">
               {{ link.name }}
             </router-link>
           </li>

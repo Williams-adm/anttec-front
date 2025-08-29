@@ -1,4 +1,4 @@
 export interface adminBreadcrumbInterface {
-  name: string
-  route?: string
-}
+  name: string,
+  route?: string,
+};

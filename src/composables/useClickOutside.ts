@@ -9,23 +9,23 @@ export function useClickOutside(
   const handleClick = (event: MouseEvent) => {
     if (elementRef.value && !elementRef.value.contains(event.target as Node)) {
       callback();
-    }
-  }
+    };
+  };
 
   const addEventListener = () => {
-    document.addEventListener('click', handleClick)
-  }
+    document.addEventListener('click', handleClick);
+  };
 
   const removeEventListener = () => {
-    document.removeEventListener('click', handleClick)
-  }
+    document.removeEventListener('click', handleClick);
+  };
 
   watch(isActive, (value) => {
-    if (value) addEventListener()
-    else removeEventListener()
-  })
+    if (value) addEventListener();
+    else removeEventListener();
+  });
 
   onBeforeUnmount(() => {
-    document.removeEventListener('click', handleClick)
-  })
+    document.removeEventListener('click', handleClick);
+  });
 }

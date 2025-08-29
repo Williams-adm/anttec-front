@@ -1,4 +1,4 @@
-import { defineStore } from "pinia"
+import { defineStore } from "pinia";
 import { ref } from "vue";
 
 export const useUIStore = defineStore('ui', () => {
@@ -6,11 +6,11 @@ export const useUIStore = defineStore('ui', () => {
   const isMenuOpen = ref(false);
 
   function toggleSidebar() {
-    isSidebarOpen.value = !isSidebarOpen.value
+    isSidebarOpen.value = !isSidebarOpen.value;
   }
 
   function toggleMenu() {
-    isMenuOpen.value = !isMenuOpen.value
+    isMenuOpen.value = !isMenuOpen.value;
   }
 
   return {

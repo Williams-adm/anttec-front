@@ -2,8 +2,8 @@
 import { useBreadcrumb } from '@/composables/useBreadcrumb';
 
 useBreadcrumb([
-  { name: 'Dashboard'}
-])
+  { name: 'Dashboard' }
+]);
 </script>
 
 <template>

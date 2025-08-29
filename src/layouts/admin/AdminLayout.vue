@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import AdminAsideHeader from '@/layouts/admin/components/AdminAsideHeader.vue'
-import AdminBreadcrumb from '@/layouts/admin/components/AdminBreadcrumb.vue'
-import AdminHeader from '@/layouts/admin/components/AdminHeader.vue'
-import { useBreadcrumbStore } from '@/stores/useBreadcrumbStore'
+import AdminAsideHeader from '@/layouts/admin/components/AdminAsideHeader.vue';
+import AdminBreadcrumb from '@/layouts/admin/components/AdminBreadcrumb.vue';
+import AdminHeader from '@/layouts/admin/components/AdminHeader.vue';
+import { useBreadcrumbStore } from '@/stores/useBreadcrumbStore';
 
-const breadcrumbStore = useBreadcrumbStore()
+const breadcrumbStore = useBreadcrumbStore();
 </script>
 
 <template>

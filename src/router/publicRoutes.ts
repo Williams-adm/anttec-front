@@ -6,6 +6,6 @@ const publicRoutes = [
     name: 'home',
     component: HomeView,
   },
-]
+];
 
-export default publicRoutes
+export default publicRoutes;
