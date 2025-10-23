@@ -1,23 +1,15 @@
-import axios, { type AxiosInstance } from "axios";
 import type { categoriesI, categoryI } from "./interfaces/CategoryInterface";
 import { handleApiError } from "@/utils/handleApiError";
 import type { categoryCreateDTO } from "@/DTOs/admin/category/CategoryCreateDTO";
 import type { categoryUpdateDTO } from "@/DTOs/admin/category/CategoryUpdateDTO";
-
-const urlApi = import.meta.env.VITE_API_URL;
+import httpAPI from "../httpAPI";
 
 class CategoryService {
-  private api: AxiosInstance;
-
-  constructor() {
-    this.api = axios.create({
-      baseURL: `${urlApi}/admin/categories`,
-    });
-  }
+  private api = httpAPI;
 
   async getAll(): Promise<categoriesI> {
     try {
-      const res = await this.api.get('');
+      const res = await this.api.get('/admin/categories');
       return res.data as categoriesI;
     } catch (error) {
       handleApiError(error);
@@ -26,7 +18,7 @@ class CategoryService {
 
   async getById(id: string): Promise<categoryI> {
     try {
-      const res = await this.api.get(`/${id}`);
+      const res = await this.api.get(`/admin/categories/${id}`)
       return res.data.data as categoryI;
     } catch (error) {
       handleApiError(error);
@@ -35,7 +27,7 @@ class CategoryService {
 
   async create(data: categoryCreateDTO): Promise<categoryI> {
     try {
-      const res = await this.api.post('', data);
+      const res = await this.api.post('/admin/categories', data)
       return res.data.data as categoryI;
     } catch (error) {
       handleApiError(error);
@@ -44,7 +36,7 @@ class CategoryService {
 
   async update(data: categoryUpdateDTO, id: string): Promise<categoryI> {
     try {
-      const res = await this.api.patch(`/${id}`, data);
+      const res = await this.api.patch(`/admin/categories/${id}`, data)
       return res.data.data as categoryI;
     } catch (error) {
       handleApiError(error);

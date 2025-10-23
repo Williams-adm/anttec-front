@@ -20,7 +20,7 @@ useBreadcrumb([
 const isLoading = ref(true);
 const serverErrors = ref<Record<string, string[]>>({});
 
-const { meta, handleSubmit, errors, defineField, setErrors  } = useForm({
+const { meta, handleSubmit, errors, defineField, setErrors } = useForm({
   validationSchema: createCategorySchema
 });
 const [name, nameAttrs] = defineField('name');
