@@ -1,4 +1,4 @@
-import { object, string } from 'yup';
+import { object, string } from 'yup'
 
 export const createCategorySchema = object({
   name: string()
@@ -9,4 +9,4 @@ export const createCategorySchema = object({
     .required('El nombre es obligatorio')
     .min(3, 'Debe de contener más de 3 caracteres')
     .max(80, 'Debe contener menos de 80 caracteres'),
-});
+})

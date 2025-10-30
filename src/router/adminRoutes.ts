@@ -1,4 +1,4 @@
-import AdminLayout from "@/layouts/admin/AdminLayout.vue";
+import AdminLayout from '@/layouts/admin/AdminLayout.vue'
 
 const adminRoutes = [
   {
@@ -30,8 +30,18 @@ const adminRoutes = [
           },
         ],
       },
+      {
+        path: 'subcategories',
+        children: [
+          {
+            path: '',
+            name: 'admin.subcategories',
+            component: () => import('@/views/admin/Subcategory/SubcategoryListView.vue')
+          }
+        ]
+      }
     ],
   },
-];
+]
 
-export default adminRoutes;
+export default adminRoutes

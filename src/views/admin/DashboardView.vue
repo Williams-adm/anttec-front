@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { useBreadcrumb } from '@/composables/useBreadcrumb';
+import { useBreadcrumb } from '@/composables/useBreadcrumb'
 
-useBreadcrumb([
-  { name: 'Dashboard' }
-]);
+useBreadcrumb([{ name: 'Dashboard' }])
 </script>
 
 <template>

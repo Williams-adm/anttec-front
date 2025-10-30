@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import CategoryService from '@/services/admin/CategoryService'
-import type { categoriesI } from '@/services/admin/interfaces/CategoryInterface'
-import { computed, onMounted, ref } from 'vue'
-import InfoAlert from '@/components/Admin/InfoAlert.vue'
 import AnimationLoader from '@/components/AnimationLoader.vue'
-import { useBreadcrumb } from '@/composables/useBreadcrumb'
+import BadgeStatus from '@/components/Admin/BadgeStatus.vue'
 import ButtonCreate from '@/components/Admin/ButtonCreate.vue'
-import ToggleSwitch from '@/components/Admin/ToggleSwitch.vue'
 import { handleApiError } from '@/utils/handleApiError'
+import InfoAlert from '@/components/Admin/InfoAlert.vue'
+import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import { useSweetAlert } from '@/composables/useSweetAlert'
 import Swal from 'sweetalert2'
-import BadgeStatus from '@/components/Admin/BadgeStatus.vue'
+import type { subcategoriesI } from '@/services/admin/interfaces/SubcategoryInterface'
+import SubcategoryService from '@/services/admin/SubcategoryService'
+import { computed, onMounted, ref } from 'vue'
+import ToggleSwitch from '@/components/Admin/ToggleSwitch.vue'
 
-useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Categorías' }])
+useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Subcategorías' }])
 
-const categories = ref<categoriesI | null>(null)
+const subcategories = ref<subcategoriesI | null>(null)
 const error = ref<string | null>(null)
-const categoriesList = computed(() => categories.value?.data ?? [])
+const subcategoriesList = computed(() => subcategories.value?.data ?? [])
 const isLoading = ref(true)
 
-const loadCategories = async () => {
+const loadSubcategories = async () => {
   try {
-    categories.value = await CategoryService.getAll()
+    subcategories.value = await SubcategoryService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'
@@ -32,7 +32,7 @@ const loadCategories = async () => {
 }
 
 onMounted(() => {
-  loadCategories()
+  loadSubcategories()
 })
 
 const updateStatus = async (id: number, currentStatus: boolean) => {
@@ -43,9 +43,9 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
       text: 'Actualizando estado',
       icon: 'loading',
     })
-    await CategoryService.update({ status: newStatus }, String(id))
+    await SubcategoryService.update({ status: newStatus }, String(id))
 
-    const category = categoriesList.value.find((c) => c.id === id)
+    const category = subcategoriesList.value.find((c) => c.id === id)
     if (category) {
       category.status = newStatus
     }
@@ -60,7 +60,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
 
 <template>
   <AnimationLoader v-if="isLoading" />
-  <div v-else-if="categoriesList.length != 0">
+  <div v-else-if="subcategoriesList.length != 0">
     <div class="flex justify-end">
       <ButtonCreate route="admin.categories.create" />
     </div>
@@ -72,6 +72,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
           <tr>
             <th scope="col" class="px-6 py-3">#</th>
             <th scope="col" class="px-6 py-3">Nombre</th>
+            <th scope="col" class="px-6 py-3">Categoría</th>
             <th scope="col" class="px-6 py-3">Estado</th>
             <th scope="col" class="px-6 py-3">Acciones</th>
           </tr>
@@ -80,11 +81,11 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
           <tr
             :class="[
               'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900',
-              index != categoriesList.length - 1
+              index != subcategoriesList.length - 1
                 ? 'border-b dark:border-gray-700 border-gray-200'
                 : '',
             ]"
-            v-for="(category, index) in categoriesList"
+            v-for="(category, index) in subcategoriesList"
             :key="index"
           >
             <th
@@ -95,6 +96,9 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
             </th>
             <td class="px-6 py-4">
               {{ category.name }}
+            </td>
+            <td class="px-6 py-4">
+              {{ category.category }}
             </td>
             <td>
               <BadgeStatus :status="category.status" />

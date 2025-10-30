@@ -1,4 +1,4 @@
-export interface categoryUpdateDTO{
-  name?: string,
+export interface categoryUpdateDTO {
+  name?: string
   status?: boolean
 }

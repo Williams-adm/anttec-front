@@ -1,6 +1,6 @@
-import Swal from "sweetalert2";
+import Swal from 'sweetalert2'
 
-type sweetAlertIcon = 'success' | 'error' | 'warning' | 'info' | 'question';
+type sweetAlertIcon = 'success' | 'error' | 'warning' | 'info' | 'question'
 
 interface sweetAlertI {
   title: string
@@ -11,13 +11,7 @@ interface sweetAlertI {
 }
 
 export function useSweetAlert(options: sweetAlertI) {
-  const {
-    title,
-    text,
-    icon,
-    timer = 1500,
-    timerProgressBar = true
-  } = options;
+  const { title, text, icon, timer = 1500, timerProgressBar = true } = options
 
   if (icon == 'loading') {
     Swal.fire({
@@ -26,9 +20,9 @@ export function useSweetAlert(options: sweetAlertI) {
       allowOutsideClick: false,
       showConfirmButton: false,
       didOpen: () => {
-        Swal.showLoading();
-      }
-    });
+        Swal.showLoading()
+      },
+    })
   } else {
     Swal.fire({
       title,

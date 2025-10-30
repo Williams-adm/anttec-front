@@ -1,4 +1,4 @@
 export interface adminMenuInterface {
-  name: string,
-  route: string,
-};
+  name: string
+  route: string
+}

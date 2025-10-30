@@ -1,5 +1,5 @@
-import HomeView from "@/views/HomeView.vue";
-import LoginView from "@/views/auth/login/LoginView.vue";
+import HomeView from '@/views/HomeView.vue'
+import LoginView from '@/views/auth/login/LoginView.vue'
 
 const publicRoutes = [
   {
@@ -12,6 +12,6 @@ const publicRoutes = [
     name: 'login',
     component: LoginView,
   },
-];
+]
 
-export default publicRoutes;
+export default publicRoutes

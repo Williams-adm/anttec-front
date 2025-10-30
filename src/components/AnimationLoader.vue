@@ -6,8 +6,7 @@
       <div class="absolute inset-0 rounded-xl bg-blue-500/20 blur-xl animate-pulse"></div>
       <div class="w-full h-full relative flex items-center justify-center">
         <div
-          class="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-500
-            to-purple-500 animate-spin blur-sm"
+          class="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 animate-spin blur-sm"
         ></div>
         <div
           class="absolute inset-1 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden"

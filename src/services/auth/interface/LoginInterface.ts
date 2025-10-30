@@ -1,8 +1,8 @@
-import type { userI } from "./UserInterface";
+import type { userI } from './UserInterface'
 
 export interface loginI {
-  success: boolean,
-  message: string,
-  token: string,
-  user: userI,
+  success: boolean
+  message: string
+  token: string
+  user: userI
 }

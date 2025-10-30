@@ -1,5 +1,5 @@
-import type { userI } from "@/services/auth/interface/UserInterface";
-import { defineStore } from "pinia";
+import type { userI } from '@/services/auth/interface/UserInterface'
+import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -9,22 +9,22 @@ export const useAuthStore = defineStore('auth', {
 
   actions: {
     setToken(token: string) {
-      this.token = token;
-      localStorage.setItem('access_token', token);
+      this.token = token
+      localStorage.setItem('access_token', token)
     },
 
     setUser(user: userI) {
-      this.user = user;
+      this.user = user
     },
 
     clearToken() {
-      this.token = null;
-      this.user = null;
+      this.token = null
+      this.user = null
       localStorage.removeItem('access_token')
     },
 
     isAuthenticated(): boolean {
-      return !!this.token;
-    }
+      return !!this.token
+    },
   },
 })
