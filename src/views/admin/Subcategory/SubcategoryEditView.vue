@@ -1,21 +1,23 @@
 <script setup lang="ts">
-import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import AnimationLoader from '@/components/AnimationLoader.vue'
+import ButtonSave from '@/components/Admin/ButtonSave.vue'
+import { useBreadcrumb } from '@/composables/useBreadcrumb'
+import { useSweetAlert } from '@/composables/useSweetAlert'
+import type { categoryI } from '@/interfaces/admin/CategoryInterface'
+import type { subcategoryI } from '@/interfaces/admin/SubcategoryInterface'
+import { editSubcategorySchema } from '@/schemas/admin/subcategory/editSubcategoryValidationSchema'
 import CategoryService from '@/services/admin/CategoryService'
+import SubcategoryService from '@/services/admin/SubcategoryService'
+import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { editCategorySchema } from '../../../schemas/admin/category/editCategoryValidationSchema'
-import { useForm } from 'vee-validate'
-import ButtonSave from '@/components/Admin/ButtonSave.vue'
-import { useSweetAlert } from '@/composables/useSweetAlert'
-import type { categoryUpdateDTO } from '@/DTOs/admin/category/CategoryUpdateDTO'
 import Swal from 'sweetalert2'
 import axios from 'axios'
-import type { categoryI } from '@/interfaces/admin/CategoryInterface'
+import type { subcategoryUpdateDTO } from '@/DTOs/admin/subcategory/SubcategoryUpdateDTO'
 
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
-  { name: 'Categorías', route: 'admin.categories' },
+  { name: 'Subcategorías', route: 'admin.subcategories' },
   { name: 'Editar' },
 ])
 
@@ -23,27 +25,48 @@ const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
 const isLoading = ref(true)
-const category = ref<categoryI | null>(null)
 const serverErrors = ref<Record<string, string[]>>({})
 
+const categories = ref<categoryI[] | null>(null)
+const subcategory = ref<subcategoryI | null>(null)
+
 const { meta, handleSubmit, errors, defineField, resetForm, setErrors } = useForm({
-  validationSchema: editCategorySchema,
+  validationSchema: editSubcategorySchema,
 })
 const [name, nameAttrs] = defineField('name')
+const [categoryId, categoryIdAttrs] = defineField('category_id')
 
-const loadCategories = async () => {
+const loadSubcategories = async () => {
   try {
-    category.value = await CategoryService.getById(id)
-    resetForm({ values: { name: category.value.name } })
+    const [subcategoryRes, categoriesRes] = await Promise.all([
+      SubcategoryService.getById(id),
+      CategoryService.getAllList(),
+    ])
+
+    subcategory.value = subcategoryRes
+    categories.value = categoriesRes
+
+    resetForm({
+      values: {
+        name: subcategory.value.name,
+        category_id: subcategory.value.category_id,
+      },
+    })
   } catch (error) {
     console.error(error)
+    useSweetAlert({
+      title: 'Error',
+      text: 'No se pudieron cargar los datos',
+      icon: 'error',
+      timer: 0,
+    })
   } finally {
     isLoading.value = false
   }
 }
 
 onMounted(() => {
-  loadCategories()
+  loadSubcategories()
 })
 
 const onSubmit = handleSubmit(async (values) => {
@@ -54,11 +77,11 @@ const onSubmit = handleSubmit(async (values) => {
       icon: 'loading',
     })
 
-    await CategoryService.update(values as categoryUpdateDTO, id)
+    await SubcategoryService.update(values as subcategoryUpdateDTO, id)
     Swal.close()
     useSweetAlert({
-      title: 'Categoría actualizada',
-      text: 'La categoría ha sido actualizada con éxito',
+      title: 'Subcategoría actualizada',
+      text: 'La subcategoría ha sido actualizada con éxito',
       icon: 'success',
     })
   } catch (err) {
@@ -90,6 +113,23 @@ const onSubmit = handleSubmit(async (values) => {
   >
     <form action="" method="POST" @submit.prevent="onSubmit">
       <div class="mb-4">
+        <label for="category_id" class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
+          Categorias
+        </label>
+        <select
+          v-model="categoryId"
+          v-bind="categoryIdAttrs"
+          id="category_id"
+          class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed focus:outline-none focus:ring-1"
+        >
+          <option disabled value="">Selecciona una categoría</option>
+          <option :value="category.id" v-for="(category, index) in categories" :key="index">
+            {{ category.name }}
+          </option>
+        </select>
+        <span class="text-red-400">{{ errors.category_id }}</span>
+      </div>
+      <div class="mb-4">
         <label for="name" class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
           Nombre
         </label>
@@ -99,7 +139,7 @@ const onSubmit = handleSubmit(async (values) => {
           id="name"
           type="text"
           class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
-          placeholder="Ingrese el nombre de la categoría"
+          placeholder="Ingrese el nombre de la subcategoría"
         />
         <span class="text-red-400">{{ errors.name }}</span>
       </div>

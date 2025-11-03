@@ -1,26 +1,26 @@
 <script setup lang="ts">
-import CategoryService from '@/services/admin/CategoryService'
-import { computed, onMounted, ref } from 'vue'
-import InfoAlert from '@/components/Admin/InfoAlert.vue'
 import AnimationLoader from '@/components/AnimationLoader.vue'
-import { useBreadcrumb } from '@/composables/useBreadcrumb'
-import ButtonCreate from '@/components/Admin/ButtonCreate.vue'
-import ToggleSwitch from '@/components/Admin/ToggleSwitch.vue'
-import { useSweetAlert } from '@/composables/useSweetAlert'
-import Swal from 'sweetalert2'
 import BadgeStatus from '@/components/Admin/BadgeStatus.vue'
-import type { categoriesI } from '@/interfaces/admin/CategoryInterface'
+import ButtonCreate from '@/components/Admin/ButtonCreate.vue'
+import InfoAlert from '@/components/Admin/InfoAlert.vue'
+import ToggleSwitch from '@/components/Admin/ToggleSwitch.vue'
+import { useBreadcrumb } from '@/composables/useBreadcrumb'
+import { useSweetAlert } from '@/composables/useSweetAlert'
+import type { brandsI } from '@/interfaces/admin/BrandInterface'
+import BrandService from '@/services/admin/BrandService'
+import { computed, onMounted, ref } from 'vue'
+import Swal from 'sweetalert2'
 
-useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Categorías' }])
+useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Marcas' }])
 
-const categories = ref<categoriesI | null>(null)
+const brands = ref<brandsI | null>(null)
 const error = ref<string | null>(null)
-const categoriesList = computed(() => categories.value?.data ?? [])
+const brandsList = computed(() => brands.value?.data ?? [])
 const isLoading = ref(true)
 
-const loadCategories = async () => {
+const loadBrands = async () => {
   try {
-    categories.value = await CategoryService.getAll()
+    brands.value = await BrandService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'
@@ -31,7 +31,7 @@ const loadCategories = async () => {
 }
 
 onMounted(() => {
-  loadCategories()
+  loadBrands()
 })
 
 const updateStatus = async (id: number, currentStatus: boolean) => {
@@ -42,9 +42,9 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
       text: 'Actualizando estado',
       icon: 'loading',
     })
-    await CategoryService.update({ status: newStatus }, String(id))
+    await BrandService.update({ status: newStatus }, String(id))
 
-    const category = categoriesList.value.find((c) => c.id === id)
+    const category = brandsList.value.find((c) => c.id === id)
     if (category) {
       category.status = newStatus
     }
@@ -59,9 +59,9 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
 
 <template>
   <AnimationLoader v-if="isLoading" />
-  <div v-else-if="categoriesList.length != 0">
+  <div v-else-if="brandsList.length != 0">
     <div class="flex justify-end">
-      <ButtonCreate route="admin.categories.create" />
+      <ButtonCreate route="admin.brands.create" />
     </div>
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
       <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -79,11 +79,9 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
           <tr
             :class="[
               'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900',
-              index != categoriesList.length - 1
-                ? 'border-b dark:border-gray-700 border-gray-200'
-                : '',
+              index != brandsList.length - 1 ? 'border-b dark:border-gray-700 border-gray-200' : '',
             ]"
-            v-for="(category, index) in categoriesList"
+            v-for="(category, index) in brandsList"
             :key="index"
           >
             <th
@@ -100,7 +98,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
             </td>
             <td class="px-6 py-4 text-right">
               <div class="flex justify-around">
-                <router-link :to="{ name: 'admin.categories.edit', params: { id: category.id } }">
+                <router-link :to="{ name: 'admin.brands.edit', params: { id: category.id } }">
                   <font-awesome-icon
                     icon="fa-solid fa-pen-to-square"
                     size="xl"

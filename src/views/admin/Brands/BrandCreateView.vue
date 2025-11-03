@@ -1,52 +1,36 @@
 <script setup lang="ts">
-import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import AnimationLoader from '@/components/AnimationLoader.vue'
-import CategoryService from '@/services/admin/CategoryService'
-import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { editCategorySchema } from '../../../schemas/admin/category/editCategoryValidationSchema'
-import { useForm } from 'vee-validate'
 import ButtonSave from '@/components/Admin/ButtonSave.vue'
+import { useBreadcrumb } from '@/composables/useBreadcrumb'
+import { createBrandSchema } from '@/schemas/admin/brand/createBrandValidationSchema'
+import { useForm } from 'vee-validate'
+import { onMounted, ref } from 'vue'
 import { useSweetAlert } from '@/composables/useSweetAlert'
-import type { categoryUpdateDTO } from '@/DTOs/admin/category/CategoryUpdateDTO'
 import Swal from 'sweetalert2'
+import BrandService from '@/services/admin/BrandService'
+import type { brandCreateDTO } from '@/DTOs/admin/brand/BrandCreateDTO'
 import axios from 'axios'
-import type { categoryI } from '@/interfaces/admin/CategoryInterface'
 
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
-  { name: 'Categorías', route: 'admin.categories' },
-  { name: 'Editar' },
+  { name: 'Marcas', route: 'admin.brands' },
+  { name: 'Crear' },
 ])
 
-const route = useRoute()
-const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
-
 const isLoading = ref(true)
-const category = ref<categoryI | null>(null)
 const serverErrors = ref<Record<string, string[]>>({})
 
-const { meta, handleSubmit, errors, defineField, resetForm, setErrors } = useForm({
-  validationSchema: editCategorySchema,
+const { meta, handleSubmit, errors, defineField, setErrors } = useForm({
+  validationSchema: createBrandSchema,
 })
 const [name, nameAttrs] = defineField('name')
 
-const loadCategories = async () => {
-  try {
-    category.value = await CategoryService.getById(id)
-    resetForm({ values: { name: category.value.name } })
-  } catch (error) {
-    console.error(error)
-  } finally {
-    isLoading.value = false
-  }
-}
-
-onMounted(() => {
-  loadCategories()
+onMounted(async () => {
+  await new Promise((resolve) => setTimeout(resolve, 200))
+  isLoading.value = false
 })
 
-const onSubmit = handleSubmit(async (values) => {
+const onSubmit = handleSubmit(async (values, { resetForm }) => {
   try {
     useSweetAlert({
       title: 'Enviando...',
@@ -54,13 +38,15 @@ const onSubmit = handleSubmit(async (values) => {
       icon: 'loading',
     })
 
-    await CategoryService.update(values as categoryUpdateDTO, id)
+    await BrandService.create(values as brandCreateDTO)
     Swal.close()
+
     useSweetAlert({
-      title: 'Categoría actualizada',
-      text: 'La categoría ha sido actualizada con éxito',
+      title: 'Marca creada',
+      text: 'La marca ha sido creada con éxito',
       icon: 'success',
     })
+    resetForm()
   } catch (err) {
     Swal.close()
     if (axios.isAxiosError(err) && err.response?.status === 422) {
@@ -88,7 +74,7 @@ const onSubmit = handleSubmit(async (values) => {
     v-else
     class="block p-5 border rounded-lg shadow-sm bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700"
   >
-    <form action="" method="POST" @submit.prevent="onSubmit">
+    <form action="" method="POST" @submit="onSubmit">
       <div class="mb-4">
         <label for="name" class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
           Nombre
@@ -99,12 +85,12 @@ const onSubmit = handleSubmit(async (values) => {
           id="name"
           type="text"
           class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
-          placeholder="Ingrese el nombre de la categoría"
+          placeholder="Ingrese el nombre de la marca"
         />
         <span class="text-red-400">{{ errors.name }}</span>
       </div>
       <div class="flex justify-end">
-        <ButtonSave name="Actualizar" :disabled="!meta.valid" />
+        <ButtonSave name="Guardar" :disabled="!meta.valid" />
       </div>
     </form>
   </div>

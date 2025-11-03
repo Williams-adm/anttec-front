@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import AnimationLoader from '@/components/AnimationLoader.vue'
-import CategoryService from '@/services/admin/CategoryService'
+import ButtonSave from '@/components/Admin/ButtonSave.vue'
+import { useBreadcrumb } from '@/composables/useBreadcrumb'
+import { useSweetAlert } from '@/composables/useSweetAlert'
+import type { brandUpdateDTO } from '@/DTOs/admin/brand/BrandUpdateDTO'
+import type { brandI } from '@/interfaces/admin/BrandInterface'
+import { editBrandSchema } from '@/schemas/admin/brand/editBrandValidationSchema'
+import BrandService from '@/services/admin/BrandService'
+import axios from 'axios'
+import Swal from 'sweetalert2'
+import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { editCategorySchema } from '../../../schemas/admin/category/editCategoryValidationSchema'
-import { useForm } from 'vee-validate'
-import ButtonSave from '@/components/Admin/ButtonSave.vue'
-import { useSweetAlert } from '@/composables/useSweetAlert'
-import type { categoryUpdateDTO } from '@/DTOs/admin/category/CategoryUpdateDTO'
-import Swal from 'sweetalert2'
-import axios from 'axios'
-import type { categoryI } from '@/interfaces/admin/CategoryInterface'
 
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
-  { name: 'Categorías', route: 'admin.categories' },
+  { name: 'Marcas', route: 'admin.brands' },
   { name: 'Editar' },
 ])
 
@@ -23,18 +23,18 @@ const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
 const isLoading = ref(true)
-const category = ref<categoryI | null>(null)
+const brand = ref<brandI | null>(null)
 const serverErrors = ref<Record<string, string[]>>({})
 
 const { meta, handleSubmit, errors, defineField, resetForm, setErrors } = useForm({
-  validationSchema: editCategorySchema,
+  validationSchema: editBrandSchema,
 })
 const [name, nameAttrs] = defineField('name')
 
-const loadCategories = async () => {
+const loadBrands = async () => {
   try {
-    category.value = await CategoryService.getById(id)
-    resetForm({ values: { name: category.value.name } })
+    brand.value = await BrandService.getById(id)
+    resetForm({ values: { name: brand.value.name } })
   } catch (error) {
     console.error(error)
   } finally {
@@ -43,7 +43,7 @@ const loadCategories = async () => {
 }
 
 onMounted(() => {
-  loadCategories()
+  loadBrands()
 })
 
 const onSubmit = handleSubmit(async (values) => {
@@ -54,7 +54,7 @@ const onSubmit = handleSubmit(async (values) => {
       icon: 'loading',
     })
 
-    await CategoryService.update(values as categoryUpdateDTO, id)
+    await BrandService.update(values as brandUpdateDTO, id)
     Swal.close()
     useSweetAlert({
       title: 'Categoría actualizada',

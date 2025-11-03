@@ -1,4 +1,4 @@
-import type { baseResponseI } from "./BaseResponseInterface"
+import type { baseResponseI } from './BaseResponseInterface'
 
 export interface paginationLinksI {
   first: string

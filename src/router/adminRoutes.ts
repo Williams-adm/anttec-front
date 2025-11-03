@@ -36,10 +36,40 @@ const adminRoutes = [
           {
             path: '',
             name: 'admin.subcategories',
-            component: () => import('@/views/admin/Subcategory/SubcategoryListView.vue')
-          }
-        ]
-      }
+            component: () => import('@/views/admin/Subcategory/SubcategoryListView.vue'),
+          },
+          {
+            path: 'create',
+            name: 'admin.subcategories.create',
+            component: () => import('@/views/admin/Subcategory/SubcategoryCreateView.vue'),
+          },
+          {
+            path: 'edit/:id',
+            name: 'admin.subcategories.edit',
+            component: () => import('@/views/admin/Subcategory/SubcategoryEditView.vue'),
+          },
+        ],
+      },
+      {
+        path: 'brands',
+        children: [
+          {
+            path: '',
+            name: 'admin.brands',
+            component: () => import('@/views/admin/Brands/BrandListView.vue'),
+          },
+          {
+            path: 'create',
+            name: 'admin.brands.create',
+            component: () => import('@/views/admin/Brands/BrandCreateView.vue'),
+          },
+          {
+            path: 'edit/:id',
+            name: 'admin.brands.edit',
+            component: () => import('@/views/admin/Brands/BrandEditView.vue'),
+          },
+        ],
+      },
     ],
   },
 ]

@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import AnimationLoader from '@/components/AnimationLoader.vue'
 import BadgeStatus from '@/components/Admin/BadgeStatus.vue'
 import ButtonCreate from '@/components/Admin/ButtonCreate.vue'
-import { handleApiError } from '@/utils/handleApiError'
 import InfoAlert from '@/components/Admin/InfoAlert.vue'
+import ToggleSwitch from '@/components/Admin/ToggleSwitch.vue'
+import AnimationLoader from '@/components/AnimationLoader.vue'
 import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import { useSweetAlert } from '@/composables/useSweetAlert'
-import Swal from 'sweetalert2'
-import type { subcategoriesI } from '@/services/admin/interfaces/SubcategoryInterface'
+import type { subcategoriesI } from '@/interfaces/admin/SubcategoryInterface'
 import SubcategoryService from '@/services/admin/SubcategoryService'
+import Swal from 'sweetalert2'
 import { computed, onMounted, ref } from 'vue'
-import ToggleSwitch from '@/components/Admin/ToggleSwitch.vue'
 
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Subcategorías' }])
 
@@ -53,7 +52,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
     Swal.close()
   } catch (error) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
-    handleApiError(error)
+    console.log(error)
   }
 }
 </script>
@@ -62,7 +61,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
   <AnimationLoader v-if="isLoading" />
   <div v-else-if="subcategoriesList.length != 0">
     <div class="flex justify-end">
-      <ButtonCreate route="admin.categories.create" />
+      <ButtonCreate route="admin.subcategories.create" />
     </div>
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
       <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -85,7 +84,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
                 ? 'border-b dark:border-gray-700 border-gray-200'
                 : '',
             ]"
-            v-for="(category, index) in subcategoriesList"
+            v-for="(subcategory, index) in subcategoriesList"
             :key="index"
           >
             <th
@@ -95,17 +94,19 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
               {{ index + 1 }}
             </th>
             <td class="px-6 py-4">
-              {{ category.name }}
+              {{ subcategory.name }}
             </td>
             <td class="px-6 py-4">
-              {{ category.category }}
+              {{ subcategory.category.name }}
             </td>
             <td>
-              <BadgeStatus :status="category.status" />
+              <BadgeStatus :status="subcategory.status" />
             </td>
             <td class="px-6 py-4 text-right">
               <div class="flex justify-around">
-                <router-link :to="{ name: 'admin.categories.edit', params: { id: category.id } }">
+                <router-link
+                  :to="{ name: 'admin.subcategories.edit', params: { id: subcategory.id } }"
+                >
                   <font-awesome-icon
                     icon="fa-solid fa-pen-to-square"
                     size="xl"
@@ -113,8 +114,8 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
                   />
                 </router-link>
                 <ToggleSwitch
-                  :status="category.status"
-                  @update:status="() => updateStatus(category.id, category.status)"
+                  :status="subcategory.status"
+                  @update:status="() => updateStatus(subcategory.id, subcategory.status)"
                 />
               </div>
             </td>

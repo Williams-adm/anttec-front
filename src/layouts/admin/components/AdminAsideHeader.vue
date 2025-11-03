@@ -12,6 +12,11 @@ const links: adminAsideInterface[] = [
     route: 'admin.dashboard',
   },
   {
+    name: 'Marcas',
+    icon: 'fa-solid fa-list',
+    route: 'admin.brands',
+  },
+  {
     name: 'Categorías',
     icon: 'fa-solid fa-layer-group',
     route: 'admin.categories',

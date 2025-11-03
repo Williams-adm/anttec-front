@@ -1,4 +1,5 @@
 export interface adminMenuInterface {
   name: string
-  route: string
+  route?: string
+  action?: string
 }

@@ -10,7 +10,7 @@ import Swal from 'sweetalert2'
 import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { loginSchema } from './schema/loginValidationSchema'
+import { loginSchema } from '../../../schemas/auth/loginValidationSchema'
 
 const router = useRouter()
 
@@ -26,8 +26,8 @@ const [password, passwordAttrs] = defineField('password')
 const onSubmit = handleSubmit(async (values) => {
   try {
     useSweetAlert({
-      title: 'Enviando...',
-      text: 'Procesando la solicitud',
+      title: 'Iniciando sesión',
+      text: 'Espere un momento',
       icon: 'loading',
     })
 

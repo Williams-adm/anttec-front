@@ -1,9 +1,10 @@
 import type { loginDTO } from '@/DTOs/auth/LoginDTO'
+import { useAuthStore } from '@/stores/useAuthStore'
+import { handleApiError } from '@/utils/handleApiError'
 import type { AxiosInstance } from 'axios'
 import axios from 'axios'
-import type { loginI } from './interface/LoginInterface'
-import { handleApiError } from '@/utils/handleApiError'
-import { useAuthStore } from '@/stores/useAuthStore'
+import type { loginI } from '../../interfaces/auth/LoginInterface'
+import type { logoutI } from '@/interfaces/auth/LogoutInterface'
 
 const urlApi = import.meta.env.VITE_API_URL
 
@@ -18,14 +19,41 @@ class AuthService {
 
   async login(data: loginDTO): Promise<loginI> {
     try {
-      const res = await this.api.post('/login', data)
+      const res = await this.api.post<loginI>('/login', data, {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      })
       const token = res.data.token
 
       const authStore = useAuthStore()
       authStore.setToken(token)
       authStore.setUser(res.data.user)
 
-      return res.data as loginI
+      return res.data
+    } catch (error) {
+      handleApiError(error)
+    }
+  }
+
+  async logout(): Promise<logoutI> {
+    const authStore = useAuthStore()
+    try {
+      const res = await this.api.post<logoutI>(
+        '/logout',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${authStore.token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        },
+      )
+      authStore.clear()
+      console.log(res.data.message)
+      return res.data
     } catch (error) {
       handleApiError(error)
     }

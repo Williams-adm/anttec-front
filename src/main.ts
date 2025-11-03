@@ -18,6 +18,7 @@ import {
   faAngleRight,
   faCircleInfo,
   faPenToSquare,
+  faList,
 } from '@fortawesome/free-solid-svg-icons'
 library.add(
   faBarsStaggered,
@@ -27,6 +28,7 @@ library.add(
   faAngleRight,
   faCircleInfo,
   faPenToSquare,
+  faList,
 )
 
 const app = createApp(App)

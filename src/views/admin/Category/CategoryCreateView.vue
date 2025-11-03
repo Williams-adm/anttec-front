@@ -2,7 +2,7 @@
 import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import AnimationLoader from '@/components/AnimationLoader.vue'
 import ButtonSave from '@/components/Admin/ButtonSave.vue'
-import { createCategorySchema } from './schemas/createValidationSchema'
+import { createCategorySchema } from '../../../schemas/admin/category/createCategoryValidationSchema'
 import CategoryService from '@/services/admin/CategoryService'
 import type { categoryCreateDTO } from '@/DTOs/admin/category/CategoryCreateDTO'
 import { onMounted, ref } from 'vue'
