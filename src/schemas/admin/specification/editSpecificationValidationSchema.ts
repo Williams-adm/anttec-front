@@ -1,13 +1,13 @@
 import { boolean, object, string } from 'yup'
 
-export const editBrandSchema = object({
+export const editSpecificationSchema = object({
   name: string()
     .optional()
-    .matches(/^[A-Za-záéíóúÁÉÍÓÚñÑ\s-]+$/, {
+    .matches(/^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$/, {
       message: 'El nombre solo puede contener letras y espacios',
       excludeEmptyString: true,
     })
-    .min(2, 'Debe de contener más de 3 caracteres')
-    .max(80, 'Debe contener menos de 80 caracteres'),
+    .min(3, 'Debe de contener más de 3 caracteres')
+    .max(100, 'Debe contener menos de 100 caracteres'),
   status: boolean().optional(),
 })

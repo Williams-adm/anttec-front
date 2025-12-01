@@ -30,6 +30,12 @@ class BrandService {
     console.log(res.data.message)
     return res.data.data
   }
+
+  async getAllList(): Promise<brandI[]> {
+    const res = await this.api.get<ApiListResponseI<brandI[]>>('/admin/brands/list')
+    console.log(res.data.message)
+    return res.data.data
+  }
 }
 
 export default new BrandService()

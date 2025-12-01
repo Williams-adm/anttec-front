@@ -19,74 +19,74 @@ useBreadcrumb([
   { name: 'Crear' },
 ])
 
-const categories = ref<categoryI[] | null>(null)
-const error = ref<string | null>(null)
+  const categories = ref<categoryI[] | null>(null)
+  const error = ref<string | null>(null)
 
-const isLoading = ref(true)
-const serverErrors = ref<Record<string, string[]>>({})
+  const isLoading = ref(true)
+  const serverErrors = ref<Record<string, string[]>>({})
 
-const loadSubcategories = async () => {
-  try {
-    categories.value = await CategoryService.getAllList()
-  } catch (err) {
-    useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
-    error.value = 'No se pudieron cargar las categorías.'
-    console.error(err)
-  } finally {
-    isLoading.value = false
-  }
-}
-
-const { meta, handleSubmit, errors, defineField, setErrors } = useForm({
-  validationSchema: createSubcategorySchema,
-  initialValues: {
-    category_id: '',
-    name: '',
-  },
-})
-const [name, nameAttrs] = defineField('name')
-const [categoryId, categoryIdAttrs] = defineField('category_id')
-
-onMounted(async () => {
-  loadSubcategories()
-})
-
-const onSubmit = handleSubmit(async (values, { resetForm }) => {
-  try {
-    useSweetAlert({
-      title: 'Enviando...',
-      text: 'Procesando el formulario',
-      icon: 'loading',
-    })
-
-    await SubcategoryService.create(values as subcategoryCreateDTO)
-    Swal.close()
-
-    useSweetAlert({
-      title: 'Subcategoría creada',
-      text: 'La subcategoría ha sido creada con éxito',
-      icon: 'success',
-    })
-    resetForm()
-  } catch (err) {
-    Swal.close()
-    if (axios.isAxiosError(err) && err.response?.status === 422) {
-      const validationErrors = err.response.data.errors
-      serverErrors.value = validationErrors
-      const veeValidateErrors: Record<string, string> = {}
-      Object.keys(validationErrors).forEach((field) => {
-        veeValidateErrors[field] = validationErrors[field][0]
-      })
-      setErrors(veeValidateErrors)
+  const loadSubcategories = async () => {
+    try {
+      categories.value = await CategoryService.getAllList()
+    } catch (err) {
+      useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
+      error.value = 'No se pudieron cargar las categorías.'
+      console.error(err)
+    } finally {
+      isLoading.value = false
     }
-    useSweetAlert({
-      title: 'Algo salió mal',
-      text: 'Verifica los datos e intenta de nuevo',
-      icon: 'error',
-      timer: 0,
-    })
   }
-})
+
+  const { meta, handleSubmit, errors, defineField, setErrors } = useForm({
+    validationSchema: createSubcategorySchema,
+    initialValues: {
+      category_id: '',
+      name: '',
+    },
+  })
+  const [name, nameAttrs] = defineField('name')
+  const [categoryId, categoryIdAttrs] = defineField('category_id')
+
+  onMounted(async () => {
+    loadSubcategories()
+  })
+
+  const onSubmit = handleSubmit(async (values, { resetForm }) => {
+    try {
+      useSweetAlert({
+        title: 'Enviando...',
+        text: 'Procesando el formulario',
+        icon: 'loading',
+      })
+
+      await SubcategoryService.create(values as subcategoryCreateDTO)
+      Swal.close()
+
+      useSweetAlert({
+        title: 'Subcategoría creada',
+        text: 'La subcategoría ha sido creada con éxito',
+        icon: 'success',
+      })
+      resetForm()
+    } catch (err) {
+      Swal.close()
+      if (axios.isAxiosError(err) && err.response?.status === 422) {
+        const validationErrors = err.response.data.errors
+        serverErrors.value = validationErrors
+        const veeValidateErrors: Record<string, string> = {}
+        Object.keys(validationErrors).forEach((field) => {
+          veeValidateErrors[field] = validationErrors[field][0]
+        })
+        setErrors(veeValidateErrors)
+      }
+      useSweetAlert({
+        title: 'Algo salió mal',
+        text: 'Verifica los datos e intenta de nuevo',
+        icon: 'error',
+        timer: 0,
+      })
+    }
+  })
 </script>
 
 <template>

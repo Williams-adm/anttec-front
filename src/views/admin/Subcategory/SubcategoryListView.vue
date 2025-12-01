@@ -58,11 +58,11 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
 </script>
 
 <template>
+  <div class="flex justify-end">
+    <ButtonCreate route="admin.subcategories.create" />
+  </div>
   <AnimationLoader v-if="isLoading" />
   <div v-else-if="subcategoriesList.length != 0">
-    <div class="flex justify-end">
-      <ButtonCreate route="admin.subcategories.create" />
-    </div>
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
       <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
         <thead

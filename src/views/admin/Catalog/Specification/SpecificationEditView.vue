@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import AnimationLoader from '@/components/AnimationLoader.vue'
 import ButtonSave from '@/components/Admin/ButtonSave.vue'
+import AnimationLoader from '@/components/AnimationLoader.vue'
 import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import { useSweetAlert } from '@/composables/useSweetAlert'
-import type { brandUpdateDTO } from '@/DTOs/admin/brand/BrandUpdateDTO'
-import type { brandI } from '@/interfaces/admin/BrandInterface'
-import { editBrandSchema } from '@/schemas/admin/brand/editBrandValidationSchema'
-import BrandService from '@/services/admin/BrandService'
+import type { specificationUpdateDTO } from '@/DTOs/admin/specification/SpecificationUpdateDTO'
+import type { SpecificationI } from '@/interfaces/admin/SpecificationInterface'
+import { editSpecificationSchema } from '@/schemas/admin/specification/editSpecificationValidationSchema'
+import SpecificationService from '@/services/admin/SpecificationService'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import { useForm } from 'vee-validate'
@@ -15,7 +15,7 @@ import { useRoute } from 'vue-router'
 
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
-  { name: 'Marcas', route: 'admin.brands' },
+  { name: 'Especificaciones', route: 'admin.catalog.specifications' },
   { name: 'Editar' },
 ])
 
@@ -23,18 +23,18 @@ const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
 const isLoading = ref(true)
-const brand = ref<brandI | null>(null)
+const specification = ref<SpecificationI | null>(null)
 const serverErrors = ref<Record<string, string[]>>({})
 
 const { meta, handleSubmit, errors, defineField, resetForm, setErrors } = useForm({
-  validationSchema: editBrandSchema,
+  validationSchema: editSpecificationSchema,
 })
 const [name, nameAttrs] = defineField('name')
 
-const loadBrands = async () => {
+const loadSpecification = async () => {
   try {
-    brand.value = await BrandService.getById(id)
-    resetForm({ values: { name: brand.value.name } })
+    specification.value = await SpecificationService.getById(id)
+    resetForm({ values: { name: specification.value.name } })
   } catch (error) {
     console.error(error)
   } finally {
@@ -43,7 +43,7 @@ const loadBrands = async () => {
 }
 
 onMounted(() => {
-  loadBrands()
+  loadSpecification()
 })
 
 const onSubmit = handleSubmit(async (values) => {
@@ -54,11 +54,11 @@ const onSubmit = handleSubmit(async (values) => {
       icon: 'loading',
     })
 
-    await BrandService.update(values as brandUpdateDTO, id)
+    await SpecificationService.update(values as specificationUpdateDTO, id)
     Swal.close()
     useSweetAlert({
-      title: 'Categoría actualizada',
-      text: 'La categoría ha sido actualizada con éxito',
+      title: 'Especificación actualizada',
+      text: 'La especificación ha sido actualizada con éxito',
       icon: 'success',
     })
   } catch (err) {
@@ -99,7 +99,7 @@ const onSubmit = handleSubmit(async (values) => {
           id="name"
           type="text"
           class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
-          placeholder="Ingrese el nombre de la categoría"
+          placeholder="Ingrese el nombre de la especificación"
         />
         <span class="text-red-400">{{ errors.name }}</span>
       </div>

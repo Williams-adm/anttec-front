@@ -56,17 +56,55 @@ const adminRoutes = [
           {
             path: '',
             name: 'admin.brands',
-            component: () => import('@/views/admin/Brands/BrandListView.vue'),
+            component: () => import('@/views/admin/Brand/BrandListView.vue'),
           },
           {
             path: 'create',
             name: 'admin.brands.create',
-            component: () => import('@/views/admin/Brands/BrandCreateView.vue'),
+            component: () => import('@/views/admin/Brand/BrandCreateView.vue'),
           },
           {
             path: 'edit/:id',
             name: 'admin.brands.edit',
-            component: () => import('@/views/admin/Brands/BrandEditView.vue'),
+            component: () => import('@/views/admin/Brand/BrandEditView.vue'),
+          },
+        ],
+      },
+      {
+        path: 'catalog/products',
+        children: [
+          {
+            path: '',
+            name: 'admin.catalog.products',
+            component: () => import('@/views/admin/Catalog/Product/ProductListView.vue'),
+          },
+          {
+            path: 'create',
+            name: 'admin.catalog.products.create',
+            component: () => import('@/views/admin/Catalog/Product/ProductCreateView.vue'),
+          },
+        ],
+      },
+      {
+        path: 'catalog/specifications',
+        children: [
+          {
+            path: '',
+            name: 'admin.catalog.specifications',
+            component: () =>
+              import('@/views/admin/Catalog/Specification/SpecificationListView.vue'),
+          },
+          {
+            path: 'create',
+            name: 'admin.catalog.specifications.create',
+            component: () =>
+              import('@/views/admin/Catalog/Specification/SpecificationCreateView.vue'),
+          },
+          {
+            path: 'edit/:id',
+            name: 'admin.catalog.specifications.edit',
+            component: () =>
+              import('@/views/admin/Catalog/Specification/SpecificationEditView.vue'),
           },
         ],
       },
