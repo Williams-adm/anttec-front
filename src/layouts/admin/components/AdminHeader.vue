@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import logoDark from '@/assets/img/logo-dark.png'
 import logo from '@/assets/img/logo.png'
 import { useClickOutside } from '@/composables/useClickOutside'
 import AdminMenu from '@/layouts/admin/components/AdminMenu.vue'
@@ -35,7 +36,10 @@ useClickOutside(
             <font-awesome-icon icon="fa-solid fa-bars-staggered" size="xl" />
           </button>
           <router-link :to="{ name: 'admin.dashboard' }" class="flex ms-2 md:me-24">
-            <img :src="logo" class="h-10 me-3" alt="Anttec Logo" />
+            <!-- Imagen para modo claro -->
+            <img class="h-10 me-3 block dark:hidden" :src="logoDark" alt="Logo Light" />
+            <!-- Imagen para modo oscuro -->
+            <img class="h-10 me-3 hidden dark:block" :src="logo" alt="Logo Dark" />
           </router-link>
         </div>
         <AdminMenu />

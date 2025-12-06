@@ -83,6 +83,16 @@ const adminRoutes = [
             name: 'admin.catalog.products.create',
             component: () => import('@/views/admin/Catalog/Product/ProductCreateView.vue'),
           },
+          {
+            path: 'show/:id',
+            name: 'admin.catalog.products.show',
+            component: () => import('@/views/admin/Catalog/Product/ProductShowView.vue'),
+          },
+          {
+            path: 'edit/:id',
+            name: 'admin.catalog.products.edit',
+            component: () => import('@/views/admin/Catalog/Product/ProductEditView.vue'),
+          },
         ],
       },
       {

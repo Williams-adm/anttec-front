@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useBreadcrumb } from '@/composables/useBreadcrumb';
 import { useSweetAlert } from '@/composables/useSweetAlert';
-import type { ProductsI } from '@/interfaces/admin/ProductInterface';
 import ProductService from '@/services/admin/ProductService';
 import { computed, onMounted, ref } from 'vue';
 import InfoAlert from '@/components/Admin/InfoAlert.vue'
@@ -10,6 +9,7 @@ import ButtonCreate from '@/components/Admin/ButtonCreate.vue'
 import ToggleSwitch from '@/components/Admin/ToggleSwitch.vue'
 import Swal from 'sweetalert2'
 import BadgeStatus from '@/components/Admin/BadgeStatus.vue'
+import type { ProductsI } from '@/interfaces/admin/product/ProductInterface';
 
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Productos' }])
 
@@ -42,11 +42,11 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
       text: 'Actualizando estado',
       icon: 'loading',
     })
-    await CategoryService.update({ status: newStatus }, String(id))
+    await ProductService.update({ status: newStatus }, String(id))
 
-    const category = categoriesList.value.find((c) => c.id === id)
-    if (category) {
-      category.status = newStatus
+    const product = productsList.value.find((c) => c.id === id)
+    if (product) {
+      product.status = newStatus
     }
 
     Swal.close()
@@ -86,7 +86,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
                 ? 'border-b dark:border-gray-700 border-gray-200'
                 : '',
             ]"
-            v-for="(category, index) in productsList"
+            v-for="(product, index) in productsList"
             :key="index"
           >
             <th
@@ -96,23 +96,30 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
               {{ index + 1 }}
             </th>
             <td class="px-6 py-4">
-              {{ category.name }}
+              {{ product.name }}
             </td>
             <td class="px-6 py-4">
-              {{ category.model }}
+              {{ product.model }}
             </td>
             <td class="px-6 py-4">
-              {{ category.subcategory }}
+              {{ product.subcategory }}
             </td>
             <td class="px-6 py-4">
-              {{ category.brand }}
+              {{ product.brand }}
             </td>
             <td>
-              <BadgeStatus :status="category.status" />
+              <BadgeStatus :status="product.status" />
             </td>
             <td class="px-6 py-4 text-right">
               <div class="flex justify-around">
-                <router-link :to="{ name: 'admin.categories.edit', params: { id: category.id } }">
+                <router-link :to="{ name: 'admin.catalog.products.show', params: { id: product.id } }">
+                  <font-awesome-icon
+                    icon="fa-solid fa-eye"
+                    size="xl"
+                    class="text-green-400"
+                  />
+                </router-link>
+                <router-link :to="{ name: 'admin.catalog.products.edit', params: { id: product.id } }">
                   <font-awesome-icon
                     icon="fa-solid fa-pen-to-square"
                     size="xl"
@@ -120,8 +127,8 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
                   />
                 </router-link>
                 <ToggleSwitch
-                  :status="category.status"
-                  @update:status="() => updateStatus(category.id, category.status)"
+                  :status="product.status"
+                  @update:status="() => updateStatus(product.id, product.status)"
                 />
               </div>
             </td>

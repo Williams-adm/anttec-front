@@ -1,8 +1,8 @@
-import type { paginatedResponseI } from "./PaginationInterface"
+import type { paginatedResponseI } from './base/PaginationInterface'
 
 export interface SpecificationI {
-  id: number,
-  name: string,
+  id: number
+  name: string
   status: boolean
 }
 

@@ -1,8 +1,8 @@
 import type { subcategoryCreateDTO } from '@/DTOs/admin/subcategory/SubcategoryCreateDTO'
 import type { subcategoryUpdateDTO } from '@/DTOs/admin/subcategory/SubcategoryUpdateDTO'
-import type { ApiListResponseI } from '@/interfaces/admin/ApiListResponseInterface'
 import type { subcategoriesI, subcategoryI } from '../../interfaces/admin/SubcategoryInterface'
 import httpAPI from '../httpAPI'
+import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
 
 class SubcategoryService {
   private api = httpAPI

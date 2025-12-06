@@ -3,6 +3,7 @@ import { boolean, number, object, string } from 'yup'
 export const editSubcategorySchema = object({
   name: string()
     .optional()
+    .required('El nombre es obligatorio')
     .matches(/^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$/, {
       message: 'El nombre solo puede contener letras y espacios',
       excludeEmptyString: true,

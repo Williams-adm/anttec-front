@@ -1,4 +1,5 @@
 export interface ProductSpecificationI {
-  specification_id: string
+  id: string
+  name: string
   value: string
 }

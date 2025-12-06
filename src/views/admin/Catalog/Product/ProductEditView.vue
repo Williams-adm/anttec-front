@@ -3,11 +3,12 @@ import ButtonSave from '@/components/Admin/ButtonSave.vue'
 import AnimationLoader from '@/components/AnimationLoader.vue'
 import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import { useSweetAlert } from '@/composables/useSweetAlert'
-import type { productCreateDTO } from '@/DTOs/admin/product/ProductCreateDTO'
+import type { productUpdateDTO } from '@/DTOs/admin/product/ProductUpdateDTO'
 import type { brandI } from '@/interfaces/admin/BrandInterface'
 import type { categoryI, categorySubI } from '@/interfaces/admin/CategoryInterface'
+import type { ProductExtendI } from '@/interfaces/admin/product/ProductInterface'
 import type { SpecificationI } from '@/interfaces/admin/SpecificationInterface'
-import { createProductSchema } from '@/schemas/admin/product/createProductValidationSchema'
+import { editProductSchema } from '@/schemas/admin/product/editProductValidationSchema'
 import BrandService from '@/services/admin/BrandService'
 import CategoryService from '@/services/admin/CategoryService'
 import ProductService from '@/services/admin/ProductService'
@@ -15,49 +16,29 @@ import SpecificationService from '@/services/admin/SpecificationService'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import { Field, FieldArray, useForm } from 'vee-validate'
-import { onMounted, ref, watch } from 'vue'
+import { nextTick, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Productos', route: 'admin.catalog.products' },
-  { name: 'Crear' },
+  { name: 'Editar' },
 ])
-
-const brands = ref<brandI[]>([])
-const categories = ref<categoryI[]>([])
-const subcategories = ref<categorySubI[]>([])
-const specifications = ref<SpecificationI[]>([])
+const route = useRoute()
+const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
 const isLoading = ref(true)
 const isSubcategoriesLoading = ref(false)
 const serverErrors = ref<Record<string, string[]>>({})
 
-const loadData = async () => {
-  try {
-    [brands.value, categories.value, specifications.value] = await Promise.all([
-      BrandService.getAllList(),
-      CategoryService.getAllList(),
-      SpecificationService.getAllList(),
-    ])
-  } catch (err) {
-    useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
-    console.error(err)
-  } finally {
-    isLoading.value = false
-  }
-}
+const brands = ref<brandI[]>([])
+const categories = ref<categoryI[]>([])
+const subcategories = ref<categorySubI[]>([])
+const specifications = ref<SpecificationI[]>([])
+const product = ref<ProductExtendI | null>(null)
 
-const { meta, handleSubmit, errors, defineField, setErrors, resetField } = useForm({
-  validationSchema: createProductSchema,
-  initialValues: {
-    brand_id: '',
-    category_id: '',
-    subcategory_id: '',
-    name: '',
-    model: '',
-    description: '',
-    specifications: [{ specification_id: '', value: '' }],
-  },
+const { meta, handleSubmit, errors, defineField, setErrors, resetField, resetForm } = useForm({
+  validationSchema: editProductSchema,
 })
 
 const [name, nameAttrs] = defineField('name')
@@ -67,12 +48,30 @@ const [subcategoryId, subcategoryIdAttrs] = defineField('subcategory_id')
 const [model, modelAttrs] = defineField('model')
 const [description, descriptionAttrs] = defineField('description')
 
-// Watch para actualizar subcategorías al cambiar categoría
-watch(categoryId, async (newCategoryId) => {
-  subcategories.value = [] // limpiar subcategorías
-  resetField('subcategory_id') // limpia valor y error sin marcar como tocado
+const isInitializing = ref(true)
 
-  if (!newCategoryId) return
+watch(categoryId, async (newCategoryId) => {
+  if (isInitializing.value) {
+    if (!product.value || newCategoryId === product.value.category?.id) return
+  }
+
+  if (!isInitializing.value && newCategoryId !== product.value?.category?.id) {
+    resetField('subcategory_id', { value: '' })
+  }
+
+  if (!newCategoryId) {
+    subcategories.value = []
+    return
+  }
+
+  const alreadyLoadedForThisCategory =
+    subcategories.value.length > 0 &&
+    product.value &&
+    product.value.category &&
+    product.value.category.id === newCategoryId
+  if (alreadyLoadedForThisCategory) {
+    return
+  }
 
   try {
     isSubcategoriesLoading.value = true
@@ -89,11 +88,63 @@ watch(categoryId, async (newCategoryId) => {
   }
 })
 
-onMounted(async () => {
+const loadData = async () => {
+  try {
+    isLoading.value = true
+    isInitializing.value = true
+    ;[brands.value, categories.value, specifications.value, product.value] = await Promise.all([
+      BrandService.getAllList(),
+      CategoryService.getAllList(),
+      SpecificationService.getAllList(),
+      ProductService.getById(id),
+    ])
+
+    const initialCategoryId = product.value?.category?.id
+    if (initialCategoryId) {
+      try {
+        isSubcategoriesLoading.value = true
+        subcategories.value = await CategoryService.getAllSubcategories(initialCategoryId.toString())
+      } catch (err) {
+        console.error('No se cargaron subcategorías iniciales', err)
+      } finally {
+        isSubcategoriesLoading.value = false
+      }
+    } else {
+      subcategories.value = []
+    }
+
+    await nextTick()
+
+    resetForm({
+      values: {
+        name: product.value?.name ?? '',
+        model: product.value?.model ?? '',
+        description: product.value?.description ?? '',
+        brand_id: product.value?.brand?.id ?? '',
+        category_id: initialCategoryId ?? '',
+        subcategory_id: product.value?.subcategory?.id ?? '',
+        specifications: product.value?.specifications?.length
+        ? product.value.specifications.map((spec) => ({
+            specification_id: spec.id,
+            value: spec.value,
+          }))
+        : [{ specification_id: '', value: '' }],
+      },
+    })
+  } catch (err) {
+    useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
+    console.error(err)
+  } finally {
+    isInitializing.value = false
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
   loadData()
 })
 
-const onSubmit = handleSubmit(async (values, { resetForm }) => {
+const onSubmit = handleSubmit(async (values) => {
   try {
     useSweetAlert({
       title: 'Enviando...',
@@ -108,15 +159,15 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       description: values.description,
       specifications: values.specifications,
     }
-    await ProductService.create(payload as productCreateDTO)
+    await ProductService.update(payload as productUpdateDTO, id)
+    console.log(payload)
     Swal.close()
 
     useSweetAlert({
-      title: 'Producto creado',
-      text: 'El producto ha sido creado con éxito',
+      title: 'Producto actualizado',
+      text: 'El producto ha sido actualizado con éxito',
       icon: 'success',
     })
-    resetForm()
   } catch (err) {
     Swal.close()
     if (axios.isAxiosError(err) && err.response?.status === 422) {
@@ -137,14 +188,13 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
   }
 })
 </script>
-
 <template>
   <AnimationLoader v-if="isLoading" />
   <div
     v-else
     class="block p-5 border rounded-lg shadow-sm bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700"
   >
-    <form action="" method="POST" @submit="onSubmit">
+    <form action="" method="POST" @submit.prevent="onSubmit">
       <div class="mb-4">
         <label for="brand_id" class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
           Marcas
@@ -190,9 +240,9 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
           v-bind="subcategoryIdAttrs"
           id="subcategory_id"
           class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed focus:outline-none focus:ring-1"
-          :disabled="isSubcategoriesLoading || !categoryId"
+          :disabled="!categoryId"
         >
-          <option disabled selected value="">
+          <option disabled value="">
             <span v-if="isSubcategoriesLoading">Cargando...</span>
             <span v-else>Selecciona una subcategoria</span>
           </option>
@@ -279,7 +329,6 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
                       as="select"
                       class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed focus:outline-none focus:ring-1"
                     >
-                      opt
                       <option disabled selected value="">Selecciona una especificación</option>
                       <option
                         :value="specification.id"
@@ -311,15 +360,19 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
                     </Field>
                     <span class="text-red-400">{{ errors[`specifications[${idx}].value`] }}</span>
                   </div>
-                                  <!-- BOTÓN ELIMINAR -->
-                <button
-                  v-if="fields.length > 1"
-                  type="button"
-                  @click="remove(idx)"
-                  class="text-red-500 hover:text-red-700 font-semibold px-3 py-2"
-                >
-                  <font-awesome-icon icon="fa-solid fa-trash-can" size="xl" class="transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white" />
-                </button>
+                  <!-- BOTÓN ELIMINAR -->
+                  <button
+                    v-if="fields.length > 1"
+                    type="button"
+                    @click="remove(idx)"
+                    class="text-red-500 hover:text-red-700 font-semibold px-3 py-2"
+                  >
+                    <font-awesome-icon
+                      icon="fa-solid fa-trash-can"
+                      size="xl"
+                      class="transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white"
+                    />
+                  </button>
                 </div>
               </fieldset>
 
@@ -338,7 +391,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       </div>
 
       <div class="flex justify-end">
-        <ButtonSave name="Guardar" :disabled="!meta.valid" />
+        <ButtonSave name="Actualizar" :disabled="!meta.valid" />
       </div>
     </form>
   </div>

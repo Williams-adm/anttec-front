@@ -1,8 +1,8 @@
 import type { brandUpdateDTO } from '@/DTOs/admin/brand/BrandUpdateDTO'
 import type { categoryCreateDTO } from '@/DTOs/admin/category/CategoryCreateDTO'
-import type { ApiListResponseI } from '@/interfaces/admin/ApiListResponseInterface'
 import type { brandI, brandsI } from '@/interfaces/admin/BrandInterface'
 import httpAPI from '../httpAPI'
+import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
 
 class BrandService {
   private api = httpAPI

@@ -1,8 +1,8 @@
 import type { specificationCreateDTO } from '@/DTOs/admin/specification/SpecificationCreateDTO'
 import type { specificationUpdateDTO } from '@/DTOs/admin/specification/SpecificationUpdateDTO'
-import type { ApiListResponseI } from '@/interfaces/admin/ApiListResponseInterface'
 import type { SpecificationI, SpecificationsI } from '@/interfaces/admin/SpecificationInterface'
 import httpAPI from '../httpAPI'
+import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
 
 class SpecificationService {
   private api = httpAPI
@@ -30,6 +30,12 @@ class SpecificationService {
       `/admin/specifications/${id}`,
       data,
     )
+    console.log(res.data.message)
+    return res.data.data
+  }
+
+  async getAllList(): Promise<SpecificationI[]> {
+    const res = await this.api.get<ApiListResponseI<SpecificationI[]>>('/admin/specifications/list')
     console.log(res.data.message)
     return res.data.data
   }
