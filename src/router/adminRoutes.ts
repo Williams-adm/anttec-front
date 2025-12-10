@@ -71,50 +71,81 @@ const adminRoutes = [
         ],
       },
       {
-        path: 'catalog/products',
+        path: 'catalog',
         children: [
           {
-            path: '',
-            name: 'admin.catalog.products',
-            component: () => import('@/views/admin/Catalog/Product/ProductListView.vue'),
+            path: 'products',
+            children: [
+              {
+                path: '',
+                name: 'admin.catalog.products',
+                component: () => import('@/views/admin/Catalog/Product/ProductListView.vue'),
+              },
+              {
+                path: 'create',
+                name: 'admin.catalog.products.create',
+                component: () => import('@/views/admin/Catalog/Product/ProductCreateView.vue'),
+              },
+              {
+                path: 'show/:id',
+                name: 'admin.catalog.products.show',
+                component: () => import('@/views/admin/Catalog/Product/ProductShowView.vue'),
+              },
+              {
+                path: 'edit/:id',
+                name: 'admin.catalog.products.edit',
+                component: () => import('@/views/admin/Catalog/Product/ProductEditView.vue'),
+              },
+            ],
           },
           {
-            path: 'create',
-            name: 'admin.catalog.products.create',
-            component: () => import('@/views/admin/Catalog/Product/ProductCreateView.vue'),
+            path: 'specifications',
+            children: [
+              {
+                path: '',
+                name: 'admin.catalog.specifications',
+                component: () =>
+                  import('@/views/admin/Catalog/Specification/SpecificationListView.vue'),
+              },
+              {
+                path: 'create',
+                name: 'admin.catalog.specifications.create',
+                component: () =>
+                  import('@/views/admin/Catalog/Specification/SpecificationCreateView.vue'),
+              },
+              {
+                path: 'edit/:id',
+                name: 'admin.catalog.specifications.edit',
+                component: () =>
+                  import('@/views/admin/Catalog/Specification/SpecificationEditView.vue'),
+              },
+            ],
           },
           {
-            path: 'show/:id',
-            name: 'admin.catalog.products.show',
-            component: () => import('@/views/admin/Catalog/Product/ProductShowView.vue'),
-          },
-          {
-            path: 'edit/:id',
-            name: 'admin.catalog.products.edit',
-            component: () => import('@/views/admin/Catalog/Product/ProductEditView.vue'),
-          },
-        ],
-      },
-      {
-        path: 'catalog/specifications',
-        children: [
-          {
-            path: '',
-            name: 'admin.catalog.specifications',
-            component: () =>
-              import('@/views/admin/Catalog/Specification/SpecificationListView.vue'),
-          },
-          {
-            path: 'create',
-            name: 'admin.catalog.specifications.create',
-            component: () =>
-              import('@/views/admin/Catalog/Specification/SpecificationCreateView.vue'),
-          },
-          {
-            path: 'edit/:id',
-            name: 'admin.catalog.specifications.edit',
-            component: () =>
-              import('@/views/admin/Catalog/Specification/SpecificationEditView.vue'),
+            path: 'options',
+            children: [
+              {
+                path: '',
+                name: 'admin.catalog.options',
+                component: () => import('@/views/admin/Catalog/Options/OptionListView.vue'),
+              },
+              {
+                path: 'show/:id',
+                name: 'admin.catalog.options.show',
+                component: () => import('@/views/admin/Catalog/Options/OptionShowView.vue'),
+              },
+              {
+                path: 'create',
+                name: 'admin.catalog.options.create',
+                component: () => import('@/views/admin/Catalog/Options/OptionCreateView.vue'),
+              },
+              {
+                path: 'edit/:id',
+                name: 'admin.catalog.options.edit',
+                component: () =>
+                  import('@/views/admin/Catalog/Options/OptionEditView.vue'),
+              },
+            ],
           },
         ],
       },

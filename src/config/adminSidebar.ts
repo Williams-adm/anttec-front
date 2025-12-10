@@ -36,6 +36,11 @@ export const adminSidebarLinks: adminAsideInterface[] = [
         icon: 'fa-solid fa-list-check',
         route: 'admin.catalog.specifications',
       },
+      {
+        name: 'Opciones',
+        icon: 'fa-solid fa-gear',
+        route: 'admin.catalog.options',
+      },
     ],
   },
 ]
