@@ -38,6 +38,14 @@ onMounted(() => {
 </script>
 
 <template>
+  <div class="flex justify-end">
+    <router-link
+      :to="{ name: 'admin.catalog.products.show.options' }"
+      class="mb-3 focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
+    >
+      Asociar Opciones
+    </router-link>
+  </div>
   <AnimationLoader v-if="isLoading" />
   <section class="mb-8" v-else>
     <h5 class="text-center text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">
@@ -72,20 +80,22 @@ onMounted(() => {
       <div class="mb-3">
         <h6 class="text-lg text-gray-700 dark:text-gray-200 font-medium">Descripción:</h6>
         <p class="text-gray-500 dark:text-gray-300 text-lg whitespace-pre-line">
-          {{ product?.description ?? 'No tiene descripción'}}
+          {{ product?.description ?? 'No tiene descripción' }}
         </p>
       </div>
 
       <div class="mb-3">
-        <h6 class="text-lg text-gray-700 dark:text-gray-200 font-medium mb-3 text-center">Especificaciones:</h6>
+        <h6 class="text-lg text-gray-700 dark:text-gray-200 font-medium mb-3 text-center">
+          Especificaciones:
+        </h6>
         <div v-if="!product?.specifications">
           <p class="text-gray-500 dark:text-gray-300 text-lg whitespace-pre-line">
-          No tiene especificaciones asociadas
-        </p>
+            No tiene especificaciones asociadas
+          </p>
         </div>
         <div class="w-full flex justify-center" v-else>
           <div class="max-w-md w-full">
-            <div class="relative overflow-x-auto shadow-md sm:rounded-lg" >
+            <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
               <table class="w-full text-left rtl:text-right text-gray-500 dark:text-gray-300">
                 <thead
                   class="text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300"
@@ -116,7 +126,6 @@ onMounted(() => {
                 </tbody>
               </table>
             </div>
-
           </div>
         </div>
       </div>

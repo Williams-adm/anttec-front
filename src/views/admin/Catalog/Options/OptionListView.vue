@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import AnimationLoader from '@/components/AnimationLoader.vue'
 import BadgeStatus from '@/components/Admin/BadgeStatus.vue'
 import ButtonCreate from '@/components/Admin/ButtonCreate.vue'
 import InfoAlert from '@/components/Admin/InfoAlert.vue'
 import ToggleSwitch from '@/components/Admin/ToggleSwitch.vue'
-import { useBreadcrumb } from '@/composables/useBreadcrumb';
-import { useSweetAlert } from '@/composables/useSweetAlert';
-import type { OptionsI } from '@/interfaces/admin/OptionInterface';
-import OptionService from '@/services/admin/OptionService';
-import Swal from 'sweetalert2';
-import { computed, onMounted, ref } from 'vue';
+import AnimationLoader from '@/components/AnimationLoader.vue'
+import { useBreadcrumb } from '@/composables/useBreadcrumb'
+import { useSweetAlert } from '@/composables/useSweetAlert'
+import type { OptionsI } from '@/interfaces/admin/options/OptionInterface'
+import OptionService from '@/services/admin/OptionService'
+import Swal from 'sweetalert2'
+import { computed, onMounted, ref } from 'vue'
 
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Opciones' }])
 
@@ -80,7 +80,9 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
           <tr
             :class="[
               'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900',
-              index != optionsList.length - 1 ? 'border-b dark:border-gray-700 border-gray-200' : '',
+              index != optionsList.length - 1
+                ? 'border-b dark:border-gray-700 border-gray-200'
+                : '',
             ]"
             v-for="(option, index) in optionsList"
             :key="index"
@@ -102,14 +104,14 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
             </td>
             <td class="px-6 py-4 text-right">
               <div class="flex justify-around">
-                <router-link :to="{ name: 'admin.catalog.options.show', params: { id: option.id } }">
-                  <font-awesome-icon
-                    icon="fa-solid fa-eye"
-                    size="xl"
-                    class="text-green-400"
-                  />
+                <router-link
+                  :to="{ name: 'admin.catalog.options.show', params: { id: option.id } }"
+                >
+                  <font-awesome-icon icon="fa-solid fa-eye" size="xl" class="text-green-400" />
                 </router-link>
-                <router-link :to="{ name: 'admin.catalog.options.edit', params: { id: option.id } }">
+                <router-link
+                  :to="{ name: 'admin.catalog.options.edit', params: { id: option.id } }"
+                >
                   <font-awesome-icon
                     icon="fa-solid fa-pen-to-square"
                     size="xl"

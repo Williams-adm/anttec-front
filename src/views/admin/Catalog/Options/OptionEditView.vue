@@ -5,7 +5,7 @@ import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import { useSweetAlert } from '@/composables/useSweetAlert'
 import { OPTION_TYPES } from '@/config/const/optionType'
 import type { optionUpdateDTO } from '@/DTOs/admin/option/OptionUpdateDTO'
-import type { OptionExtendI } from '@/interfaces/admin/OptionInterface'
+import type { OptionExtendI } from '@/interfaces/admin/options/OptionInterface'
 import { editOptionSchema } from '@/schemas/admin/option/editOptionValidationScema'
 import OptionService from '@/services/admin/OptionService'
 import axios from 'axios'
@@ -75,9 +75,8 @@ const onSubmit = handleSubmit(async (values) => {
       name: values.name,
       option_values: values.option_values,
     }
-
-    console.log(payload)
     await OptionService.update(payload as optionUpdateDTO, id)
+    await loadOption()
     Swal.close()
 
     useSweetAlert({

@@ -1,4 +1,4 @@
-import type { paginatedResponseI } from './base/PaginationInterface'
+import type { paginatedResponseI } from '../base/PaginationInterface'
 import type { OptionValueI } from './OptionValueInterface'
 
 export interface OptionI {
@@ -15,6 +15,5 @@ export interface OptionExtendI {
   status: boolean
   option_values: OptionValueI[]
 }
-
 
 export type OptionsI = paginatedResponseI<OptionI>

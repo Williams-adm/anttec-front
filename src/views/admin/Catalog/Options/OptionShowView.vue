@@ -2,7 +2,7 @@
 import AnimationLoader from '@/components/AnimationLoader.vue'
 import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import { useSweetAlert } from '@/composables/useSweetAlert'
-import type { OptionExtendI } from '@/interfaces/admin/OptionInterface'
+import type { OptionExtendI } from '@/interfaces/admin/options/OptionInterface'
 import OptionService from '@/services/admin/OptionService'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
