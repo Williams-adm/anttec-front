@@ -4,6 +4,7 @@ import type { OptionProductI } from '@/interfaces/admin/optionProduct/OptionProd
 import httpAPI from '../httpAPI'
 import type { OptionProductShortI } from '@/interfaces/admin/optionProduct/OptionProductShortInterface'
 import type { addValuesDTO } from '@/DTOs/admin/productOption/addValuesDTO'
+import type { OptionProductValuesI } from '@/interfaces/admin/optionProduct/OptionProductValuesInterface'
 
 class OptionProductService {
   private api = httpAPI
@@ -27,6 +28,14 @@ class OptionProductService {
     const res = await this.api.post<ApiListResponseI<OptionProductShortI>>(
       '/admin/option-products/values',
       data,
+    )
+    console.log(res.data.message)
+    return res.data.data
+  }
+
+  async getAllValues(id: string | number): Promise<OptionProductValuesI[]> {
+    const res = await this.api.get<ApiListResponseI<OptionProductValuesI[]>>(
+      `/admin/option-products/${id}/values`,
     )
     console.log(res.data.message)
     return res.data.data

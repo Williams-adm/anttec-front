@@ -4,6 +4,8 @@ import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseIn
 import type { OptionProductI } from '@/interfaces/admin/optionProduct/OptionProductInterface'
 import type { ProductExtendI, ProductsI } from '@/interfaces/admin/product/ProductInterface'
 import httpAPI from '../httpAPI'
+import type { ProductHasOptionsI } from '@/interfaces/admin/product/ProductHasOptionsInterface'
+import type { ProductOptionListI } from '@/interfaces/admin/product/ProductOptionListInterface'
 
 class ProductService {
   private api = httpAPI
@@ -38,6 +40,20 @@ class ProductService {
   async getOptions(id: string): Promise<OptionProductI[]> {
     const res = await this.api.get<ApiListResponseI<OptionProductI[]>>(
       `/admin/products/${id}/options`,
+    )
+    console.log(res.data.message)
+    return res.data.data
+  }
+
+  async hasOptions(id: string): Promise<string> {
+    const res = await this.api.get<ProductHasOptionsI>(`/admin/products/${id}/hasOptions`)
+    console.log(res.data.message)
+    return res.data.message
+  }
+
+  async getAllOptionsList(id: string): Promise<ProductOptionListI[]> {
+    const res = await this.api.get<ApiListResponseI<ProductOptionListI[]>>(
+      `/admin/products/${id}/optionsList`,
     )
     console.log(res.data.message)
     return res.data.data

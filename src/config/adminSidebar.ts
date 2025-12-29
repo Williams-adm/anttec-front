@@ -43,4 +43,21 @@ export const adminSidebarLinks: adminAsideInterface[] = [
       },
     ],
   },
+  {
+    name: 'Almacén',
+    icon: 'fa-solid fa-shop',
+    route: 'admin.store',
+    children: [
+      {
+        name: 'Sucursal',
+        icon: 'fa-solid fa-warehouse',
+        route: 'admin.store.branches',
+      },
+      {
+        name: 'Inventario',
+        icon: 'fa-solid fa-clipboard-list',
+        route: 'admin.store.variants',
+      },
+    ],
+  },
 ]

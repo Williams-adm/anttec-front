@@ -28,7 +28,11 @@ import {
   faTrashCan,
   faEye,
   faGear,
-  faCirclePlus
+  faCirclePlus,
+  faClipboardList,
+  faWarehouse,
+  faShop,
+  faLink
 } from '@fortawesome/free-solid-svg-icons'
 library.add(
   faBarsStaggered,
@@ -49,6 +53,10 @@ library.add(
   faEye,
   faGear,
   faCirclePlus,
+  faClipboardList,
+  faWarehouse,
+  faShop,
+  faLink
 )
 
 const app = createApp(App)

@@ -94,7 +94,20 @@ const adminRoutes = [
               {
                 path: 'show/:id/options',
                 name: 'admin.catalog.products.show.options',
-                component: () => import('@/views/admin/Catalog/Product/ProductOption/associateOptions.vue'),
+                component: () =>
+                  import('@/views/admin/Catalog/Product/ProductOption/associateOptions.vue'),
+              },
+              {
+                path: 'show/:id/variants',
+                name: 'admin.catalog.products.show.variants',
+                component: () =>
+                  import('@/views/admin/Catalog/Product/Variant/productVariantView.vue'),
+              },
+              {
+                path: 'show/:id/variants/create',
+                name: 'admin.catalog.products.show.variants.create',
+                component: () =>
+                  import('@/views/admin/Catalog/Product/Variant/productVariantCreate.vue'),
               },
               {
                 path: 'edit/:id',
@@ -147,8 +160,37 @@ const adminRoutes = [
               {
                 path: 'edit/:id',
                 name: 'admin.catalog.options.edit',
-                component: () =>
-                  import('@/views/admin/Catalog/Options/OptionEditView.vue'),
+                component: () => import('@/views/admin/Catalog/Options/OptionEditView.vue'),
+              },
+            ],
+          },
+        ],
+      },
+      {
+        path: 'store',
+        children: [
+          {
+            path: 'branches',
+            children: [
+              {
+                path: '',
+                name: 'admin.store.branches',
+                component: () => import('@/views/admin/store/branch/BranchListView.vue'),
+              },
+            ],
+          },
+          {
+            path: 'variants',
+            children: [
+              {
+                path: '',
+                name: 'admin.store.variants',
+                component: () => import('@/views/admin/store/variant/VariantListView.vue'),
+              },
+              {
+                path: 'show/:id',
+                name: 'admin.store.variants.show',
+                component: () => import('@/views/admin/store/variant/VariantShowView.vue'),
               },
             ],
           },

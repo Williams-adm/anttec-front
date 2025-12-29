@@ -108,7 +108,7 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <InfoAlert v-else message="Cree las opciones, para poder generar las variantes" />
+          <InfoAlert v-else message="Este producto, aún no tiene asociado ninguna opción" />
         </div>
       </section>
     </div>
