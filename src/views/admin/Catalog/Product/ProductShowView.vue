@@ -7,18 +7,18 @@ import ProductService from '@/services/admin/ProductService'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-useBreadcrumb([
-  { name: 'Dashboard', route: 'admin.dashboard' },
-  { name: 'Productos', route: 'admin.catalog.products' },
-  { name: 'Detalle' },
-])
-
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
 const product = ref<ProductExtendI | null>(null)
 const isLoading = ref(true)
 const error = ref<string | null>(null)
+
+useBreadcrumb(() => [
+  { name: 'Dashboard', route: 'admin.dashboard' },
+  { name: 'Productos', route: 'admin.catalog.products' },
+  { name: product.value ? `Detalle - ${product.value.name}` : 'Detalle' },
+])
 
 const loadProduct = async () => {
   try {

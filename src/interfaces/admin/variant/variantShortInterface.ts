@@ -1,6 +1,6 @@
-import type { paginatedResponseI } from "../base/PaginationInterface"
-import type { variantFeatureI } from "./variantFeatureInterface"
-import type { imgI } from "./variantImgInterface"
+import type { paginatedResponseI } from '../base/PaginationInterface'
+import type { variantFeatureI } from './variantFeatureInterface'
+import type { imgI } from './variantImgInterface'
 
 export interface variantShortI {
   id: number | string

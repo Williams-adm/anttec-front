@@ -13,18 +13,20 @@ import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-useBreadcrumb([
-  { name: 'Dashboard', route: 'admin.dashboard' },
-  { name: 'Marcas', route: 'admin.brands' },
-  { name: 'Editar' },
-])
-
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
 const isLoading = ref(true)
 const brand = ref<brandI | null>(null)
 const serverErrors = ref<Record<string, string[]>>({})
+
+useBreadcrumb(() => [
+  { name: 'Dashboard', route: 'admin.dashboard' },
+  { name: 'Marcas', route: 'admin.brands' },
+  {
+    name: brand.value ? `Editar - ${brand.value.name}` : 'Editar',
+  },
+])
 
 const { meta, handleSubmit, errors, defineField, resetForm, setErrors } = useForm({
   validationSchema: editBrandSchema,

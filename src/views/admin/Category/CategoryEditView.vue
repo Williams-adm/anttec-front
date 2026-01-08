@@ -1,23 +1,17 @@
 <script setup lang="ts">
-import { useBreadcrumb } from '@/composables/useBreadcrumb'
+import ButtonSave from '@/components/Admin/ButtonSave.vue'
 import AnimationLoader from '@/components/AnimationLoader.vue'
+import { useBreadcrumb } from '@/composables/useBreadcrumb'
+import { useSweetAlert } from '@/composables/useSweetAlert'
+import type { categoryUpdateDTO } from '@/DTOs/admin/category/CategoryUpdateDTO'
+import type { categoryI } from '@/interfaces/admin/CategoryInterface'
 import CategoryService from '@/services/admin/CategoryService'
+import axios from 'axios'
+import Swal from 'sweetalert2'
+import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { editCategorySchema } from '../../../schemas/admin/category/editCategoryValidationSchema'
-import { useForm } from 'vee-validate'
-import ButtonSave from '@/components/Admin/ButtonSave.vue'
-import { useSweetAlert } from '@/composables/useSweetAlert'
-import type { categoryUpdateDTO } from '@/DTOs/admin/category/CategoryUpdateDTO'
-import Swal from 'sweetalert2'
-import axios from 'axios'
-import type { categoryI } from '@/interfaces/admin/CategoryInterface'
-
-useBreadcrumb([
-  { name: 'Dashboard', route: 'admin.dashboard' },
-  { name: 'Categorías', route: 'admin.categories' },
-  { name: 'Editar' },
-])
 
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
@@ -25,6 +19,14 @@ const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 const isLoading = ref(true)
 const category = ref<categoryI | null>(null)
 const serverErrors = ref<Record<string, string[]>>({})
+
+useBreadcrumb(() => [
+  { name: 'Dashboard', route: 'admin.dashboard' },
+  { name: 'Categorías', route: 'admin.categories' },
+  {
+    name: category.value ? `Editar - ${category.value.name}` : 'Editar',
+  },
+])
 
 const { meta, handleSubmit, errors, defineField, resetForm, setErrors } = useForm({
   validationSchema: editCategorySchema,

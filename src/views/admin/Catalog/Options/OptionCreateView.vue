@@ -11,6 +11,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import { Field, FieldArray, useForm } from 'vee-validate'
 import { onMounted, ref, watch } from 'vue'
+
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Opciones', route: 'admin.catalog.options' },
@@ -38,8 +39,8 @@ watch(type, (newType, oldType) => {
   }
 
   if (newType === 'color') {
-      setFieldValue('option_values', [{ value: '#000000', description: '' }])
-    }
+    setFieldValue('option_values', [{ value: '#000000', description: '' }])
+  }
 })
 
 onMounted(async () => {
@@ -102,7 +103,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
           id="name"
           type="text"
           class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
-          placeholder="Ingrese el nombre de la marca"
+          placeholder="Ingrese el nombre de la opción"
         />
         <span class="text-red-400">{{ errors.name }}</span>
       </div>

@@ -1,25 +1,19 @@
 <script setup lang="ts">
-import AnimationLoader from '@/components/AnimationLoader.vue'
 import ButtonSave from '@/components/Admin/ButtonSave.vue'
+import AnimationLoader from '@/components/AnimationLoader.vue'
 import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import { useSweetAlert } from '@/composables/useSweetAlert'
+import type { subcategoryUpdateDTO } from '@/DTOs/admin/subcategory/SubcategoryUpdateDTO'
 import type { categoryI } from '@/interfaces/admin/CategoryInterface'
 import type { subcategoryI } from '@/interfaces/admin/SubcategoryInterface'
 import { editSubcategorySchema } from '@/schemas/admin/subcategory/editSubcategoryValidationSchema'
 import CategoryService from '@/services/admin/CategoryService'
 import SubcategoryService from '@/services/admin/SubcategoryService'
+import axios from 'axios'
+import Swal from 'sweetalert2'
 import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import Swal from 'sweetalert2'
-import axios from 'axios'
-import type { subcategoryUpdateDTO } from '@/DTOs/admin/subcategory/SubcategoryUpdateDTO'
-
-useBreadcrumb([
-  { name: 'Dashboard', route: 'admin.dashboard' },
-  { name: 'Subcategorías', route: 'admin.subcategories' },
-  { name: 'Editar' },
-])
 
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
@@ -29,6 +23,14 @@ const serverErrors = ref<Record<string, string[]>>({})
 
 const categories = ref<categoryI[] | null>(null)
 const subcategory = ref<subcategoryI | null>(null)
+
+useBreadcrumb(() => [
+  { name: 'Dashboard', route: 'admin.dashboard' },
+  { name: 'Subcategorías', route: 'admin.subcategories' },
+  {
+    name: subcategory.value ? `Editar - ${subcategory.value.name}` : 'Editar',
+  },
+])
 
 const { meta, handleSubmit, errors, defineField, resetForm, setErrors } = useForm({
   validationSchema: editSubcategorySchema,

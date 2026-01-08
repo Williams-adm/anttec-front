@@ -1,4 +1,4 @@
-import type { ProductSpecificationDTO } from "./ProductSpecificationDTO"
+import type { ProductSpecificationDTO } from './ProductSpecificationDTO'
 
 export interface productUpdateDTO {
   name?: string

@@ -34,7 +34,7 @@ const serverErrors = ref<Record<string, string[]>>({})
 
 const loadData = async () => {
   try {
-    [brands.value, categories.value, specifications.value] = await Promise.all([
+    ;[brands.value, categories.value, specifications.value] = await Promise.all([
       BrandService.getAllList(),
       CategoryService.getAllList(),
       SpecificationService.getAllList(),
@@ -310,15 +310,19 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
                     </Field>
                     <span class="text-red-400">{{ errors[`specifications[${idx}].value`] }}</span>
                   </div>
-                                  <!-- BOTÓN ELIMINAR -->
-                <button
-                  v-if="fields.length > 1"
-                  type="button"
-                  @click="remove(idx)"
-                  class="text-red-500 hover:text-red-700 font-semibold px-3 py-2"
-                >
-                  <font-awesome-icon icon="fa-solid fa-trash-can" size="xl" class="transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white" />
-                </button>
+                  <!-- BOTÓN ELIMINAR -->
+                  <button
+                    v-if="fields.length > 1"
+                    type="button"
+                    @click="remove(idx)"
+                    class="text-red-500 hover:text-red-700 font-semibold px-3 py-2"
+                  >
+                    <font-awesome-icon
+                      icon="fa-solid fa-trash-can"
+                      size="xl"
+                      class="transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white"
+                    />
+                  </button>
                 </div>
               </fieldset>
 

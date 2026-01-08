@@ -64,7 +64,7 @@ onMounted(() => {
             <button @click="openModal" class="bg-blue-600 text-white px-4 py-2 rounded">
               Agregar
             </button>
-            <associateCreateModal ref="modalRef" :product-id="id" @created="loadProductOption"/>
+            <associateCreateModal ref="modalRef" :product-id="id" @created="loadProductOption" />
           </div>
         </header>
 
@@ -104,7 +104,7 @@ onMounted(() => {
                     </div>
                   </div>
                 </div>
-                <addValue :option_id="option.option_id" @created="loadProductOption"/>
+                <addValue :option_id="option.option_id" @created="loadProductOption" />
               </div>
             </div>
           </div>

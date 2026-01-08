@@ -58,6 +58,16 @@ export const adminSidebarLinks: adminAsideInterface[] = [
         icon: 'fa-solid fa-clipboard-list',
         route: 'admin.store.variants',
       },
+      {
+        name: 'Movimientos',
+        icon: 'fa-solid fa-file-invoice',
+        route: 'admin.store.movements',
+      },
     ],
+  },
+  {
+    name: 'Portadas',
+    icon: 'fa-solid fa-images',
+    route: 'admin.covers',
   },
 ]

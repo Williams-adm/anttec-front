@@ -109,7 +109,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
     const payload = {
       product_id: props.productId,
       option_id: values.option_id,
-      values: values.values
+      values: values.values,
     }
     await OptionProductService.create(payload as productOptionCreateDTO)
     Swal.close()

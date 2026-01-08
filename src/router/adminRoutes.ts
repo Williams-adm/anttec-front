@@ -194,6 +194,46 @@ const adminRoutes = [
               },
             ],
           },
+          {
+            path: 'movements',
+            children: [
+              {
+                path: '',
+                name: 'admin.store.movements',
+                component: () => import('@/views/admin/store/movements/MovementsListView.vue'),
+              },
+              {
+                path: 'create',
+                name: 'admin.store.movements.create',
+                component: () => import('@/views/admin/store/movements/MovementCreateView.vue'),
+              },
+              {
+                path: 'show/:id',
+                name: 'admin.store.movements.show',
+                component: () => import('@/views/admin/store/movements/MovementShowView.vue'),
+              },
+            ],
+          },
+        ],
+      },
+      {
+        path: 'covers',
+        children: [
+          {
+            path: '',
+            name: 'admin.covers',
+            component: () => import('@/views/admin/Cover/CoverListView.vue'),
+          },
+          {
+            path: 'create',
+            name: 'admin.covers.create',
+            component: () => import('@/views/admin/Cover/CoverCreateView.vue'),
+          },
+          {
+            path: 'edit/:id',
+            name: 'admin.covers.edit',
+            component: () => import('@/views/admin/Cover/CoverEditView.vue'),
+          },
         ],
       },
     ],

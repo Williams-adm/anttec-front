@@ -7,17 +7,17 @@ import OptionService from '@/services/admin/OptionService'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-useBreadcrumb([
-  { name: 'Dashboard', route: 'admin.dashboard' },
-  { name: 'Opciones', route: 'admin.catalog.options' },
-  { name: 'Detalle' },
-])
-
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 const option = ref<OptionExtendI | null>(null)
 const isLoading = ref(true)
 const error = ref<string | null>(null)
+
+useBreadcrumb(() => [
+  { name: 'Dashboard', route: 'admin.dashboard' },
+  { name: 'Opciones', route: 'admin.catalog.options' },
+  { name: option.value ? `Detalle - ${option.value.name}` : 'Detalle' },
+])
 
 const loadOption = async () => {
   try {

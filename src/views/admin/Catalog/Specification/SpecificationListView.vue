@@ -4,10 +4,10 @@ import BadgeStatus from '@/components/Admin/BadgeStatus.vue'
 import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import ButtonCreate from '@/components/Admin/ButtonCreate.vue'
 import InfoAlert from '@/components/Admin/InfoAlert.vue'
-import { useSweetAlert } from '@/composables/useSweetAlert';
-import type { SpecificationsI } from '@/interfaces/admin/SpecificationInterface';
-import SpecificationService from '@/services/admin/SpecificationService';
-import { computed, onMounted, ref } from 'vue';
+import { useSweetAlert } from '@/composables/useSweetAlert'
+import type { SpecificationsI } from '@/interfaces/admin/SpecificationInterface'
+import SpecificationService from '@/services/admin/SpecificationService'
+import { computed, onMounted, ref } from 'vue'
 import ToggleSwitch from '@/components/Admin/ToggleSwitch.vue'
 import Swal from 'sweetalert2'
 
@@ -79,7 +79,9 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
           <tr
             :class="[
               'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900',
-              index != specificationsList.length - 1 ? 'border-b dark:border-gray-700 border-gray-200' : '',
+              index != specificationsList.length - 1
+                ? 'border-b dark:border-gray-700 border-gray-200'
+                : '',
             ]"
             v-for="(specification, index) in specificationsList"
             :key="index"
@@ -98,7 +100,12 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
             </td>
             <td class="px-6 py-4 text-right">
               <div class="flex justify-around">
-                <router-link :to="{ name: 'admin.catalog.specifications.edit', params: { id: specification.id } }">
+                <router-link
+                  :to="{
+                    name: 'admin.catalog.specifications.edit',
+                    params: { id: specification.id },
+                  }"
+                >
                   <font-awesome-icon
                     icon="fa-solid fa-pen-to-square"
                     size="xl"

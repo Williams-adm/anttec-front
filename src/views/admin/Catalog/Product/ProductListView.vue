@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { useBreadcrumb } from '@/composables/useBreadcrumb';
-import { useSweetAlert } from '@/composables/useSweetAlert';
-import ProductService from '@/services/admin/ProductService';
-import { computed, onMounted, ref } from 'vue';
+import { useBreadcrumb } from '@/composables/useBreadcrumb'
+import { useSweetAlert } from '@/composables/useSweetAlert'
+import ProductService from '@/services/admin/ProductService'
+import { computed, onMounted, ref } from 'vue'
 import InfoAlert from '@/components/Admin/InfoAlert.vue'
 import AnimationLoader from '@/components/AnimationLoader.vue'
 import ButtonCreate from '@/components/Admin/ButtonCreate.vue'
 import ToggleSwitch from '@/components/Admin/ToggleSwitch.vue'
 import Swal from 'sweetalert2'
 import BadgeStatus from '@/components/Admin/BadgeStatus.vue'
-import type { ProductsI } from '@/interfaces/admin/product/ProductInterface';
+import type { ProductsI } from '@/interfaces/admin/product/ProductInterface'
 
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Productos' }])
 
@@ -112,14 +112,14 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
             </td>
             <td class="px-6 py-4 text-right">
               <div class="flex justify-around">
-                <router-link :to="{ name: 'admin.catalog.products.show', params: { id: product.id } }">
-                  <font-awesome-icon
-                    icon="fa-solid fa-eye"
-                    size="xl"
-                    class="text-green-400"
-                  />
+                <router-link
+                  :to="{ name: 'admin.catalog.products.show', params: { id: product.id } }"
+                >
+                  <font-awesome-icon icon="fa-solid fa-eye" size="xl" class="text-green-400" />
                 </router-link>
-                <router-link :to="{ name: 'admin.catalog.products.edit', params: { id: product.id } }">
+                <router-link
+                  :to="{ name: 'admin.catalog.products.edit', params: { id: product.id } }"
+                >
                   <font-awesome-icon
                     icon="fa-solid fa-pen-to-square"
                     size="xl"

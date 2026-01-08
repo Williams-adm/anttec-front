@@ -1,4 +1,4 @@
-import type { ProductOptionValuesDTO } from "./productOptionValuesDTO"
+import type { ProductOptionValuesDTO } from './productOptionValuesDTO'
 
 export interface productOptionCreateDTO {
   product_id: string | number

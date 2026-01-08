@@ -33,9 +33,12 @@ class OptionProductService {
     return res.data.data
   }
 
-  async getAllValues(id: string | number): Promise<OptionProductValuesI[]> {
+  async getAllValues(
+    productId: string | number,
+    optionId: string | number,
+  ): Promise<OptionProductValuesI[]> {
     const res = await this.api.get<ApiListResponseI<OptionProductValuesI[]>>(
-      `/admin/option-products/${id}/values`,
+      `/admin/option-products/${productId}/values/${optionId}`,
     )
     console.log(res.data.message)
     return res.data.data

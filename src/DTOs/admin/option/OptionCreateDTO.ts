@@ -1,4 +1,4 @@
-import type { OptionValuesDTO } from "./OptionValuesDTO"
+import type { OptionValuesDTO } from './OptionValuesDTO'
 
 export interface optionCreateDTO {
   name: string

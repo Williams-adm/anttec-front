@@ -19,11 +19,6 @@ import { Field, FieldArray, useForm } from 'vee-validate'
 import { nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
-useBreadcrumb([
-  { name: 'Dashboard', route: 'admin.dashboard' },
-  { name: 'Productos', route: 'admin.catalog.products' },
-  { name: 'Editar' },
-])
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
@@ -36,6 +31,12 @@ const categories = ref<categoryI[]>([])
 const subcategories = ref<categorySubI[]>([])
 const specifications = ref<SpecificationI[]>([])
 const product = ref<ProductExtendI | null>(null)
+
+useBreadcrumb(() => [
+  { name: 'Dashboard', route: 'admin.dashboard' },
+  { name: 'Productos', route: 'admin.catalog.products' },
+  { name: product.value ? `Editar - ${product.value.name}` : 'Editar' },
+])
 
 const { meta, handleSubmit, errors, defineField, setErrors, resetField, resetForm } = useForm({
   validationSchema: editProductSchema,
@@ -103,7 +104,9 @@ const loadData = async () => {
     if (initialCategoryId) {
       try {
         isSubcategoriesLoading.value = true
-        subcategories.value = await CategoryService.getAllSubcategories(initialCategoryId.toString())
+        subcategories.value = await CategoryService.getAllSubcategories(
+          initialCategoryId.toString(),
+        )
       } catch (err) {
         console.error('No se cargaron subcategorías iniciales', err)
       } finally {
@@ -124,11 +127,11 @@ const loadData = async () => {
         category_id: initialCategoryId ?? '',
         subcategory_id: product.value?.subcategory?.id ?? '',
         specifications: product.value?.specifications?.length
-        ? product.value.specifications.map((spec) => ({
-            specification_id: spec.id,
-            value: spec.value,
-          }))
-        : [{ specification_id: '', value: '' }],
+          ? product.value.specifications.map((spec) => ({
+              specification_id: spec.id,
+              value: spec.value,
+            }))
+          : [{ specification_id: '', value: '' }],
       },
     })
   } catch (err) {

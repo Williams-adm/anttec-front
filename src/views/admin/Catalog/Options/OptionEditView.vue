@@ -14,18 +14,20 @@ import { Field, FieldArray, useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-useBreadcrumb([
-  { name: 'Dashboard', route: 'admin.dashboard' },
-  { name: 'Opciones', route: 'admin.catalog.options' },
-  { name: 'Editar' },
-])
-
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
 const isLoading = ref(true)
 const option = ref<OptionExtendI | null>(null)
 const serverErrors = ref<Record<string, string[]>>({})
+
+useBreadcrumb(() => [
+  { name: 'Dashboard', route: 'admin.dashboard' },
+  { name: 'Opciones', route: 'admin.catalog.options' },
+  {
+    name: option.value ? `Editar - ${option.value.name}` : 'Editar',
+  },
+])
 
 const { meta, handleSubmit, errors, defineField, setErrors, resetForm, values } = useForm({
   validationSchema: editOptionSchema,
@@ -195,7 +197,7 @@ const onSubmit = handleSubmit(async (values) => {
 
                     <div v-show="type === 'color'" class="flex items-center gap-2">
                       <div
-                        class="border border-gray-300 dark:border-gray-600 rounded-md shadow-sm h-[46px] flex items-center px-3 justify-between w-full"
+                        class="border border-gray-300 dark:border-gray-600 rounded-md shadow-sm h-11.5 flex items-center px-3 justify-between w-full"
                       >
                         <p class="text-gray-900 dark:text-gray-200">
                           {{ values.option_values[idx].value || 'Seleccione un color' }}

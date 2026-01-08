@@ -114,7 +114,7 @@ watch(
 
       try {
         loadingMap.value[idx] = true
-        valuesMap.value[idx] = await OptionProductService.getAllValues(optionId)
+        valuesMap.value[idx] = await OptionProductService.getAllValues(id, optionId)
       } catch (e) {
         useSweetAlert({
           title: 'Error',
@@ -150,7 +150,6 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       text: 'Procesando el formulario',
       icon: 'loading',
     })
-    console.log(values)
     const formData = new FormData()
 
     formData.append('selling_price', String(values.selling_price))
@@ -211,7 +210,81 @@ onMounted(async () => {
   <AnimationLoader v-if="isLoading" />
   <div v-else>
     <form action="" method="POST" @submit="onSubmit" :key="formKey">
-      <div class="mt-1 flex items-center mb-6 dark:text-gray-300 text-gray-800">
+      <div class="flex items-center mb-6 dark:text-gray-300 text-gray-800">
+        <hr class="flex-1" />
+        <span class="mx-4"> Datos de la variante </span>
+        <hr class="flex-1" />
+      </div>
+      <div class="mb-4">
+        <label
+          for="purcharse_price"
+          class="block mb-2 font-medium text-gray-900 dark:text-gray-200"
+        >
+          Precio de compra
+        </label>
+        <input
+          v-model="purcharsePrice"
+          v-bind="purcharsePriceAttrs"
+          id="purcharse_price"
+          type="number"
+          step="0.01"
+          class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
+          placeholder="Ingrese el precio de compra: S/. 50.50"
+        />
+        <span class="text-red-400">{{ errors.purcharse_price }}</span>
+      </div>
+      <div class="mb-4">
+        <label for="selling_price" class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
+          Precio de venta
+        </label>
+        <input
+          v-model="sellingPrice"
+          v-bind="sellingPriceAttrs"
+          id="selling_price"
+          type="number"
+          step="0.01"
+          class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
+          placeholder="Ingrese el precio de venta: S/. 100.00"
+        />
+        <span class="text-red-400">{{ errors.selling_price }}</span>
+      </div>
+      <div class="mb-4">
+        <label for="stock_min" class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
+          Stock Minimo
+        </label>
+        <input
+          v-model="stockMin"
+          v-bind="stockMinAttrs"
+          id="stock_min"
+          type="number"
+          step="0.01"
+          class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
+          placeholder="Ingrese el stock mínimo"
+        />
+        <span class="text-red-400">{{ errors.stock_min }}</span>
+      </div>
+
+      <div class="mb-6">
+        <label class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
+          Imagen de la variante
+        </label>
+
+        <FilePond
+          ref="filePondRef"
+          name="image"
+          allowMultiple="true"
+          allowFileTypeValidation="true"
+          :acceptedFileTypes="['image/*']"
+          allowImagePreview="true"
+          maxFileSize="15MB"
+          imagePreviewHeight="200"
+          allowReorder="true"
+          @updatefiles="onUpdateFiles"
+          labelIdle="Arrastra la imagen o <span class='filepond--label-action'>Examinar</span>"
+        />
+        <span class="text-red-400" v-if="imagesMeta.touched">{{ imagesError }}</span>
+      </div>
+      <div class="mt-4 flex items-center mb-6 dark:text-gray-300 text-gray-800">
         <hr class="flex-1" />
         <span class="mx-4"> Seleccione los valores de la variante </span>
         <hr class="flex-1" />
@@ -297,81 +370,8 @@ onMounted(async () => {
           </button>
         </div>
       </div>
-      <div class="flex items-center mb-6 dark:text-gray-300 text-gray-800 mt-8">
-        <hr class="flex-1" />
-        <span class="mx-4"> Datos de la variante </span>
-        <hr class="flex-1" />
-      </div>
-      <div class="mb-4">
-        <label
-          for="purcharse_price"
-          class="block mb-2 font-medium text-gray-900 dark:text-gray-200"
-        >
-          Precio de compra
-        </label>
-        <input
-          v-model="purcharsePrice"
-          v-bind="purcharsePriceAttrs"
-          id="purcharse_price"
-          type="number"
-          step="0.01"
-          class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
-          placeholder="Ingrese el precio de compra: S/. 50.50"
-        />
-        <span class="text-red-400">{{ errors.purcharse_price }}</span>
-      </div>
-      <div class="mb-4">
-        <label for="selling_price" class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
-          Precio de venta
-        </label>
-        <input
-          v-model="sellingPrice"
-          v-bind="sellingPriceAttrs"
-          id="selling_price"
-          type="number"
-          step="0.01"
-          class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
-          placeholder="Ingrese el precio de venta: S/. 100.00"
-        />
-        <span class="text-red-400">{{ errors.selling_price }}</span>
-      </div>
-      <div class="mb-4">
-        <label for="stock_min" class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
-          Stock Minimo
-        </label>
-        <input
-          v-model="stockMin"
-          v-bind="stockMinAttrs"
-          id="stock_min"
-          type="number"
-          step="0.01"
-          class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
-          placeholder="Ingrese el stock mínimo"
-        />
-        <span class="text-red-400">{{ errors.stock_min }}</span>
-      </div>
 
-      <div class="mb-6">
-        <label class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
-          Imagen de la variante
-        </label>
-
-        <FilePond
-          ref="filePondRef"
-          name="image"
-          allowMultiple="true"
-          allowFileTypeValidation="true"
-          :acceptedFileTypes="['image/*']"
-          allowImagePreview="true"
-          maxFileSize="10MB"
-          imagePreviewHeight="200"
-          allowReorder="true"
-          @updatefiles="onUpdateFiles"
-          labelIdle="Arrastra la imagen o <span class='filepond--label-action'>Examinar</span>"
-        />
-        <span class="text-red-400" v-if="imagesMeta.touched">{{ imagesError }}</span>
-      </div>
-      <div class="flex justify-end">
+      <div class="flex justify-end mt-4">
         <ButtonSave name="Guardar" :disabled="!meta.valid" />
       </div>
     </form>

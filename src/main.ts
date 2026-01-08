@@ -32,7 +32,10 @@ import {
   faClipboardList,
   faWarehouse,
   faShop,
-  faLink
+  faLink,
+  faFileInvoice,
+  faImages,
+  faCalendar,
 } from '@fortawesome/free-solid-svg-icons'
 library.add(
   faBarsStaggered,
@@ -56,7 +59,10 @@ library.add(
   faClipboardList,
   faWarehouse,
   faShop,
-  faLink
+  faLink,
+  faFileInvoice,
+  faImages,
+  faCalendar,
 )
 
 const app = createApp(App)

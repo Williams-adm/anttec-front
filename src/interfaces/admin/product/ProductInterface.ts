@@ -1,8 +1,8 @@
-import type { paginatedResponseI } from "../base/PaginationInterface"
-import type { ProductBrandI } from "./ProductBrandInterface"
-import type { ProductCategoryI } from "./ProductCategoryInterface"
-import type { ProductSpecificationI } from "./ProductSpecificationInterface"
-import type { ProductSubcategoryI } from "./ProductSubcategoryInterface"
+import type { paginatedResponseI } from '../base/PaginationInterface'
+import type { ProductBrandI } from './ProductBrandInterface'
+import type { ProductCategoryI } from './ProductCategoryInterface'
+import type { ProductSpecificationI } from './ProductSpecificationInterface'
+import type { ProductSubcategoryI } from './ProductSubcategoryInterface'
 
 export interface ProductI {
   id: number

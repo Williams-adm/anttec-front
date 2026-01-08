@@ -57,7 +57,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
     })
     const payload = {
       option_product_id: props.option_id,
-      option_value_id: values.option_value_id
+      option_value_id: values.option_value_id,
     }
     await OptionProductService.addValues(payload as addValuesDTO)
     Swal.close()
@@ -97,7 +97,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       </label>
       <select
         v-model="optionValueId"
-              v-bind="optionValueIdAttrs"
+        v-bind="optionValueIdAttrs"
         id="option_id"
         class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed focus:outline-none focus:ring-1"
       >
@@ -109,7 +109,11 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       <span class="text-red-400">{{ errors.option_value_id }}</span>
     </div>
     <div class="pt-10">
-      <button class="cursor-pointer disabled:opacity-50 transition ease-in-out duration-150" type="submit" :disabled="!meta.valid">
+      <button
+        class="cursor-pointer disabled:opacity-50 transition ease-in-out duration-150"
+        type="submit"
+        :disabled="!meta.valid"
+      >
         <font-awesome-icon icon="fa-solid fa-circle-plus" size="2xl" class="text-amber-400" />
       </button>
     </div>

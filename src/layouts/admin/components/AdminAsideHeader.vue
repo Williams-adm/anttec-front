@@ -13,7 +13,7 @@ const activeRoutes = computed(() => {
 
   const map: Record<string, boolean> = {}
 
-  links.forEach(link => {
+  links.forEach((link) => {
     // padre sin hijos
     if (!link.children) {
       map[link.route] = currentName.startsWith(link.route)
@@ -25,7 +25,7 @@ const activeRoutes = computed(() => {
 
     map[link.route] = isParentActive
 
-    link.children.forEach(child => {
+    link.children.forEach((child) => {
       map[child.route] = currentName.startsWith(child.route)
 
       // activar padre si el hijo está activo
@@ -76,7 +76,8 @@ const open = reactive<Record<string, boolean>>({})
             <button
               @click="open[link.name] = !open[link.name]"
               type="button"
-              :class="['flex items-center w-full justify-between p-2 text-body rounded-lg text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group',
+              :class="[
+                'flex items-center w-full justify-between p-2 text-body rounded-lg text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group',
                 activeRoutes[link.route] ? 'bg-gray-100 dark:bg-gray-700' : '',
               ]"
             >
