@@ -1,8 +1,8 @@
 import type { branchesI } from '@/interfaces/admin/branch/BranchInterface'
-import httpAPI from '../httpAPI'
+import httpAdmin from '../httpAdmin'
 
 class BranchService {
-  private api = httpAPI
+  private api = httpAdmin
 
   async getAll(): Promise<branchesI> {
     const res = await this.api.get<branchesI>('/admin/branches')

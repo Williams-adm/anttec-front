@@ -2,13 +2,13 @@ import type { productCreateDTO } from '@/DTOs/admin/product/ProductCreateDTO'
 import type { productUpdateDTO } from '@/DTOs/admin/product/ProductUpdateDTO'
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
 import type { OptionProductI } from '@/interfaces/admin/optionProduct/OptionProductInterface'
-import type { ProductExtendI, ProductsI } from '@/interfaces/admin/product/ProductInterface'
-import httpAPI from '../httpAPI'
 import type { ProductHasOptionsI } from '@/interfaces/admin/product/ProductHasOptionsInterface'
+import type { ProductExtendI, ProductsI } from '@/interfaces/admin/product/ProductInterface'
 import type { ProductOptionListI } from '@/interfaces/admin/product/ProductOptionListInterface'
+import httpAdmin from '../httpAdmin'
 
 class ProductService {
-  private api = httpAPI
+  private api = httpAdmin
 
   async getAll(): Promise<ProductsI> {
     const res = await this.api.get<ProductsI>('/admin/products')

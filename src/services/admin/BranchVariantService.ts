@@ -1,9 +1,9 @@
-import type { branchVariantI } from '@/interfaces/admin/BranchVariantInterface'
-import httpAPI from '../httpAPI'
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
+import type { branchVariantI } from '@/interfaces/admin/BranchVariantInterface'
+import httpAdmin from '../httpAdmin'
 
 class BranchVariantService {
-  private api = httpAPI
+  private api = httpAdmin
 
   async getAllList(): Promise<branchVariantI[]> {
     const res = await this.api.get<ApiListResponseI<branchVariantI[]>>(

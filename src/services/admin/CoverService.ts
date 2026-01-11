@@ -1,10 +1,10 @@
 import type { coverOrderDTO } from '@/DTOs/admin/cover/CoverOrderDTO'
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
 import type { coverI, coversI } from '@/interfaces/admin/CoverInterface'
-import httpAPI from '../httpAPI'
+import httpAdmin from '../httpAdmin'
 
 class CoverService {
-  private api = httpAPI
+  private api = httpAdmin
 
   async getAll(): Promise<coversI> {
     const res = await this.api.get<coversI>('/admin/covers')

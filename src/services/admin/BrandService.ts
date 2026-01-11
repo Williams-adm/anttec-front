@@ -1,11 +1,11 @@
 import type { brandUpdateDTO } from '@/DTOs/admin/brand/BrandUpdateDTO'
 import type { categoryCreateDTO } from '@/DTOs/admin/category/CategoryCreateDTO'
-import type { brandI, brandsI } from '@/interfaces/admin/BrandInterface'
-import httpAPI from '../httpAPI'
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
+import type { brandI, brandsI } from '@/interfaces/admin/BrandInterface'
+import httpAdmin from '../httpAdmin'
 
 class BrandService {
-  private api = httpAPI
+  private api = httpAdmin
 
   async getAll(): Promise<brandsI> {
     const res = await this.api.get<brandsI>('/admin/brands')

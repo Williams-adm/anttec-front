@@ -1,13 +1,13 @@
+import type { addValuesDTO } from '@/DTOs/admin/productOption/addValuesDTO'
 import type { productOptionCreateDTO } from '@/DTOs/admin/productOption/ProductOptionCreateDTO'
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
 import type { OptionProductI } from '@/interfaces/admin/optionProduct/OptionProductInterface'
-import httpAPI from '../httpAPI'
 import type { OptionProductShortI } from '@/interfaces/admin/optionProduct/OptionProductShortInterface'
-import type { addValuesDTO } from '@/DTOs/admin/productOption/addValuesDTO'
 import type { OptionProductValuesI } from '@/interfaces/admin/optionProduct/OptionProductValuesInterface'
+import httpAdmin from '../httpAdmin'
 
 class OptionProductService {
-  private api = httpAPI
+  private api = httpAdmin
 
   async getById(id: string): Promise<OptionProductI> {
     const res = await this.api.get<ApiListResponseI<OptionProductI>>(`/admin/option-products/${id}`)

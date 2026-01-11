@@ -1,11 +1,11 @@
-import type { categoriesI, categoryI, categorySubI } from '@/interfaces/admin/CategoryInterface'
 import type { categoryCreateDTO } from '@/DTOs/admin/category/CategoryCreateDTO'
 import type { categoryUpdateDTO } from '@/DTOs/admin/category/CategoryUpdateDTO'
-import httpAPI from '../httpAPI'
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
+import type { categoriesI, categoryI, categorySubI } from '@/interfaces/admin/CategoryInterface'
+import httpAdmin from '../httpAdmin'
 
 class CategoryService {
-  private api = httpAPI
+  private api = httpAdmin
 
   async getAll(): Promise<categoriesI> {
     const res = await this.api.get<categoriesI>('/admin/categories')

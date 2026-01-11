@@ -1,11 +1,11 @@
 import type { movementCreateDTO } from '@/DTOs/admin/movement/MovementCreateDTO'
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
-import httpAPI from '../httpAPI'
-import type { movementsShortI } from '@/interfaces/admin/movement/MovementShortInterface'
 import type { movementI } from '@/interfaces/admin/movement/MovementInterface'
+import type { movementsShortI } from '@/interfaces/admin/movement/MovementShortInterface'
+import httpAdmin from '../httpAdmin'
 
 class MovementsService {
-  private api = httpAPI
+  private api = httpAdmin
 
   async getAll(): Promise<movementsShortI> {
     const res = await this.api.get<movementsShortI>('/admin/movements')

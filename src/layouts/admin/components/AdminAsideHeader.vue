@@ -77,7 +77,7 @@ const open = reactive<Record<string, boolean>>({})
               @click="open[link.name] = !open[link.name]"
               type="button"
               :class="[
-                'flex items-center w-full justify-between p-2 text-body rounded-lg text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group',
+                'flex items-center w-full justify-between p-2 rounded-lg text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group',
                 activeRoutes[link.route] ? 'bg-gray-100 dark:bg-gray-700' : '',
               ]"
             >

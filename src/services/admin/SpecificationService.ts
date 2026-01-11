@@ -1,11 +1,11 @@
 import type { specificationCreateDTO } from '@/DTOs/admin/specification/SpecificationCreateDTO'
 import type { specificationUpdateDTO } from '@/DTOs/admin/specification/SpecificationUpdateDTO'
-import type { SpecificationI, SpecificationsI } from '@/interfaces/admin/SpecificationInterface'
-import httpAPI from '../httpAPI'
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
+import type { SpecificationI, SpecificationsI } from '@/interfaces/admin/SpecificationInterface'
+import httpAdmin from '../httpAdmin'
 
 class SpecificationService {
-  private api = httpAPI
+  private api = httpAdmin
 
   async getAll(): Promise<SpecificationsI> {
     const res = await this.api.get<SpecificationsI>('/admin/specifications')

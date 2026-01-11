@@ -3,10 +3,10 @@ import type { optionUpdateDTO } from '@/DTOs/admin/option/OptionUpdateDTO'
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
 import type { OptionExtendI, OptionI, OptionsI } from '@/interfaces/admin/options/OptionInterface'
 import type { OptionValueShortI } from '@/interfaces/admin/options/OptionValueInterface'
-import httpAPI from '../httpAPI'
+import httpAdmin from '../httpAdmin'
 
 class OptionService {
-  private api = httpAPI
+  private api = httpAdmin
 
   async getAll(): Promise<OptionsI> {
     const res = await this.api.get<OptionsI>('/admin/options')

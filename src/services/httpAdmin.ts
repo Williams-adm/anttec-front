@@ -2,7 +2,7 @@ import { useAuthStore } from '@/stores/useAuthStore'
 import { handleApiError } from '@/utils/handleApiError'
 import axios from 'axios'
 
-const httpAPI = axios.create({
+const httpAdmin = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: {
     'Content-Type': 'application/json',
@@ -11,7 +11,7 @@ const httpAPI = axios.create({
   /* withCredentials: true, */
 })
 
-httpAPI.interceptors.request.use(
+httpAdmin.interceptors.request.use(
   (config) => {
     const authStore = useAuthStore()
 
@@ -26,7 +26,7 @@ httpAPI.interceptors.request.use(
   },
 )
 
-httpAPI.interceptors.response.use(
+httpAdmin.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status
@@ -44,4 +44,4 @@ httpAPI.interceptors.response.use(
   },
 )
 
-export default httpAPI
+export default httpAdmin

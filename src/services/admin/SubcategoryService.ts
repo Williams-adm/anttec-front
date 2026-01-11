@@ -1,11 +1,11 @@
 import type { subcategoryCreateDTO } from '@/DTOs/admin/subcategory/SubcategoryCreateDTO'
 import type { subcategoryUpdateDTO } from '@/DTOs/admin/subcategory/SubcategoryUpdateDTO'
-import type { subcategoriesI, subcategoryI } from '../../interfaces/admin/SubcategoryInterface'
-import httpAPI from '../httpAPI'
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
+import type { subcategoriesI, subcategoryI } from '../../interfaces/admin/SubcategoryInterface'
+import httpAdmin from '../httpAdmin'
 
 class SubcategoryService {
-  private api = httpAPI
+  private api = httpAdmin
 
   async getAll(): Promise<subcategoriesI> {
     const res = await this.api.get<subcategoriesI>('/admin/subcategories')

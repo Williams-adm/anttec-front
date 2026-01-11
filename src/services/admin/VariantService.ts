@@ -1,10 +1,10 @@
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
 import type { variantI, variantsI } from '@/interfaces/admin/variant/variantInterface'
 import type { variantShortsI } from '@/interfaces/admin/variant/variantShortInterface'
-import httpAPI from '../httpAPI'
+import httpAdmin from '../httpAdmin'
 
 class VariantService {
-  private api = httpAPI
+  private api = httpAdmin
 
   async getAll(): Promise<variantsI> {
     const res = await this.api.get<variantsI>('/admin/variants')

@@ -1,42 +1,49 @@
 //import './assets/main.css'
 import './style.css'
 
-import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { createApp } from 'vue'
 
 import App from './App.vue'
 import router from './router'
 
 //Font awesomo
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {
-  faBarsStaggered,
-  faChartLine,
-  faLayerGroup,
-  faTags,
-  faAngleRight,
-  faCircleInfo,
-  faPenToSquare,
-  faList,
-  faBoxesStacked,
-  faAngleUp,
   faAngleDown,
-  faBox,
+  faAngleRight,
+  faAngleUp,
+  faBarsStaggered,
   faBook,
-  faListCheck,
-  faTrashCan,
-  faEye,
-  faGear,
+  faBox,
+  faBoxesStacked,
+  faCalendar,
+  faCartShopping,
+  faChartLine,
+  faCircleInfo,
   faCirclePlus,
   faClipboardList,
-  faWarehouse,
-  faShop,
-  faLink,
+  faEye,
   faFileInvoice,
+  faGear,
   faImages,
-  faCalendar,
+  faLayerGroup,
+  faLink,
+  faList,
+  faListCheck,
+  faMagnifyingGlass,
+  faPenToSquare,
+  faShop,
+  faTags,
+  faTrashCan,
+  faUser,
+  faWarehouse,
+  faBars,
+  faAnglesRight,
+  faXmark,
+  faAngleLeft,
 } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(
   faBarsStaggered,
   faChartLine,
@@ -63,7 +70,17 @@ library.add(
   faFileInvoice,
   faImages,
   faCalendar,
+  faMagnifyingGlass,
+  faCartShopping,
+  faUser,
+  faBars,
+  faAnglesRight,
+  faXmark,
+  faAngleLeft,
 )
+
+import { faFacebookF, faInstagram } from '@fortawesome/free-brands-svg-icons'
+library.add(faFacebookF, faInstagram)
 
 const app = createApp(App)
 

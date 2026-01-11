@@ -24,7 +24,7 @@ useClickOutside(
 const links: adminMenuInterface[] = [
   {
     name: 'Tienda virtual',
-    route: 'home',
+    route: 'shop.home',
   },
   {
     name: 'Cerrar sesión',
@@ -44,7 +44,7 @@ const handleLogout = async () => {
     await AuthService.logout()
     ui.isMenuOpen = false
     Swal.close()
-    await router.push({ name: 'home' })
+    await router.push({ name: 'shop.home' })
   } catch (err) {
     console.error('Error al cerrar sesión:', err)
   }
@@ -74,7 +74,7 @@ const handleLogout = async () => {
         class="z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-sm shadow-sm dark:bg-gray-700 dark:divide-gray-600"
         :class="
           ui.isMenuOpen
-            ? 'block absolute -top-4 right-23 m-0 translate-x-[80px] translate-y-[58px]'
+            ? 'block absolute -top-4 right-23 m-0 translate-x-20 translate-y-14.5'
             : 'hidden'
         "
       >

@@ -4,7 +4,7 @@ import logoDark from '@/assets/img/logo-dark.png'
 </script>
 
 <template>
-  <router-link :to="{ name: 'home' }">
+  <router-link :to="{ name: 'shop.home' }">
     <!-- Imagen para modo claro -->
     <img class="w-40 h-16 block dark:hidden" :src="logoDark" alt="Logo Light" />
     <!-- Imagen para modo oscuro -->

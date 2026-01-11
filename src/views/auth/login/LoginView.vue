@@ -33,7 +33,7 @@ const onSubmit = handleSubmit(async (values) => {
 
     await AuthService.login(values as loginDTO)
     Swal.close()
-    router.push({ name: 'home' })
+    router.push({ name: 'shop.home' })
   } catch (err) {
     Swal.close()
     if (axios.isAxiosError(err)) {
