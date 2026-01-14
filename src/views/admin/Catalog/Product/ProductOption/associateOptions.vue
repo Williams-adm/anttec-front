@@ -104,7 +104,7 @@ onMounted(() => {
                     </div>
                   </div>
                 </div>
-                <addValue :option_id="option.option_id" @created="loadProductOption" />
+                <addValue :option_id="option.option_id" :option_product="option.id" @created="loadProductOption" />
               </div>
             </div>
           </div>

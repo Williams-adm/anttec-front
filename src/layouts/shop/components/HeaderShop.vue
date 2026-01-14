@@ -69,7 +69,7 @@ watch(isCategoriesOpen, (open) => {
   <div class="sticky top-0 z-50">
     <div class="relative">
       <header class="bg-black shadow-md dark:bg-banner">
-        <div class="container lg:mx-auto max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="container lg:mx-auto max-w-8xl mx-auto px-6 lg:px-8">
           <div class="flex items-center justify-between py-3 sm:py-4">
             <!-- Toggle categorías (mobile / tablet) -->
             <div class="lg:hidden" ref="categoriesRef">

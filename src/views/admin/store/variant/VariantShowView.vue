@@ -176,7 +176,7 @@ onMounted(() => {
             :space-between="10"
             :navigation="true"
             :thumbs="{ swiper: thumbsSwiper }"
-            class="w-full max-w-md aspect-square sm:aspect-[4/3] lg:aspect-[3/4]"
+            class="w-full max-w-md aspect-square sm:aspect-4/3 lg:aspect-3/4"
           >
             <SwiperSlide v-for="(img, i) in variantImages" :key="img.id ?? i">
               <div class="relative w-full h-full">

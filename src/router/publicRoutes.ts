@@ -9,17 +9,32 @@ const publicRoutes = [
       {
         path: '',
         name: 'shop.home',
-        component: () => import('@/views/HomeView.vue'),
+        component: () => import('@/views/shop/HomeView.vue'),
+      },
+      {
+        path: 'products/category/:categoryId',
+        name: 'shop.products.category',
+        component: () => import('@/views/shop/product/ProductsView.vue'),
+      },
+      {
+        path: 'products/category/:categoryId/subcategory/:subcategoryId',
+        name: 'shop.products.category.subcategory',
+        component: () => import('@/views/shop/product/ProductsView.vue'),
+      },
+      {
+        path: 'variant/product/:productId/variant/:variantId',
+        name: 'shop.variant.show',
+        component: () => import('@/views/shop/variant/VariantShowView.vue'),
       },
       {
         path: 'aboutUs',
         name: 'shop.aboutUs',
-        component: () => import('@/views/shop/footer/company/aboutUsView.vue'),
+        component: () => import('@/views/shop/footer/company/AboutUsView.vue'),
       },
       {
         path: 'privacy-policy',
         name: 'shop.privacyPolicy',
-        component: () => import('@/views/shop/footer/legal/privacyPolicyView.vue'),
+        component: () => import('@/views/shop/footer/legal/PrivacyPolicyView.vue'),
       },
       {
         path: 'terms-and-conditions',

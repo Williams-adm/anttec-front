@@ -10,6 +10,12 @@ class CategorySService {
     console.log(res.data.message)
     return res.data.data
   }
+
+  async getById(id: string): Promise<categorySI> {
+    const res = await this.api.get<ApiListResponseI<categorySI>>(`categories/${id}`)
+    console.log(res.data.message)
+    return res.data.data
+  }
 }
 
 export default new CategorySService()

@@ -1,10 +1,10 @@
 export interface categorySI {
   id: number
   name: string
-  subcategories: subI[]
+  subcategories?: subSI[]
 }
 
-export interface subI {
+export interface subSI {
   id: number
   name: string
 }

@@ -17,6 +17,7 @@ const serverErrors = ref<Record<string, string[]>>({})
 
 const props = defineProps<{
   option_id: number | string
+  option_product: number | string
 }>()
 
 const emit = defineEmits<{
@@ -56,7 +57,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       icon: 'loading',
     })
     const payload = {
-      option_product_id: props.option_id,
+      option_product_id: props.option_product,
       option_value_id: values.option_value_id,
     }
     await OptionProductService.addValues(payload as addValuesDTO)

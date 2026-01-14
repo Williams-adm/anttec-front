@@ -42,6 +42,9 @@ import {
   faAnglesRight,
   faXmark,
   faAngleLeft,
+  faHouse,
+  faPlus,
+  faMinus,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(
@@ -77,6 +80,9 @@ library.add(
   faAnglesRight,
   faXmark,
   faAngleLeft,
+  faHouse,
+  faPlus,
+  faMinus,
 )
 
 import { faFacebookF, faInstagram } from '@fortawesome/free-brands-svg-icons'
