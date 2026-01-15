@@ -19,15 +19,25 @@ export const editCoverSchema = object({
     .transform((value, originalValue) => (originalValue === '' ? null : value))
     .min(ref('start_at'), 'La fecha de fin debe ser igual o posterior a la fecha de inicio'),
 
-  image: mixed<File | Blob | string>()
+  image: mixed<File | Blob | string | { name: string; size: number; type: string }>()
     .required('La imagen es obligatoria')
     .test('imageType', 'Debe ser una imagen', (value) => {
       if (!value) return false
 
-      // imagen existente (URL)
+      // Imagen existente (URL string)
       if (typeof value === 'string') return true
 
-      // File
+      // Objeto de metadatos de FilePond (archivo existente con File Poster)
+      if (
+        typeof value === 'object' &&
+        'name' in value &&
+        'type' in value &&
+        typeof value.type === 'string'
+      ) {
+        return value.type.startsWith('image/')
+      }
+
+      // File (nueva imagen subida)
       if (value instanceof File) {
         return value.type.startsWith('image/')
       }

@@ -5,7 +5,7 @@ defineProps<{
 </script>
 
 <template>
-  <router-link :to="{ name: '' }" class="relative text-gray-700 hover:text-indigo-600">
+  <router-link :to="{ name: 'shop.cart' }" class="relative text-gray-700 hover:text-indigo-600">
     <font-awesome-icon icon="fa-solid fa-cart-shopping" class="text-3xl text-gray-200" />
     <span
       v-if="itemCount && itemCount > 0"

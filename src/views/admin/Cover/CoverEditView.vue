@@ -14,6 +14,8 @@ import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orien
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
 import FilePondPluginImageResize from 'filepond-plugin-image-resize'
+import FilePondPluginFilePoster from 'filepond-plugin-file-poster'
+import 'filepond-plugin-file-poster/dist/filepond-plugin-file-poster.css'
 import 'filepond/dist/filepond.min.css'
 import { Datepicker } from 'flowbite'
 import Swal from 'sweetalert2'
@@ -44,7 +46,7 @@ useBreadcrumb(() => [
   },
 ])
 
-const { meta, handleSubmit, errors, defineField, resetForm, setFieldValue, setErrors } = useForm({
+const { meta, handleSubmit, errors, defineField, resetForm, setFieldValue, setErrors, values } = useForm({
   validationSchema: editCoverSchema,
 })
 
@@ -67,6 +69,7 @@ const FilePond = VueFilePond(
   FilePondPluginFileValidateSize,
   FilePondPluginFileValidateType,
   FilePondPluginImageResize,
+  FilePondPluginFilePoster,
 )
 
 const onUpdateFiles = (files: FilePondFile[]) => {
@@ -98,13 +101,23 @@ const loadcovers = async () => {
         image: cover.value.image,
       },
     })
-    /* 🔹 Imagen existente en FilePond */
+    /* 🔹 Imagen existente en FilePond usando File Poster */
     if (cover.value.image) {
+      const imageName = cover.value.image.split('/').pop() || 'imagen.jpg'
+
       initialFiles.value = [
         {
           source: cover.value.image,
           options: {
             type: 'local',
+            file: {
+              name: imageName,
+              size: 0,
+              type: 'image/jpeg',
+            },
+            metadata: {
+              poster: cover.value.image,
+            },
           },
         },
       ]
@@ -169,22 +182,6 @@ watch(isLoading, (val) => {
   if (!val) initDatepickers()
 })
 
-const filePondServer = {
-  load: (source: string, load: (data: Blob) => void, error: (err: string) => void) => {
-    fetch(source)
-      .then((res) => {
-        if (!res.ok) throw new Error('No se pudo cargar la imagen')
-        return res.blob()
-      })
-      .then((blob) => {
-        load(blob)
-      })
-      .catch(() => {
-        error('Error cargando la imagen')
-      })
-  },
-}
-
 const onSubmit = handleSubmit(async (values) => {
   try {
     useSweetAlert({
@@ -210,8 +207,8 @@ const onSubmit = handleSubmit(async (values) => {
     Swal.close()
 
     useSweetAlert({
-      title: 'Portada creado',
-      text: 'La portada ha sido creado con éxito',
+      title: 'Portada actualizada',
+      text: 'La portada ha sido actualizada con éxito',
       icon: 'success',
     })
   } catch (err) {
@@ -236,6 +233,9 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <template>
+  <pre class="text-gray-100">
+    {{ values }}
+  </pre>
   <AnimationLoader v-if="isLoading" />
   <div
     v-else
@@ -305,7 +305,6 @@ const onSubmit = handleSubmit(async (values) => {
             ref="filePondRef"
             name="image"
             :files="initialFiles"
-            :server="filePondServer"
             allowFileTypeValidation="true"
             allowImageResize="true"
             imageResizeUpscale="true"

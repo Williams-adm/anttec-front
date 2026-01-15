@@ -12,19 +12,30 @@ const publicRoutes = [
         component: () => import('@/views/shop/HomeView.vue'),
       },
       {
-        path: 'products/category/:categoryId',
-        name: 'shop.products.category',
-        component: () => import('@/views/shop/product/ProductsView.vue'),
-      },
-      {
-        path: 'products/category/:categoryId/subcategory/:subcategoryId',
-        name: 'shop.products.category.subcategory',
-        component: () => import('@/views/shop/product/ProductsView.vue'),
+        path: 'products',
+        children: [
+          {
+            path: 'category/:categoryId',
+            name: 'shop.products.category',
+            component: () => import('@/views/shop/product/ProductsView.vue'),
+          },
+          {
+            path: 'category/:categoryId/subcategory/:subcategoryId',
+            name: 'shop.products.category.subcategory',
+            component: () => import('@/views/shop/product/ProductsView.vue'),
+          },
+
+        ]
       },
       {
         path: 'variant/product/:productId/variant/:variantId',
         name: 'shop.variant.show',
         component: () => import('@/views/shop/variant/VariantShowView.vue'),
+      },
+      {
+        path: 'cart',
+        name: 'shop.cart',
+        component: () => import('@/views/shop/cart/CartView.vue'),
       },
       {
         path: 'aboutUs',
