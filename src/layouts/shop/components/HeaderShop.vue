@@ -9,6 +9,7 @@ import ProfileMenu from './header/ProfileMenu.vue'
 import CartButton from './header/CartButton.vue'
 import MobileDrawer from './header/MobileDrawer.vue'
 import DesktopMenu from './header/DesktopMenu.vue'
+import CartDrawer from '@/components/shop/cart/CartDrawer.vue'
 
 const isCategoriesOpen = ref(false)
 const categoriesRef = ref<HTMLElement | null>(null)
@@ -89,7 +90,7 @@ watch(isCategoriesOpen, (open) => {
             </div>
 
             <!-- Navegación y acciones -->
-            <nav class="flex items-center space-x-8 text-gray-700 dark:text-gray-200">
+            <nav class="flex items-center space-x-2 md:space-x-5 lg:md:space-x-8 text-gray-700 dark:text-gray-200">
               <!-- Contacto -->
               <div class="hidden md:flex flex-col text-center">
                 <span class="text-gray-300">Contáctanos</span>
@@ -102,7 +103,7 @@ watch(isCategoriesOpen, (open) => {
               <ProfileMenu />
 
               <!-- Carrito -->
-              <CartButton :item-count="3" />
+              <CartButton />
             </nav>
           </div>
 
@@ -126,5 +127,6 @@ watch(isCategoriesOpen, (open) => {
 
     <!-- Desktop Menu -->
     <DesktopMenu :categories="categoriesList" />
+    <CartDrawer />
   </div>
 </template>

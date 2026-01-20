@@ -4,13 +4,14 @@ import { useRoute, useRouter } from 'vue-router'
 
 import BreadCrumb from '@/components/shop/BreadCrumb.vue'
 import type { BreadcrumbInterface } from '@/components/shop/interface/breadcrumbInterface'
-import VariantImgGallery from './components/VariantImgGallery.vue'
-import VariantQuantityInput from './components/VariantQuantityInput.vue'
-import VariantSpecifications from './components/VariantSpecifications.vue'
-import VariantSelector from './components/VariantSelector.vue'
 import { useSweetAlert } from '@/composables/useSweetAlert'
 import type { variantSI } from '@/interfaces/shop/Variant/VariantSInterface'
 import VariantSService from '@/services/shop/VariantSService'
+import VariantImgGallery from './components/VariantImgGallery.vue'
+import VariantQuantityInput from './components/VariantQuantityInput.vue'
+import VariantSelector from './components/VariantSelector.vue'
+import VariantSpecifications from './components/VariantSpecifications.vue'
+import { useCart } from '@/composables/useCart'
 
 const route = useRoute()
 const router = useRouter()
@@ -19,6 +20,9 @@ const product = ref<variantSI | null>(null)
 const isLoading = ref(true)
 const quantity = ref(1)
 const swiperKey = ref(0)
+
+// Composable del carrito
+const { addToCart: addToCartComposable, isInCart, getItemQuantity } = useCart()
 
 // Cargar producto
 const loadProduct = async () => {
@@ -139,7 +143,7 @@ const isFeatureAvailable = (featureId: number, optionName: string) => {
 
   if (currentFeatures.length === 0) {
     return product.value.variants.some((variant) =>
-      variant.features.some((vf) => vf.id === featureId)
+      variant.features.some((vf) => vf.id === featureId),
     )
   }
 
@@ -176,7 +180,7 @@ const selectFeature = (featureId: number, optionName: string) => {
 
   if (!targetVariant) {
     targetVariant = product.value.variants.find((variant) =>
-      variant.features.some((vf) => vf.id === featureId)
+      variant.features.some((vf) => vf.id === featureId),
     )
   }
 
@@ -191,11 +195,11 @@ const selectFeature = (featureId: number, optionName: string) => {
   }
 }
 
-// Agregar al carrito
-const addToCart = () => {
+// Agregar al carrito mejorado
+const addToCart = async () => {
   if (!product.value) return
 
-  // Validación adicional por si acaso
+  // Validación de cantidad
   if (quantity.value < 1 || quantity.value > product.value.selected_variant.stock) {
     useSweetAlert({
       title: 'Cantidad inválida',
@@ -206,14 +210,40 @@ const addToCart = () => {
     return
   }
 
-  // Aquí iría la lógica real de agregar al carrito
-  useSweetAlert({
-    title: '¡Agregado al carrito!',
-    text: `${quantity.value} unidad(es) de ${product.value.name}`,
-    icon: 'success',
-    timer: 2000,
-  })
+  // Validar stock disponible
+  if (quantity.value > product.value.selected_variant.stock) {
+    useSweetAlert({
+      title: 'Stock insuficiente',
+      text: `Solo hay ${product.value.selected_variant.stock} unidades disponibles`,
+      icon: 'warning',
+      timer: 3000,
+    })
+    return
+  }
+
+  // Obtener el branch_variant_id del producto
+  const branchVariantId = product.value.selected_variant.branch_variant_id
+
+  // Agregar al carrito usando el composable
+  const success = await addToCartComposable(branchVariantId, quantity.value)
+
+  if (success) {
+    // Resetear cantidad después de agregar exitosamente
+    quantity.value = 1
+  }
 }
+
+// Computed para verificar si está en el carrito
+const isProductInCart = computed(() => {
+  if (!product.value?.selected_variant.branch_variant_id) return false
+  return isInCart(product.value.selected_variant.branch_variant_id)
+})
+
+// Computed para obtener cantidad en el carrito
+const cartQuantity = computed(() => {
+  if (!product.value?.selected_variant.branch_variant_id) return 0
+  return getItemQuantity(product.value.selected_variant.branch_variant_id)
+})
 
 // Recargar cuando cambie la ruta
 watch(
@@ -221,7 +251,7 @@ watch(
   async () => {
     await loadProduct()
   },
-  { deep: true }
+  { deep: true },
 )
 
 onMounted(loadProduct)
@@ -355,13 +385,58 @@ onBeforeUnmount(() => {
               <button
                 @click="addToCart"
                 :disabled="product.selected_variant.stock === 0"
-                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg transition-all disabled:bg-gray-400 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
+                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg transition-all disabled:bg-gray-400 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
               >
                 <span class="flex items-center justify-center gap-2">
                   <font-awesome-icon icon="fa-solid fa-cart-shopping" />
-                  Agregar al carrito
+                  {{ isProductInCart ? 'Actualizar carrito' : 'Agregar al carrito' }}
                 </span>
               </button>
+            </div>
+
+            <!-- Mostrar si ya está en el carrito -->
+            <div
+              v-if="isProductInCart"
+              class="text-sm text-green-600 dark:text-green-400 flex items-center gap-2 bg-green-50 dark:bg-green-900/20 p-3 rounded-lg"
+            >
+              <font-awesome-icon icon="fa-solid fa-circle-check" />
+              Ya tienes {{ cartQuantity }} unidad{{ cartQuantity > 1 ? 'es' : '' }} en el carrito
+            </div>
+
+            <!-- Métodos de Entrega -->
+            <div>
+              <h3
+                class="font-semibold text-gray-900 dark:text-gray-100 mb-3 text-sm uppercase tracking-wide mt-5"
+              >
+                Métodos de entrega:
+              </h3>
+              <div class="space-y-3">
+                <!-- Despacho a domicilio -->
+                <div class="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                  <div
+                    class="w-10 h-10 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 rounded-lg"
+                  >
+                    <font-awesome-icon
+                      icon="fa-solid fa-truck-fast"
+                      class="text-blue-600 dark:text-blue-400 text-lg"
+                    />
+                  </div>
+                  <p class="text-sm font-medium">Despacho a domicilio</p>
+                </div>
+
+                <!-- Recojo en tienda -->
+                <div class="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                  <div
+                    class="w-10 h-10 flex items-center justify-center bg-green-100 dark:bg-green-900/30 rounded-lg"
+                  >
+                    <font-awesome-icon
+                      icon="fa-solid fa-shop"
+                      class="text-green-600 dark:text-green-400 text-lg"
+                    />
+                  </div>
+                  <p class="text-sm font-medium">Recojo en tienda</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

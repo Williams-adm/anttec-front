@@ -16,7 +16,8 @@ export interface variantSI {
 
 export interface variantsSI {
   id: number
-  features: featuresSI []
+  branch_variant_id: number
+  features: featuresSI[]
 }
 
 export interface categorySI {

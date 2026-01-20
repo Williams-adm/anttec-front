@@ -97,13 +97,14 @@ const handleKeypress = (event: KeyboardEvent) => {
       <button
         @click="decrement"
         :disabled="disabled || internalValue <= 1"
-        class="px-4 py-2.5 transition-colors"
+        class="px-4 py-2.5 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         :class="[
           disabled || internalValue <= 1
             ? 'opacity-50 cursor-not-allowed'
             : 'hover:bg-gray-100 dark:hover:bg-gray-700',
         ]"
         type="button"
+        title="Disminuir cantidad"
       >
         <font-awesome-icon icon="fa-solid fa-minus" size="sm" class="text-gray-700 dark:text-gray-300" />
       </button>
@@ -129,13 +130,14 @@ const handleKeypress = (event: KeyboardEvent) => {
       <button
         @click="increment"
         :disabled="disabled || internalValue >= maxStock"
-        class="px-4 py-2.5 transition-colors"
+        class="px-4 py-2.5 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         :class="[
           disabled || internalValue >= maxStock
             ? 'opacity-50 cursor-not-allowed'
             : 'hover:bg-gray-100 dark:hover:bg-gray-700',
         ]"
         type="button"
+        title="Aumentar cantidad"
       >
         <font-awesome-icon icon="fa-solid fa-plus" size="sm" class="text-gray-700 dark:text-gray-300" />
       </button>

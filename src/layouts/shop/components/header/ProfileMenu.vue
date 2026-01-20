@@ -5,7 +5,6 @@ import Swal from 'sweetalert2'
 import { useClickOutside } from '@/composables/useClickOutside'
 import { useSweetAlert } from '@/composables/useSweetAlert'
 import { useAuthStore } from '@/stores/useAuthStore'
-import AuthService from '@/services/auth/AuthService'
 import type { profileMenuInterface } from '../../interface/profileMenuInterface'
 
 const router = useRouter()
@@ -54,7 +53,7 @@ const handleLogout = async () => {
       icon: 'loading',
     })
 
-    await AuthService.logout()
+    await authStore.logout()
     isProfileOpen.value = false
     Swal.close()
     await router.push({ name: 'shop.home' })

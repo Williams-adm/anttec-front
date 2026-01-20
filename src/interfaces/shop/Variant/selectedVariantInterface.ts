@@ -1,5 +1,6 @@
 export interface selectedVariantSI {
   id: number
+  branch_variant_id: number
   sku: string
   price: string | number
   stock: number

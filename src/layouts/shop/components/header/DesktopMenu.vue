@@ -7,7 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <section class="bg-gray-300 hidden lg:block">
+  <section class="bg-gray-100 hidden lg:block">
     <ul class="flex justify-center gap-8 p-2">
       <li v-for="(category, index) in categories" :key="index" class="relative group">
         <!-- Categoría -->

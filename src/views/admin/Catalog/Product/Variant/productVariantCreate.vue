@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ButtonSave from '@/components/Admin/ButtonSave.vue'
+import InfoAlert from '@/components/Admin/InfoAlert.vue'
 import AnimationLoader from '@/components/AnimationLoader.vue'
 import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import { useSweetAlert } from '@/composables/useSweetAlert'
@@ -27,8 +28,7 @@ useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Productos', route: 'admin.catalog.products' },
   { name: 'Detalle', route: 'admin.catalog.products.show' },
-  { name: 'Variantes', route: 'admin.catalog.products.show.variants' },
-  { name: 'Crear' },
+  { name: 'Crear Variante' },
 ])
 
 const formKey = ref(0)
@@ -48,6 +48,7 @@ interface Feature {
   option_product_value_id: number | string
 }
 
+const hasOptions = ref<string | null>(null)
 const options = ref<ProductOptionListI[]>([])
 const isLoading = ref(true)
 const serverErrors = ref<Record<string, string[]>>({})
@@ -56,12 +57,18 @@ const valuesMap = ref<Record<number, OptionProductValuesI[]>>({})
 const loadingMap = ref<Record<number, boolean>>({})
 const filePondRef = ref<FilePondInstance | null>(null)
 
-const loadOptions = async () => {
+const loadData = async () => {
   try {
-    options.value = await ProductService.getAllOptionsList(id)
+    const [optionsList, optionsStatus] = await Promise.all([
+      ProductService.getAllOptionsList(id),
+      ProductService.hasOptions(id),
+    ])
+    options.value = optionsList
+    hasOptions.value = optionsStatus
+
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
-    error.value = 'No se pudieron cargar las categorías.'
+    error.value = 'No se pudieron cargar las opciones.'
     console.error(err)
   } finally {
     isLoading.value = false
@@ -202,179 +209,182 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
 })
 
 onMounted(async () => {
-  loadOptions()
+  loadData()
 })
 </script>
 
 <template>
   <AnimationLoader v-if="isLoading" />
   <div v-else>
-    <form action="" method="POST" @submit="onSubmit" :key="formKey">
-      <div class="flex items-center mb-6 dark:text-gray-300 text-gray-800">
-        <hr class="flex-1" />
-        <span class="mx-4"> Datos de la variante </span>
-        <hr class="flex-1" />
-      </div>
-      <div class="mb-4">
-        <label
-          for="purcharse_price"
-          class="block mb-2 font-medium text-gray-900 dark:text-gray-200"
-        >
-          Precio de compra
-        </label>
-        <input
-          v-model="purcharsePrice"
-          v-bind="purcharsePriceAttrs"
-          id="purcharse_price"
-          type="number"
-          step="0.01"
-          class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
-          placeholder="Ingrese el precio de compra: S/. 50.50"
-        />
-        <span class="text-red-400">{{ errors.purcharse_price }}</span>
-      </div>
-      <div class="mb-4">
-        <label for="selling_price" class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
-          Precio de venta
-        </label>
-        <input
-          v-model="sellingPrice"
-          v-bind="sellingPriceAttrs"
-          id="selling_price"
-          type="number"
-          step="0.01"
-          class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
-          placeholder="Ingrese el precio de venta: S/. 100.00"
-        />
-        <span class="text-red-400">{{ errors.selling_price }}</span>
-      </div>
-      <div class="mb-4">
-        <label for="stock_min" class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
-          Stock Minimo
-        </label>
-        <input
-          v-model="stockMin"
-          v-bind="stockMinAttrs"
-          id="stock_min"
-          type="number"
-          step="0.01"
-          class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
-          placeholder="Ingrese el stock mínimo"
-        />
-        <span class="text-red-400">{{ errors.stock_min }}</span>
-      </div>
-
-      <div class="mb-6">
-        <label class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
-          Imagen de la variante
-        </label>
-
-        <FilePond
-          ref="filePondRef"
-          name="image"
-          allowMultiple="true"
-          allowFileTypeValidation="true"
-          :acceptedFileTypes="['image/*']"
-          allowImagePreview="true"
-          maxFileSize="15MB"
-          imagePreviewHeight="200"
-          allowReorder="true"
-          @updatefiles="onUpdateFiles"
-          labelIdle="Arrastra la imagen o <span class='filepond--label-action'>Examinar</span>"
-        />
-        <span class="text-red-400" v-if="imagesMeta.touched">{{ imagesError }}</span>
-      </div>
-      <div class="mt-4 flex items-center mb-6 dark:text-gray-300 text-gray-800">
-        <hr class="flex-1" />
-        <span class="mx-4"> Seleccione los valores de la variante </span>
-        <hr class="flex-1" />
-      </div>
-      <div class="space-y-4">
-        <fieldset v-for="(field, idx) in featureFields" :key="field.key">
-          <div
-            class="relative rounded-lg border bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 p-6"
-          >
-            <div
-              v-if="featureFields.length > 1"
-              class="absolute top-2 right-4 px-4 bg-white dark:bg-gray-800"
-            >
-              <button
-                @click="remove(idx)"
-                type="button"
-                class="text-red-500 hover:text-red-700 font-semibold px-3 py-2"
-              >
-                <font-awesome-icon
-                  icon="fa-solid fa-trash-can"
-                  size="xl"
-                  class="transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white"
-                />
-              </button>
-            </div>
-            <div class="mb-4">
-              <label
-                :for="`option_product_${idx}`"
-                class="block mb-2 font-medium text-gray-900 dark:text-gray-200"
-              >
-                Opciones
-              </label>
-              <Field
-                validateOnInput
-                :id="`option_product_${idx}`"
-                :name="`features[${idx}].option_product_id`"
-                as="select"
-                class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed focus:outline-none focus:ring-1"
-              >
-                <option disabled selected value="">Selecciona una opción</option>
-                <option :value="option.id" v-for="(option, index) in options" :key="index">
-                  {{ option.name }}
-                </option>
-              </Field>
-              <span class="text-red-400">{{ errors[`features[${idx}].option_product_id`] }}</span>
-            </div>
-            <div class="mb-4">
-              <label
-                :for="`option_product_value_${idx}`"
-                class="block mb-2 font-medium text-gray-900 dark:text-gray-200"
-              >
-                Valor
-              </label>
-              <Field
-                validateOnInput
-                :id="`option_product_value_${idx}`"
-                :name="`features[${idx}].option_product_value_id`"
-                as="select"
-                class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed focus:outline-none focus:ring-1"
-                :disabled="loadingMap[idx] || !featureFields[idx].value.option_product_id"
-              >
-                <option value="" disabled selected>
-                  {{ loadingMap[idx] ? 'Cargando...' : 'Selecciona un valor' }}
-                </option>
-                <option v-for="value in valuesMap[idx] || []" :key="value.id" :value="value.id">
-                  {{ value.description }}
-                </option>
-              </Field>
-              <span class="text-red-400">{{
-                errors[`features[${idx}].option_product_value_id`]
-              }}</span>
-            </div>
-          </div>
-        </fieldset>
-        <span class="text-red-400">{{ errors.features }}</span>
-        <div class="flex justify-end">
-          <button
-            type="button"
-            class="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900"
-            @click="push({ option_product_id: '', option_product_value_id: '' })"
-          >
-            Agregar
-          </button>
+    <div v-if="hasOptions === 'Tiene opciones'">
+      <form action="" method="POST" @submit="onSubmit" :key="formKey">
+        <div class="flex items-center mb-6 dark:text-gray-300 text-gray-800">
+          <hr class="flex-1" />
+          <span class="mx-4"> Datos de la variante </span>
+          <hr class="flex-1" />
         </div>
-      </div>
+        <div class="mb-4">
+          <label
+            for="purcharse_price"
+            class="block mb-2 font-medium text-gray-900 dark:text-gray-200"
+          >
+            Precio de compra
+          </label>
+          <input
+            v-model="purcharsePrice"
+            v-bind="purcharsePriceAttrs"
+            id="purcharse_price"
+            type="number"
+            step="0.01"
+            class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
+            placeholder="Ingrese el precio de compra: S/. 50.50"
+          />
+          <span class="text-red-400">{{ errors.purcharse_price }}</span>
+        </div>
+        <div class="mb-4">
+          <label for="selling_price" class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
+            Precio de venta
+          </label>
+          <input
+            v-model="sellingPrice"
+            v-bind="sellingPriceAttrs"
+            id="selling_price"
+            type="number"
+            step="0.01"
+            class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
+            placeholder="Ingrese el precio de venta: S/. 100.00"
+          />
+          <span class="text-red-400">{{ errors.selling_price }}</span>
+        </div>
+        <div class="mb-4">
+          <label for="stock_min" class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
+            Stock Minimo
+          </label>
+          <input
+            v-model="stockMin"
+            v-bind="stockMinAttrs"
+            id="stock_min"
+            type="number"
+            step="0.01"
+            class="mb-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
+            placeholder="Ingrese el stock mínimo"
+          />
+          <span class="text-red-400">{{ errors.stock_min }}</span>
+        </div>
 
-      <div class="flex justify-end mt-4">
-        <ButtonSave name="Guardar" :disabled="!meta.valid" />
-      </div>
-    </form>
+        <div class="mb-6">
+          <label class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
+            Imagen de la variante
+          </label>
+
+          <FilePond
+            ref="filePondRef"
+            name="image"
+            allowMultiple="true"
+            allowFileTypeValidation="true"
+            :acceptedFileTypes="['image/*']"
+            allowImagePreview="true"
+            maxFileSize="15MB"
+            imagePreviewHeight="200"
+            allowReorder="true"
+            @updatefiles="onUpdateFiles"
+            labelIdle="Arrastra la imagen o <span class='filepond--label-action'>Examinar</span>"
+          />
+          <span class="text-red-400" v-if="imagesMeta.touched">{{ imagesError }}</span>
+        </div>
+        <div class="mt-4 flex items-center mb-6 dark:text-gray-300 text-gray-800">
+          <hr class="flex-1" />
+          <span class="mx-4"> Seleccione los valores de la variante </span>
+          <hr class="flex-1" />
+        </div>
+        <div class="space-y-4">
+          <fieldset v-for="(field, idx) in featureFields" :key="field.key">
+            <div
+              class="relative rounded-lg border bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 p-6"
+            >
+              <div
+                v-if="featureFields.length > 1"
+                class="absolute top-2 right-4 px-4 bg-white dark:bg-gray-800"
+              >
+                <button
+                  @click="remove(idx)"
+                  type="button"
+                  class="text-red-500 hover:text-red-700 font-semibold px-3 py-2"
+                >
+                  <font-awesome-icon
+                    icon="fa-solid fa-trash-can"
+                    size="xl"
+                    class="transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white"
+                  />
+                </button>
+              </div>
+              <div class="mb-4">
+                <label
+                  :for="`option_product_${idx}`"
+                  class="block mb-2 font-medium text-gray-900 dark:text-gray-200"
+                >
+                  Opciones
+                </label>
+                <Field
+                  validateOnInput
+                  :id="`option_product_${idx}`"
+                  :name="`features[${idx}].option_product_id`"
+                  as="select"
+                  class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed focus:outline-none focus:ring-1"
+                >
+                  <option disabled selected value="">Selecciona una opción</option>
+                  <option :value="option.id" v-for="(option, index) in options" :key="index">
+                    {{ option.name }}
+                  </option>
+                </Field>
+                <span class="text-red-400">{{ errors[`features[${idx}].option_product_id`] }}</span>
+              </div>
+              <div class="mb-4">
+                <label
+                  :for="`option_product_value_${idx}`"
+                  class="block mb-2 font-medium text-gray-900 dark:text-gray-200"
+                >
+                  Valor
+                </label>
+                <Field
+                  validateOnInput
+                  :id="`option_product_value_${idx}`"
+                  :name="`features[${idx}].option_product_value_id`"
+                  as="select"
+                  class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed focus:outline-none focus:ring-1"
+                  :disabled="loadingMap[idx] || !featureFields[idx].value.option_product_id"
+                >
+                  <option value="" disabled selected>
+                    {{ loadingMap[idx] ? 'Cargando...' : 'Selecciona un valor' }}
+                  </option>
+                  <option v-for="value in valuesMap[idx] || []" :key="value.id" :value="value.id">
+                    {{ value.description }}
+                  </option>
+                </Field>
+                <span class="text-red-400">{{
+                  errors[`features[${idx}].option_product_value_id`]
+                }}</span>
+              </div>
+            </div>
+          </fieldset>
+          <span class="text-red-400">{{ errors.features }}</span>
+          <div class="flex justify-end">
+            <button
+              type="button"
+              class="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900"
+              @click="push({ option_product_id: '', option_product_value_id: '' })"
+            >
+              Agregar
+            </button>
+          </div>
+        </div>
+
+        <div class="flex justify-end mt-4">
+          <ButtonSave name="Guardar" :disabled="!meta.valid" />
+        </div>
+      </form>
+    </div>
+    <InfoAlert v-else message="Asigne opciones a este producto, para poder generar las variantes" />
   </div>
 </template>
 

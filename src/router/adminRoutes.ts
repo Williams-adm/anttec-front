@@ -99,12 +99,6 @@ const adminRoutes = [
                   import('@/views/admin/Catalog/Product/ProductOption/associateOptions.vue'),
               },
               {
-                path: 'show/:id/variants',
-                name: 'admin.catalog.products.show.variants',
-                component: () =>
-                  import('@/views/admin/Catalog/Product/Variant/productVariantView.vue'),
-              },
-              {
                 path: 'show/:id/variants/create',
                 name: 'admin.catalog.products.show.variants.create',
                 component: () =>

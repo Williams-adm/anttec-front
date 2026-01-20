@@ -1,7 +1,16 @@
 <script setup lang="ts">
+import { useCartStore } from '@/stores/useCartStore'
 import BannerShort from './components/BannerShort.vue'
 import FooterShop from './components/FooterShop.vue'
-import HeaderShop from './components/HeaderShop.vue';
+import HeaderShop from './components/HeaderShop.vue'
+import { onMounted } from 'vue'
+
+const cartStore = useCartStore()
+
+onMounted(() => {
+  cartStore.loadCart()
+})
+
 </script>
 
 <template>

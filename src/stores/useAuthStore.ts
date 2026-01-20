@@ -1,5 +1,7 @@
 import type { userI } from '@/interfaces/auth/UserInterface'
 import { defineStore } from 'pinia'
+import { useCartStore } from './useCartStore'
+import AuthService from '@/services/auth/AuthService'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -18,6 +20,38 @@ export const useAuthStore = defineStore('auth', {
     setUser(user: userI) {
       this.user = user
       localStorage.setItem('user', JSON.stringify(user))
+    },
+
+    async setAuthData(token: string, user: userI) {
+      this.setToken(token)
+      this.setUser(user)
+
+      // Sincronizar carrito solo si hay items que sincronizar
+      const cartStore = useCartStore()
+
+      // Solo intentar sincronizar si hay un sessionId válido Y items en el carrito
+      if (cartStore.sessionId && cartStore.hasItems) {
+        try {
+          await cartStore.mergeCart()
+          console.log('Carrito sincronizado exitosamente')
+        } catch (error) {
+          console.error('Error al sincronizar carrito después del login:', error)
+          // No lanzamos el error para no bloquear el login
+        }
+      } else {
+        console.log('No hay items en el carrito para sincronizar')
+      }
+    },
+
+    // Método mejorado para logout con limpieza de carrito
+    async logout() {
+      await AuthService.logout()
+      // Limpiar datos de autenticación
+      this.clear()
+
+      // Limpiar carrito y reiniciar sessionId
+      const cartStore = useCartStore()
+      await cartStore.clearOnLogout()
     },
 
     clear() {

@@ -45,6 +45,9 @@ import {
   faHouse,
   faPlus,
   faMinus,
+  faTruckFast,
+  faCircleCheck,
+  faShield,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(
@@ -83,6 +86,9 @@ library.add(
   faHouse,
   faPlus,
   faMinus,
+  faTruckFast,
+  faCircleCheck,
+  faShield,
 )
 
 import { faFacebookF, faInstagram } from '@fortawesome/free-brands-svg-icons'

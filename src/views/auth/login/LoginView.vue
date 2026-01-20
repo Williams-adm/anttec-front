@@ -11,8 +11,10 @@ import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { loginSchema } from '../../../schemas/auth/loginValidationSchema'
+import { useAuthStore } from '@/stores/useAuthStore'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const isLoading = ref(true)
 const serverErrors = ref<Record<string, string[]>>({})
@@ -31,7 +33,11 @@ const onSubmit = handleSubmit(async (values) => {
       icon: 'loading',
     })
 
-    await AuthService.login(values as loginDTO)
+    // 1. Hacer login
+    const response = await AuthService.login(values as loginDTO)
+    // 2. Guardar datos de autenticación Y sincronizar carrito
+    await authStore.setAuthData(response.token, response.user)
+
     Swal.close()
     router.push({ name: 'shop.home' })
   } catch (err) {

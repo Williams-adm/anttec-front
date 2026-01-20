@@ -1,17 +1,38 @@
 <script setup lang="ts">
-defineProps<{
-  itemCount?: number
-}>()
+import { useCart } from '@/composables/useCart'
+
+const { itemsCount, toggleDrawer } = useCart()
 </script>
 
 <template>
-  <router-link :to="{ name: 'shop.cart' }" class="relative text-gray-700 hover:text-indigo-600">
+  <button
+    @click="toggleDrawer"
+    class="relative p-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 rounded-lg cursor-pointer transition-colors"
+    aria-label="Carrito de compras"
+  >
     <font-awesome-icon icon="fa-solid fa-cart-shopping" class="text-3xl text-gray-200" />
     <span
-      v-if="itemCount && itemCount > 0"
-      class="absolute -top-1 -end-2 bg-indigo-600 text-white text-xs rounded-full px-1"
+      class="absolute -top-1 -right-1 bg-gray-800 text-white font-medium rounded-full w-6 h-6 flex items-center justify-center shadow-lg"
     >
-      {{ itemCount }}
+      {{ itemsCount ? (itemsCount > 99 ? '99+' : itemsCount) : 0 }}
     </span>
-  </router-link>
+  </button>
 </template>
+
+<style scoped>
+@keyframes scale-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out;
+}
+</style>
