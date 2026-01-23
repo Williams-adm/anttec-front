@@ -2,7 +2,6 @@ import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseIn
 import httpPublic from '../httpPublic'
 import type { variantSI } from '@/interfaces/shop/Variant/VariantSInterface'
 
-
 class VariantSService {
   private api = httpPublic
 

@@ -65,7 +65,6 @@ const loadData = async () => {
     ])
     options.value = optionsList
     hasOptions.value = optionsStatus
-
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las opciones.'
@@ -242,7 +241,10 @@ onMounted(async () => {
           <span class="text-red-400">{{ errors.purcharse_price }}</span>
         </div>
         <div class="mb-4">
-          <label for="selling_price" class="block mb-2 font-medium text-gray-900 dark:text-gray-200">
+          <label
+            for="selling_price"
+            class="block mb-2 font-medium text-gray-900 dark:text-gray-200"
+          >
             Precio de venta
           </label>
           <input

@@ -3,7 +3,9 @@ import AuthenticationCardLogo from './AuthenticationCardLogo.vue'
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col justify-center items-center bg-gray-100 dark:bg-gray-900 mx-4 md:mx-0">
+  <div
+    class="min-h-screen flex flex-col justify-center items-center bg-gray-100 dark:bg-gray-900 mx-4 md:mx-0"
+  >
     <div>
       <AuthenticationCardLogo />
     </div>

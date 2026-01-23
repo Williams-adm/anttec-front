@@ -68,6 +68,9 @@ const loadedImages = ref<Record<number, boolean>>({})
         </div>
       </div>
     </div>
-    <InfoAlert v-else message="Este producto todavía no tiene variantes. Primero asocie las opciones correspondientes y luego cree las variantes." />
+    <InfoAlert
+      v-else
+      message="Este producto todavía no tiene variantes. Primero asocie las opciones correspondientes y luego cree las variantes."
+    />
   </section>
 </template>

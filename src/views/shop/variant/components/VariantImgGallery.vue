@@ -85,7 +85,11 @@ const handleImageLoad = (index: number) => {
         <div
           class="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
         >
-          <img :src="image.url" :alt="`Thumbnail ${index + 1}`" class="w-full h-full object-cover" />
+          <img
+            :src="image.url"
+            :alt="`Thumbnail ${index + 1}`"
+            class="w-full h-full object-cover"
+          />
         </div>
       </SwiperSlide>
     </Swiper>

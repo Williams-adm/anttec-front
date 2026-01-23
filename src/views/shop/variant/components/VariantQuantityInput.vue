@@ -48,7 +48,7 @@ watch(
     if (props.modelValue > newMaxStock) {
       emit('update:modelValue', newMaxStock)
     }
-  }
+  },
 )
 
 const increment = () => {
@@ -106,7 +106,11 @@ const handleKeypress = (event: KeyboardEvent) => {
         type="button"
         title="Disminuir cantidad"
       >
-        <font-awesome-icon icon="fa-solid fa-minus" size="sm" class="text-gray-700 dark:text-gray-300" />
+        <font-awesome-icon
+          icon="fa-solid fa-minus"
+          size="sm"
+          class="text-gray-700 dark:text-gray-300"
+        />
       </button>
 
       <input
@@ -139,7 +143,11 @@ const handleKeypress = (event: KeyboardEvent) => {
         type="button"
         title="Aumentar cantidad"
       >
-        <font-awesome-icon icon="fa-solid fa-plus" size="sm" class="text-gray-700 dark:text-gray-300" />
+        <font-awesome-icon
+          icon="fa-solid fa-plus"
+          size="sm"
+          class="text-gray-700 dark:text-gray-300"
+        />
       </button>
     </div>
 

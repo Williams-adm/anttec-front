@@ -231,6 +231,82 @@ const adminRoutes = [
           },
         ],
       },
+      {
+        path: 'address',
+        children: [
+          {
+            path: 'countries',
+            name: 'admin.address.countries',
+            component: () => import('@/views/admin/Address/Country/CountryView.vue'),
+          },
+          {
+            path: 'departments',
+            children: [
+              {
+                path: '',
+                name: 'admin.address.departments',
+                component: () => import('@/views/admin/Address/Department/DepartmentListView.vue'),
+              },
+              {
+                path: 'create',
+                name: 'admin.address.departments.create',
+                component: () =>
+                  import('@/views/admin/Address/Department/DepartmentCreateView.vue'),
+              },
+              {
+                path: 'edit/:id',
+                name: 'admin.address.departments.edit',
+                component: () => import('@/views/admin/Address/Department/DepartmentEditView.vue'),
+              },
+            ],
+          },
+          {
+            path: 'provinces',
+            children: [
+              {
+                path: '',
+                name: 'admin.address.provinces',
+                component: () => import('@/views/admin/Address/Province/ProvinceListView.vue'),
+              },
+              {
+                path: 'create',
+                name: 'admin.address.provinces.create',
+                component: () => import('@/views/admin/Address/Province/ProvinceCreateView.vue'),
+              },
+              {
+                path: 'edit/:id',
+                name: 'admin.address.provinces.edit',
+                component: () => import('@/views/admin/Address/Province/ProvinceEditView.vue'),
+              },
+            ],
+          },
+          {
+            path: 'districts',
+            children: [
+              {
+                path: '',
+                name: 'admin.address.districts',
+                component: () => import('@/views/admin/Address/District/DistrictListView.vue'),
+              },
+              {
+                path: 'create',
+                name: 'admin.address.districts.create',
+                component: () => import('@/views/admin/Address/District/DistrictCreateView.vue'),
+              },
+              {
+                path: 'show/:id',
+                name: 'admin.address.districts.show',
+                component: () => import('@/views/admin/Address/District/DistrictShowView.vue'),
+              },
+              {
+                path: 'edit/:id',
+                name: 'admin.address.districts.edit',
+                component: () => import('@/views/admin/Address/District/DistrictEditView.vue'),
+              },
+            ],
+          },
+        ],
+      },
     ],
   },
 ]

@@ -29,7 +29,10 @@ defineProps<{
           <ul class="py-2">
             <li v-for="sub in category.subcategories" :key="sub.id">
               <router-link
-                :to="{ name: 'shop.products.category.subcategory', params: {categoryId: category.id, subcategoryId: sub.id} }"
+                :to="{
+                  name: 'shop.products.category.subcategory',
+                  params: { categoryId: category.id, subcategoryId: sub.id },
+                }"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-200 dark:hover:bg-gray-300"
               >
                 {{ sub.name }}

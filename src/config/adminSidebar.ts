@@ -70,4 +70,31 @@ export const adminSidebarLinks: adminAsideInterface[] = [
     icon: 'fa-solid fa-images',
     route: 'admin.covers',
   },
+  {
+    name: 'Zonas de envío',
+    icon: 'fa-solid fa-map-location-dot',
+    route: 'admin.address',
+    children: [
+      {
+        name: 'Paises',
+        icon: 'fa-solid fa-earth-americas',
+        route: 'admin.address.countries',
+      },
+      {
+        name: 'Departamentos',
+        icon: 'fa-solid fa-location-dot',
+        route: 'admin.address.departments',
+      },
+      {
+        name: 'Provincias',
+        icon: 'fa-solid fa-location-arrow',
+        route: 'admin.address.provinces',
+      },
+      {
+        name: 'Distritos',
+        icon: 'fa-solid fa-location-crosshairs',
+        route: 'admin.address.districts',
+      },
+    ],
+  },
 ]

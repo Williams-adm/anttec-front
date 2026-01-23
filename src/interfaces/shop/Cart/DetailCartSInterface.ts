@@ -1,4 +1,4 @@
-import type { cartTotalSI } from "./CartSInterface"
+import type { cartTotalSI } from './CartSInterface'
 
 export interface detailCartSI {
   item_id: number

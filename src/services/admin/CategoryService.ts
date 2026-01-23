@@ -37,7 +37,7 @@ class CategoryService {
     return res.data.data
   }
 
-  async getAllSubcategories(id: string): Promise<categorySubI[]> {
+  async getAllSubcategories(id: string | number): Promise<categorySubI[]> {
     const res = await this.api.get<ApiListResponseI<categorySubI[]>>(
       `/admin/categories/${id}/subcategories`,
     )

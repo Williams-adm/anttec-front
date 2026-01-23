@@ -26,7 +26,7 @@ const links: profileMenuInterface = {
     {
       name: 'Cerrar sesión',
       action: 'logout',
-    }
+    },
   ],
   notLoggedIn: [
     {
@@ -36,8 +36,8 @@ const links: profileMenuInterface = {
     {
       name: 'Crear cuenta',
       route: 'login',
-    }
-  ]
+    },
+  ],
 }
 
 // Computed para obtener los links correctos según autenticación
@@ -63,7 +63,7 @@ const handleLogout = async () => {
       title: 'Error',
       text: 'No se pudo cerrar sesión',
       icon: 'error',
-      timer: 3000
+      timer: 3000,
     })
   }
 }
@@ -92,9 +92,7 @@ useClickOutside(
     >
       <!-- Desktop (md+) -->
       <div class="hidden md:inline">
-        <span v-if="authStore.user?.name" class="mr-1">
-          Hola, {{ authStore.user.name }}
-        </span>
+        <span v-if="authStore.user?.name" class="mr-1"> Hola, {{ authStore.user.name }} </span>
         <span v-else>Hola, Inicia Sesión</span>
         <font-awesome-icon icon="fa-solid fa-angle-down" />
       </div>

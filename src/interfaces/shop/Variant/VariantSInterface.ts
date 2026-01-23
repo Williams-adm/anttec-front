@@ -1,5 +1,5 @@
-import type { featuresSI, selectedVariantSI } from "./selectedVariantInterface"
-import type { variantSpecificationsSI } from "./VariantSpecificationsInterface"
+import type { featuresSI, selectedVariantSI } from './selectedVariantInterface'
+import type { variantSpecificationsSI } from './VariantSpecificationsInterface'
 
 export interface variantSI {
   id: number

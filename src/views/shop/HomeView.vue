@@ -89,7 +89,13 @@ onMounted(() => {
         :key="product.id"
         class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col"
       >
-        <router-link :to="{ name: 'shop.variant.show', params: { productId: product.id, variantId: product.variant.id } }" class="flex flex-col h-full">
+        <router-link
+          :to="{
+            name: 'shop.variant.show',
+            params: { productId: product.id, variantId: product.variant.id },
+          }"
+          class="flex flex-col h-full"
+        >
           <!-- Image Container -->
           <div class="relative w-full h-64 bg-gray-100 dark:bg-gray-700 overflow-hidden">
             <!-- Skeleton for image -->

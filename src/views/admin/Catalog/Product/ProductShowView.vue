@@ -40,7 +40,7 @@ const loadProduct = async () => {
       title: 'Algo salió mal',
       text: 'No se pudo cargar la información del producto',
       icon: 'error',
-      timer: 0
+      timer: 0,
     })
     error.value = 'Error al cargar los datos.'
     console.error(err)
@@ -159,8 +159,6 @@ onMounted(() => {
     </section>
 
     <!-- Componente de Variantes -->
-    <productVariantView
-      :variants="variants"
-    />
+    <productVariantView :variants="variants" />
   </div>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { featuresSI } from '@/interfaces/shop/Variant/selectedVariantInterface';
+import type { featuresSI } from '@/interfaces/shop/Variant/selectedVariantInterface'
 
 interface Props {
   groupedFeatures: Record<string, featuresSI[]>

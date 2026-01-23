@@ -32,6 +32,10 @@ const subcategories = ref<categorySubI[]>([])
 const specifications = ref<SpecificationI[]>([])
 const product = ref<ProductExtendI | null>(null)
 
+// Estados para controlar la carga inicial
+const isInitialLoad = ref(true)
+const initialDataLoaded = ref(false)
+
 useBreadcrumb(() => [
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Productos', route: 'admin.catalog.products' },
@@ -49,35 +53,18 @@ const [subcategoryId, subcategoryIdAttrs] = defineField('subcategory_id')
 const [model, modelAttrs] = defineField('model')
 const [description, descriptionAttrs] = defineField('description')
 
-const isInitializing = ref(true)
-
-watch(categoryId, async (newCategoryId) => {
-  if (isInitializing.value) {
-    if (!product.value || newCategoryId === product.value.category?.id) return
-  }
-
-  if (!isInitializing.value && newCategoryId !== product.value?.category?.id) {
-    resetField('subcategory_id', { value: '' })
-  }
-
-  if (!newCategoryId) {
+// Función para cargar subcategorías
+const loadSubcategories = async (categoryIdValue: string | number) => {
+  if (!categoryIdValue) {
     subcategories.value = []
-    return
-  }
-
-  const alreadyLoadedForThisCategory =
-    subcategories.value.length > 0 &&
-    product.value &&
-    product.value.category &&
-    product.value.category.id === newCategoryId
-  if (alreadyLoadedForThisCategory) {
     return
   }
 
   try {
     isSubcategoriesLoading.value = true
-    subcategories.value = await CategoryService.getAllSubcategories(newCategoryId)
+    subcategories.value = await CategoryService.getAllSubcategories(categoryIdValue)
   } catch (err) {
+    subcategories.value = []
     useSweetAlert({
       title: 'Error',
       text: 'No se pudieron cargar las subcategorías',
@@ -87,44 +74,65 @@ watch(categoryId, async (newCategoryId) => {
   } finally {
     isSubcategoriesLoading.value = false
   }
+}
+
+// Watch optimizado para cambios de categoría
+watch(categoryId, async (newCategoryId, oldCategoryId) => {
+  // Ignorar el primer cambio durante la carga inicial
+  if (isInitialLoad.value) {
+    return
+  }
+
+  // Si no hay categoría seleccionada, limpiar subcategorías
+  if (!newCategoryId) {
+    subcategories.value = []
+    resetField('subcategory_id', { value: '' })
+    return
+  }
+
+  // Si cambió la categoría, resetear la subcategoría y cargar nuevas subcategorías
+  if (newCategoryId !== oldCategoryId) {
+    resetField('subcategory_id', { value: '' })
+    await loadSubcategories(newCategoryId)
+  }
 })
 
 const loadData = async () => {
   try {
     isLoading.value = true
-    isInitializing.value = true
-    ;[brands.value, categories.value, specifications.value, product.value] = await Promise.all([
+    isSubcategoriesLoading.value = true
+
+    // Cargar todos los datos en paralelo
+    const [brandsData, categoriesData, specificationsData, productData] = await Promise.all([
       BrandService.getAllList(),
       CategoryService.getAllList(),
       SpecificationService.getAllList(),
       ProductService.getById(id),
     ])
 
-    const initialCategoryId = product.value?.category?.id
-    if (initialCategoryId) {
-      try {
-        isSubcategoriesLoading.value = true
-        subcategories.value = await CategoryService.getAllSubcategories(
-          initialCategoryId.toString(),
-        )
-      } catch (err) {
-        console.error('No se cargaron subcategorías iniciales', err)
-      } finally {
-        isSubcategoriesLoading.value = false
-      }
-    } else {
-      subcategories.value = []
+    brands.value = brandsData
+    categories.value = categoriesData
+    specifications.value = specificationsData
+    product.value = productData
+
+    // Si el producto tiene una categoría, cargar sus subcategorías
+    if (product.value?.category?.id) {
+      subcategories.value = await CategoryService.getAllSubcategories(product.value.category.id)
     }
 
+    isSubcategoriesLoading.value = false
+
+    // Esperar al siguiente tick para asegurar que el DOM esté actualizado
     await nextTick()
 
+    // Establecer los valores del formulario
     resetForm({
       values: {
         name: product.value?.name ?? '',
         model: product.value?.model ?? '',
         description: product.value?.description ?? '',
         brand_id: product.value?.brand?.id ?? '',
-        category_id: initialCategoryId ?? '',
+        category_id: product.value?.category?.id ?? '',
         subcategory_id: product.value?.subcategory?.id ?? '',
         specifications: product.value?.specifications?.length
           ? product.value.specifications.map((spec) => ({
@@ -134,11 +142,23 @@ const loadData = async () => {
           : [{ specification_id: '', value: '' }],
       },
     })
+
+    // Marcar que los datos iniciales se han cargado
+    initialDataLoaded.value = true
+
+    // Esperar un tick adicional antes de desactivar isInitialLoad
+    await nextTick()
+    isInitialLoad.value = false
   } catch (err) {
-    useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
+    useSweetAlert({
+      title: 'Algo salió mal',
+      text: 'No se pudieron cargar los datos. Intenta de nuevo',
+      icon: 'error',
+      timer: 0,
+    })
     console.error(err)
   } finally {
-    isInitializing.value = false
+    isSubcategoriesLoading.value = false
     isLoading.value = false
   }
 }
@@ -154,7 +174,8 @@ const onSubmit = handleSubmit(async (values) => {
       text: 'Procesando el formulario',
       icon: 'loading',
     })
-    const payload = {
+
+    const payload: productUpdateDTO = {
       brand_id: values.brand_id,
       subcategory_id: values.subcategory_id,
       name: values.name,
@@ -162,8 +183,8 @@ const onSubmit = handleSubmit(async (values) => {
       description: values.description,
       specifications: values.specifications,
     }
-    await ProductService.update(payload as productUpdateDTO, id)
-    console.log(payload)
+
+    await ProductService.update(payload, id)
     Swal.close()
 
     useSweetAlert({
@@ -173,24 +194,30 @@ const onSubmit = handleSubmit(async (values) => {
     })
   } catch (err) {
     Swal.close()
+
     if (axios.isAxiosError(err) && err.response?.status === 422) {
       const validationErrors = err.response.data.errors
       serverErrors.value = validationErrors
+
       const veeValidateErrors: Record<string, string> = {}
       Object.keys(validationErrors).forEach((field) => {
         veeValidateErrors[field] = validationErrors[field][0]
       })
+
       setErrors(veeValidateErrors)
     }
+
     useSweetAlert({
       title: 'Algo salió mal',
       text: 'Verifica los datos e intenta de nuevo',
       icon: 'error',
       timer: 0,
     })
+    console.error(err)
   }
 })
 </script>
+
 <template>
   <AnimationLoader v-if="isLoading" />
   <div

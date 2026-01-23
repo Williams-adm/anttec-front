@@ -29,7 +29,7 @@ const loadCategoryInfo = async () => {
       if (route.params.subcategoryId && categoryInfo.value.subcategories) {
         subcategoryInfo.value =
           categoryInfo.value.subcategories.find(
-            (sub) => sub.id === Number(route.params.subcategoryId)
+            (sub) => sub.id === Number(route.params.subcategoryId),
           ) || null
       } else {
         subcategoryInfo.value = null
@@ -44,7 +44,7 @@ const loadCategoryInfo = async () => {
       title: 'Error',
       text: 'No se pudo cargar la información de la categoría',
       icon: 'error',
-      timer: 3000
+      timer: 3000,
     })
   }
 }
@@ -92,15 +92,15 @@ const loadProducts = async () => {
       ...product,
       variant: {
         ...product.variant,
-        imgLoaded: false
-      }
+        imgLoaded: false,
+      },
     }))
   } catch (error) {
     useSweetAlert({
       title: 'Error',
       text: 'No se pudieron cargar los productos',
       icon: 'error',
-      timer: 0
+      timer: 0,
     })
     console.error(error)
   } finally {
@@ -119,7 +119,7 @@ const changeSort = (sortValue: string) => {
   router.push({
     name: route.name as string,
     params: route.params,
-    query: { ...route.query, sort: sortValue }
+    query: { ...route.query, sort: sortValue },
   })
 }
 
@@ -135,12 +135,12 @@ const breadcrumbs = computed<BreadcrumbInterface[]>(() => {
     crumbs.push({
       name: categoryInfo.value.name,
       route: 'shop.products.category',
-      params: { categoryId: route.params.categoryId }
+      params: { categoryId: route.params.categoryId },
     })
 
     if (subcategoryInfo.value) {
       crumbs.push({
-        name: subcategoryInfo.value.name
+        name: subcategoryInfo.value.name,
         // no ponemos route porque es la última y no necesita link
       })
     }
@@ -155,7 +155,7 @@ const breadcrumbs = computed<BreadcrumbInterface[]>(() => {
 <template>
   <div class="container mx-auto px-4 py-8">
     <!-- Breadcrumb -->
-    <BreadCrumb :breadcrumbs="breadcrumbs" class="mb-5"/>
+    <BreadCrumb :breadcrumbs="breadcrumbs" class="mb-5" />
 
     <!-- Header con título y contador -->
     <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -222,7 +222,10 @@ const breadcrumbs = computed<BreadcrumbInterface[]>(() => {
           class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col"
         >
           <router-link
-            :to="{ name: 'shop.variant.show', params: { productId: product.id, variantId: product.variant.id } }"
+            :to="{
+              name: 'shop.variant.show',
+              params: { productId: product.id, variantId: product.variant.id },
+            }"
             class="flex flex-col h-full"
           >
             <!-- Image Container -->

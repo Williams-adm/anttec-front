@@ -90,7 +90,9 @@ const goToProduct = () => {
       class="absolute inset-0 bg-white/50 dark:bg-gray-900/50 rounded-lg flex items-center justify-center z-10"
     >
       <div class="flex flex-col items-center gap-2">
-        <div class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <div
+          class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"
+        ></div>
         <span class="text-xs text-gray-600 dark:text-gray-400 font-medium">Actualizando...</span>
       </div>
     </div>
@@ -107,11 +109,7 @@ const goToProduct = () => {
         role="status"
         class="absolute inset-0 flex items-center justify-center bg-gray-300 dark:bg-gray-700 animate-pulse"
       >
-        <img
-          :src="noImg"
-          alt="Cargando imagen"
-          class="w-10 h-10 object-contain opacity-60"
-        />
+        <img :src="noImg" alt="Cargando imagen" class="w-10 h-10 object-contain opacity-60" />
         <span class="sr-only">Cargando...</span>
       </div>
 

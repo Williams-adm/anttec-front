@@ -15,14 +15,9 @@ defineProps<{
           class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-white"
         >
           <font-awesome-icon icon="fa-solid fa-house" size="sm" />
-          <span class="mx-1">
-            Home
-          </span>
+          <span class="mx-1"> Home </span>
         </router-link>
-        <font-awesome-icon
-          icon="fa-solid fa-angle-right"
-          class="text-gray-400 mx-1"
-        />
+        <font-awesome-icon icon="fa-solid fa-angle-right" class="text-gray-400 mx-1" />
       </li>
       <li
         v-for="(item, index) in breadcrumbs"
@@ -55,6 +50,7 @@ defineProps<{
           {{ item.name }}
         </span>
       </li>
-    </ol>>
+    </ol>
+    >
   </nav>
 </template>

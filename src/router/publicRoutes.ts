@@ -24,8 +24,7 @@ const publicRoutes = [
             name: 'shop.products.category.subcategory',
             component: () => import('@/views/shop/product/ProductsView.vue'),
           },
-
-        ]
+        ],
       },
       {
         path: 'variant/product/:productId/variant/:variantId',

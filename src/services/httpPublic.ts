@@ -1,6 +1,6 @@
-import { useAuthStore } from "@/stores/useAuthStore"
-import { handleApiError } from "@/utils/handleApiError"
-import axios from "axios"
+import { useAuthStore } from '@/stores/useAuthStore'
+import { handleApiError } from '@/utils/handleApiError'
+import axios from 'axios'
 
 const httpPublic = axios.create({
   baseURL: import.meta.env.VITE_API_URL,

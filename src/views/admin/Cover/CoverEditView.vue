@@ -46,9 +46,10 @@ useBreadcrumb(() => [
   },
 ])
 
-const { meta, handleSubmit, errors, defineField, resetForm, setFieldValue, setErrors, values } = useForm({
-  validationSchema: editCoverSchema,
-})
+const { meta, handleSubmit, errors, defineField, resetForm, setFieldValue, setErrors, values } =
+  useForm({
+    validationSchema: editCoverSchema,
+  })
 
 const [title, titleAttrs] = defineField('title')
 const [startAt] = defineField('start_at')

@@ -1,4 +1,4 @@
-import type { paginatedResponseI } from "@/interfaces/admin/base/PaginationInterface"
+import type { paginatedResponseI } from '@/interfaces/admin/base/PaginationInterface'
 
 export interface productSI {
   id: number
@@ -15,7 +15,5 @@ export interface productVariantSI {
   image: string
   imgLoaded?: boolean
 }
-
-
 
 export type productsSI = paginatedResponseI<productSI>

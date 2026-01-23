@@ -85,7 +85,9 @@ const goToProduct = () => {
       class="absolute inset-0 bg-white/50 dark:bg-gray-900/50 rounded-xl flex items-center justify-center z-10"
     >
       <div class="flex flex-col items-center gap-2">
-        <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <div
+          class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"
+        ></div>
         <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">Actualizando...</span>
       </div>
     </div>
@@ -103,11 +105,7 @@ const goToProduct = () => {
           role="status"
           class="absolute inset-0 flex items-center justify-center bg-gray-300 dark:bg-gray-700 animate-pulse"
         >
-          <img
-            :src="noImg"
-            alt="Cargando imagen"
-            class="w-16 h-16 object-contain opacity-60"
-          />
+          <img :src="noImg" alt="Cargando imagen" class="w-16 h-16 object-contain opacity-60" />
           <span class="sr-only">Cargando...</span>
         </div>
 
@@ -135,7 +133,10 @@ const goToProduct = () => {
             <h3
               @click="!isUpdating && goToProduct()"
               class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1 transition-colors"
-              :class="{ 'cursor-pointer hover:text-blue-600 dark:hover:text-blue-400': !isUpdating, 'cursor-default': isUpdating }"
+              :class="{
+                'cursor-pointer hover:text-blue-600 dark:hover:text-blue-400': !isUpdating,
+                'cursor-default': isUpdating,
+              }"
             >
               {{ item.variant.name }} - {{ item.variant.model }}
             </h3>
@@ -165,7 +166,7 @@ const goToProduct = () => {
             class="hidden sm:block text-gray-400 dark:text-red-400 hover:text-red-600 dark:hover:text-red-500 transition-colors p-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             title="Eliminar del carrito"
           >
-            <font-awesome-icon icon="fa-solid fa-trash-alt" size="lg"/>
+            <font-awesome-icon icon="fa-solid fa-trash-alt" size="lg" />
           </button>
         </div>
 
@@ -188,7 +189,11 @@ const goToProduct = () => {
                 @click="decrement"
                 class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
-                <font-awesome-icon icon="fa-solid fa-minus" size="sm" class="text-gray-600 dark:text-gray-200"/>
+                <font-awesome-icon
+                  icon="fa-solid fa-minus"
+                  size="sm"
+                  class="text-gray-600 dark:text-gray-200"
+                />
               </button>
 
               <span
@@ -202,7 +207,11 @@ const goToProduct = () => {
                 :disabled="isUpdating || item.quantity >= item.variant.stock"
                 class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
-                <font-awesome-icon icon="fa-solid fa-plus" size="sm" class="text-gray-600 dark:text-gray-200"/>
+                <font-awesome-icon
+                  icon="fa-solid fa-plus"
+                  size="sm"
+                  class="text-gray-600 dark:text-gray-200"
+                />
               </button>
             </div>
 

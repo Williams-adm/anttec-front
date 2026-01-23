@@ -16,11 +16,7 @@ const emit = defineEmits<{
 
 <template>
   <!-- OVERLAY -->
-  <div
-    v-if="isOpen"
-    class="fixed inset-0 bg-black/50 z-30 lg:hidden"
-    @click="emit('close')"
-  ></div>
+  <div v-if="isOpen" class="fixed inset-0 bg-black/50 z-30 lg:hidden" @click="emit('close')"></div>
 
   <!-- DRAWER -->
   <div
@@ -31,15 +27,16 @@ const emit = defineEmits<{
     <div class="bg-black dark:bg-banner p-4 flex items-center justify-between">
       <!-- Si hay categoría activa: mostrar con link y hover -->
       <h3 v-if="activeCategory" class="text-white font-semibold text-lg uppercase hover:underline">
-        <router-link :to="{ name: 'shop.products.category', params: { categoryId: activeCategory.id } }" @click="emit('close')">
+        <router-link
+          :to="{ name: 'shop.products.category', params: { categoryId: activeCategory.id } }"
+          @click="emit('close')"
+        >
           {{ activeCategory.name }}
         </router-link>
       </h3>
 
       <!-- Si NO hay categoría activa: solo texto, sin link ni hover -->
-      <h3 v-else class="text-white font-semibold text-lg uppercase">
-        Categorías
-      </h3>
+      <h3 v-else class="text-white font-semibold text-lg uppercase">Categorías</h3>
       <button @click="emit('close')" class="text-white cursor-pointer">
         <font-awesome-icon icon="fa-solid fa-xmark" size="xl" />
       </button>
@@ -74,7 +71,10 @@ const emit = defineEmits<{
       <ul class="divide-y divide-gray-200 dark:divide-gray-700">
         <li v-for="sub in activeCategory.subcategories" :key="sub.id">
           <router-link
-            :to="{ name: 'shop.products.category.subcategory', params: {categoryId: activeCategory.id, subcategoryId: sub.id} }"
+            :to="{
+              name: 'shop.products.category.subcategory',
+              params: { categoryId: activeCategory.id, subcategoryId: sub.id },
+            }"
             class="block px-4 py-4 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
             @click="emit('close')"
           >

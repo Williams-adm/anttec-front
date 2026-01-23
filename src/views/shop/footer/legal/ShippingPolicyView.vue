@@ -14,9 +14,7 @@ import logo from '@/assets/img/logo.png'
           <img class="w-40 h-16 hidden dark:block" :src="logo" alt="Logo Dark" />
         </router-link>
       </div>
-      <h2 class="dark:text-white text-gray-800 mt-5 text-2xl font-semibold">
-        Políticas de Envío
-      </h2>
+      <h2 class="dark:text-white text-gray-800 mt-5 text-2xl font-semibold">Políticas de Envío</h2>
       <div
         class="w-full sm:max-w-2xl mt-5 py-4 px-8 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg prose dark:prose-invert mb-4"
       >
@@ -39,7 +37,11 @@ import logo from '@/assets/img/logo.png'
               </li>
               <li class="flex items-start gap-3">
                 <span class="text-green-500 mt-1">✔</span>
-                <span>Recogida en tienda: Puedes recoger tu pedido directamente en nuestra tienda ubicada en Av. Giráldez 274 T-02, Giráldez Centro de Negocios, Junín – Huancayo.</span>
+                <span
+                  >Recogida en tienda: Puedes recoger tu pedido directamente en nuestra tienda
+                  ubicada en Av. Giráldez 274 T-02, Giráldez Centro de Negocios, Junín –
+                  Huancayo.</span
+                >
               </li>
             </ul>
           </div>
@@ -48,7 +50,8 @@ import logo from '@/assets/img/logo.png'
         <section>
           <h3 class="text-xl dark:text-gray-200 font-medium mb-3">3. Costos de envío</h3>
           <p class="mb-6 dark:text-gray-300">
-            El costo de envío depende del destino de tu pedido y se calculará automáticamente al momento de la compra.
+            El costo de envío depende del destino de tu pedido y se calculará automáticamente al
+            momento de la compra.
           </p>
         </section>
 
@@ -69,14 +72,16 @@ import logo from '@/assets/img/logo.png'
         <section>
           <h3 class="text-xl dark:text-gray-200 font-medium mb-3">5. Condiciones especiales</h3>
           <p class="mb-6 dark:text-gray-300">
-            Todos nuestros productos son tecnológicos y delicados, por lo que manejamos cada pedido con cuidado para garantizar que lleguen en perfectas condiciones.
+            Todos nuestros productos son tecnológicos y delicados, por lo que manejamos cada pedido
+            con cuidado para garantizar que lleguen en perfectas condiciones.
           </p>
         </section>
 
         <section>
           <h3 class="text-xl dark:text-gray-200 font-medium mb-3">6. Contacto</h3>
           <p class="mb-6 dark:text-gray-300">
-            Si tienes alguna pregunta sobre nuestros envíos, puedes contactarnos a través del siguiente número:
+            Si tienes alguna pregunta sobre nuestros envíos, puedes contactarnos a través del
+            siguiente número:
             <br />
             <span>
               Teléfono:
@@ -94,4 +99,3 @@ import logo from '@/assets/img/logo.png'
     </div>
   </div>
 </template>
-

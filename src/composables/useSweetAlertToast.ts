@@ -1,4 +1,4 @@
-import Swal, { type SweetAlertPosition } from "sweetalert2";
+import Swal, { type SweetAlertPosition } from 'sweetalert2'
 
 type sweetAlertIcon = 'success' | 'error' | 'warning' | 'info' | 'question'
 
@@ -23,19 +23,19 @@ export function useSweetAlertToast(options: sweetAlertToastI) {
     toast = true,
     position = 'top-end',
     showConfirmButton,
-  } = options;
+  } = options
 
   const Toast = Swal.mixin({
     toast,
     position,
     showConfirmButton,
     timer,
-    timerProgressBar
+    timerProgressBar,
   })
 
   Toast.fire({
     title,
     icon,
-    text
+    text,
   })
 }

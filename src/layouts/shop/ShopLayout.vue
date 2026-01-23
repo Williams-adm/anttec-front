@@ -10,7 +10,6 @@ const cartStore = useCartStore()
 onMounted(() => {
   cartStore.loadCart()
 })
-
 </script>
 
 <template>

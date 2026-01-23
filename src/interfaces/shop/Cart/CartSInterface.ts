@@ -1,4 +1,4 @@
-import type { detailCartSI } from "./DetailCartSInterface"
+import type { detailCartSI } from './DetailCartSInterface'
 
 export interface cartSI {
   id: number

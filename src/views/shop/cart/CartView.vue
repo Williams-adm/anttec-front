@@ -48,17 +48,12 @@ const proceedToCheckout = () => {
     </div>
 
     <!-- Empty State -->
-    <div
-      v-else-if="isEmpty"
-      class="flex flex-col items-center justify-center py-10 px-4"
-    >
+    <div v-else-if="isEmpty" class="flex flex-col items-center justify-center py-10 px-4">
       <div class="text-center max-w-md">
         <!-- Icono -->
         <div class="mb-8">
-          <div
-            class="flex items-center justify-center"
-          >
-            <img :src="cartEmpty" alt="carrito-vacio" class="h-32"/>
+          <div class="flex items-center justify-center">
+            <img :src="cartEmpty" alt="carrito-vacio" class="h-32" />
           </div>
         </div>
 
@@ -69,8 +64,8 @@ const proceedToCheckout = () => {
 
         <!-- Descripción -->
         <p class="text-gray-600 dark:text-gray-400 mb-8">
-          Parece que aún no has agregado ningún producto. ¡Explora nuestra tienda y encuentra lo
-          que necesitas!
+          Parece que aún no has agregado ningún producto. ¡Explora nuestra tienda y encuentra lo que
+          necesitas!
         </p>
 
         <!-- Botón CTA -->
@@ -131,24 +126,22 @@ const proceedToCheckout = () => {
               @click="proceedToCheckout"
               class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 cursor-pointer"
             >
-              <span class="flex items-center justify-center gap-2">
-                Continuar compra
-              </span>
+              <span class="flex items-center justify-center gap-2"> Continuar compra </span>
             </button>
 
             <button
               @click="continueShopping"
               class="w-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-bold py-3 px-6 rounded-lg transition-colors cursor-pointer"
             >
-              <span class="flex items-center justify-center gap-2">
-                Seguir comprando
-              </span>
+              <span class="flex items-center justify-center gap-2"> Seguir comprando </span>
             </button>
           </div>
 
           <!-- Información adicional -->
           <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <div class="flex gap-3 text-sm text-gray-600 dark:text-gray-400 items-center justify-center">
+            <div
+              class="flex gap-3 text-sm text-gray-600 dark:text-gray-400 items-center justify-center"
+            >
               <font-awesome-icon icon="fa-solid fa-shield" class="text-green-600 mt-0.5" />
               <p>Compra 100% segura. Tus datos están protegidos.</p>
             </div>

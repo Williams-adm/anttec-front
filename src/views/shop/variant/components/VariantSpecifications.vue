@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { variantSpecificationsSI } from '@/interfaces/shop/Variant/VariantSpecificationsInterface';
+import type { variantSpecificationsSI } from '@/interfaces/shop/Variant/VariantSpecificationsInterface'
 
 interface Props {
   description: string | null

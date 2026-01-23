@@ -88,7 +88,7 @@ onBeforeUnmount(() => {
           v-if="isEmpty"
           class="flex flex-col items-center justify-center h-full p-8 text-center"
         >
-          <img :src="cartEmpty" alt="carrito-vacio" class="h-32 mb-4"/>
+          <img :src="cartEmpty" alt="carrito-vacio" class="h-32 mb-4" />
           <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
             Tu carrito está vacío
           </h3>
