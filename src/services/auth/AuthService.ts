@@ -1,10 +1,12 @@
 import type { loginDTO } from '@/DTOs/auth/LoginDTO'
+import type { registerDTO } from '@/DTOs/auth/RegisterDTO'
+import type { logoutI } from '@/interfaces/auth/LogoutInterface'
+import type { registerI } from '@/interfaces/auth/RegisterInterface'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { handleApiError } from '@/utils/handleApiError'
 import type { AxiosInstance } from 'axios'
 import axios from 'axios'
 import type { loginI } from '../../interfaces/auth/LoginInterface'
-import type { logoutI } from '@/interfaces/auth/LogoutInterface'
 
 const urlApi = import.meta.env.VITE_API_URL
 
@@ -35,6 +37,21 @@ class AuthService {
     } catch (error) {
       handleApiError(error)
     }
+  }
+
+  async register(data: registerDTO): Promise<registerI> {
+    const res = await this.api.post<registerI>('/register', data, {
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    })
+
+    const token = res.data.token
+    const authStore = useAuthStore()
+    authStore.setToken(token)
+    authStore.setUser(res.data.user)
+    return res.data
   }
 
   async logout(): Promise<logoutI> {

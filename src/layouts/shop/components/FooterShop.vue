@@ -33,10 +33,10 @@
 
             <p class="text-sm font-medium mt-4 mb-1">Correo</p>
             <a
-              href="mailto:ventas@anttecperu.com"
+              href="mailto:anttecshop@gmail.com"
               class="block text-sm hover:text-white transition"
             >
-              ventas@anttecperu.com
+              anttecshop@gmail.com
             </a>
 
             <p class="text-sm font-medium mt-4 mb-1">Horario</p>

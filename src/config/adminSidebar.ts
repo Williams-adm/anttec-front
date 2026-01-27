@@ -7,6 +7,9 @@ export const adminSidebarLinks: adminAsideInterface[] = [
     route: 'admin.dashboard',
   },
   {
+    header: 'Administrar página',
+  },
+  {
     name: 'Marcas',
     icon: 'fa-solid fa-tags',
     route: 'admin.brands',
@@ -69,6 +72,9 @@ export const adminSidebarLinks: adminAsideInterface[] = [
     name: 'Portadas',
     icon: 'fa-solid fa-images',
     route: 'admin.covers',
+  },
+  {
+    header: 'Órdenes y envío',
   },
   {
     name: 'Zonas de envío',

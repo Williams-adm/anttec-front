@@ -55,6 +55,7 @@ import {
   faLocationCrosshairs,
   faBarcode,
   faDownload,
+  faEyeSlash,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(
@@ -103,6 +104,7 @@ library.add(
   faLocationCrosshairs,
   faBarcode,
   faDownload,
+  faEyeSlash,
 )
 
 import { faFacebookF, faInstagram } from '@fortawesome/free-brands-svg-icons'

@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/stores/useAuthStore'
-import { handleApiError } from '@/utils/handleApiError'
+import { handleHttpError } from '@/utils/errorHandler'
 import axios from 'axios'
 
 const httpPublic = axios.create({
@@ -30,18 +30,8 @@ httpPublic.interceptors.request.use(
 httpPublic.interceptors.response.use(
   (response) => response,
   (error) => {
-    const status = error.response?.status
+    handleHttpError(error)
 
-    // 🔐 Autenticación expirada
-    // Solo manejamos el error normalmente
-    if (status === 401) {
-      // No hacemos logout automático en httpPublic
-      // porque puede ser un guest intentando acceder a algo protegido
-      window.location.href = '/login'
-      console.warn('Unauthorized request:', error.config.url)
-    }
-
-    handleApiError(error)
     return Promise.reject(error)
   },
 )

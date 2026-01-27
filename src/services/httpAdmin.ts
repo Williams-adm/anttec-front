@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/stores/useAuthStore'
-import { handleApiError } from '@/utils/handleApiError'
+import { handleHttpError } from '@/utils/errorHandler'
 import axios from 'axios'
 
 const httpAdmin = axios.create({
@@ -8,7 +8,6 @@ const httpAdmin = axios.create({
     'Content-Type': 'application/json',
     Accept: 'application/json',
   },
-  /* withCredentials: true, */
 })
 
 httpAdmin.interceptors.request.use(
@@ -29,17 +28,7 @@ httpAdmin.interceptors.request.use(
 httpAdmin.interceptors.response.use(
   (response) => response,
   (error) => {
-    const status = error.response?.status
-
-    // 🔐 Autenticación expirada
-    if (status === 401) {
-      /* const authStore = useAuthStore()
-      authStore.logout() */
-      window.location.href = '/login'
-    } else {
-      handleApiError(error)
-    }
-
+    handleHttpError(error)
     return Promise.reject(error)
   },
 )

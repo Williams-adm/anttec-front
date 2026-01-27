@@ -40,12 +40,6 @@ const loadCategoryInfo = async () => {
     }
   } catch (error) {
     console.error('Error cargando información de categoría:', error)
-    useSweetAlert({
-      title: 'Error',
-      text: 'No se pudo cargar la información de la categoría',
-      icon: 'error',
-      timer: 3000,
-    })
   }
 }
 

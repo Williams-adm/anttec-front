@@ -1,7 +1,7 @@
 import type { userI } from '@/interfaces/auth/UserInterface'
+import AuthService from '@/services/auth/AuthService'
 import { defineStore } from 'pinia'
 import { useCartStore } from './useCartStore'
-import AuthService from '@/services/auth/AuthService'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -10,6 +10,14 @@ export const useAuthStore = defineStore('auth', {
       ? (JSON.parse(localStorage.getItem('user') as string) as userI)
       : null,
   }),
+
+  getters: {
+    // ← AÑADIR ESTOS GETTERS
+    userRoles: (state) => state.user?.roles || [],
+    isAdmin: (state) => state.user?.roles?.includes('admin') || false,
+    isEmployee: (state) => state.user?.roles?.includes('employee') || false,
+    isUser: (state) => state.user?.roles?.includes('user') || false,
+  },
 
   actions: {
     setToken(token: string) {
@@ -63,6 +71,12 @@ export const useAuthStore = defineStore('auth', {
 
     isAuthenticated(): boolean {
       return !!this.token
+    },
+
+    hasRole(role: string | string[]): boolean {
+      if (!this.user?.roles) return false
+      const roles = Array.isArray(role) ? role : [role]
+      return roles.some((r) => this.user!.roles.includes(r))
     },
   },
 })

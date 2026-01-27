@@ -4,7 +4,7 @@ const adminRoutes = [
   {
     path: '/admin',
     component: AdminLayout,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, roles: ['admin'] },
     children: [
       {
         path: '',

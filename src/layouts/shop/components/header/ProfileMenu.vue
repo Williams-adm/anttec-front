@@ -22,6 +22,7 @@ const links: profileMenuInterface = {
     {
       name: 'Admin',
       route: 'admin.dashboard',
+      roles: ['admin'], // ← AÑADIR ESTO
     },
     {
       name: 'Cerrar sesión',
@@ -35,14 +36,25 @@ const links: profileMenuInterface = {
     },
     {
       name: 'Crear cuenta',
-      route: 'login',
+      route: 'register',
     },
   ],
 }
 
-// Computed para obtener los links correctos según autenticación
+// ✅ Computed que filtra por roles
 const currentLinks = computed(() => {
-  return authStore.isAuthenticated() ? links.loggedIn : links.notLoggedIn
+  if (!authStore.isAuthenticated()) {
+    return links.notLoggedIn
+  }
+
+  // Filtrar links según roles del usuario
+  return links.loggedIn.filter((link) => {
+    // Si no tiene roles definidos, mostrarlo siempre
+    if (!link.roles) return true
+
+    // Si tiene roles, verificar que el usuario tenga al menos uno
+    return link.roles.some((role) => authStore.hasRole(role))
+  })
 })
 
 const handleLogout = async () => {
@@ -72,7 +84,6 @@ const handleAction = (action: string) => {
   if (action === 'logout') {
     handleLogout()
   }
-  // Puedes agregar más acciones aquí en el futuro
 }
 
 useClickOutside(

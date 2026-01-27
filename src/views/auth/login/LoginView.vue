@@ -5,25 +5,30 @@ import ButtonAuth from '@/components/auth/ButtonAuth.vue'
 import { useSweetAlert } from '@/composables/useSweetAlert'
 import type { loginDTO } from '@/DTOs/auth/LoginDTO'
 import AuthService from '@/services/auth/AuthService'
+import { useAuthStore } from '@/stores/useAuthStore'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { loginSchema } from '../../../schemas/auth/loginValidationSchema'
-import { useAuthStore } from '@/stores/useAuthStore'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
 const isLoading = ref(true)
 const serverErrors = ref<Record<string, string[]>>({})
+const showPassword = ref(false)
 
 const { meta, handleSubmit, errors, defineField, setErrors } = useForm({
   validationSchema: loginSchema,
 })
 const [email, emailAttrs] = defineField('email')
 const [password, passwordAttrs] = defineField('password')
+
+const togglePasswordVisibility = () => {
+  showPassword.value = !showPassword.value
+}
 
 const onSubmit = handleSubmit(async (values) => {
   try {
@@ -107,14 +112,36 @@ onMounted(async () => {
         <label for="password" class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
           >Contraseña</label
         >
-        <input
-          v-model="password"
-          v-bind="passwordAttrs"
-          id="password"
-          name="password"
-          type="password"
-          class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
-        />
+        <div class="relative">
+          <input
+            v-model="password"
+            v-bind="passwordAttrs"
+            id="password"
+            name="password"
+            :type="showPassword ? 'text' : 'password'"
+            class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
+          />
+          <button
+            type="button"
+            @click="togglePasswordVisibility"
+            class="absolute right-3 top-5 transform -translate-y-1/2 mt-0.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none cursor-pointer"
+          >
+            <span v-if="!showPassword">
+              <font-awesome-icon
+                icon="fa-solid fa-eye"
+                size="lg"
+                class="text-gray-300"
+              />
+            </span>
+            <span v-else>
+              <font-awesome-icon
+                icon="fa-solid fa-eye-slash"
+                size="lg"
+                class="text-gray-300"
+              />
+            </span>
+          </button>
+        </div>
         <span class="text-red-400">{{ errors.password }}</span>
       </div>
 

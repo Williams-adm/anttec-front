@@ -14,23 +14,26 @@ const activeRoutes = computed(() => {
   const map: Record<string, boolean> = {}
 
   links.forEach((link) => {
+    // ← SKIP headers
+    if (link.header) return
+
     // padre sin hijos
     if (!link.children) {
-      map[link.route] = currentName.startsWith(link.route)
+      map[link.route!] = currentName.startsWith(link.route!)
       return
     }
 
     // padre con hijos
-    const isParentActive = currentName.startsWith(link.route)
+    const isParentActive = currentName.startsWith(link.route!)
 
-    map[link.route] = isParentActive
+    map[link.route!] = isParentActive
 
     link.children.forEach((child) => {
-      map[child.route] = currentName.startsWith(child.route)
+      map[child.route!] = currentName.startsWith(child.route!)
 
       // activar padre si el hijo está activo
-      if (map[child.route]) {
-        map[link.route] = true
+      if (map[child.route!]) {
+        map[link.route!] = true
       }
     })
   })
@@ -49,21 +52,31 @@ const open = reactive<Record<string, boolean>>({})
   >
     <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
       <ul class="space-y-2 font-medium">
-        <li v-for="link in links" :key="link.name">
-          <div v-if="!link.children">
+        <li v-for="(link, index) in links" :key="link.header || link.name || index">
+
+          <!-- ✅ HEADER -->
+          <div
+            v-if="link.header"
+            class="px-3 py-2 mt-4 first:mt-0 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide"
+          >
+            {{ link.header }}
+          </div>
+
+          <!-- Link sin hijos -->
+          <div v-else-if="!link.children">
             <router-link
               :to="{ name: link.route }"
               :class="[
                 'flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group',
-                activeRoutes[link.route] ? 'bg-gray-100 dark:bg-gray-700' : '',
+                activeRoutes[link.route!] ? 'bg-gray-100 dark:bg-gray-700' : '',
               ]"
             >
               <font-awesome-icon
-                :icon="link.icon"
+                :icon="link.icon!"
                 size="xl"
                 :class="[
                   'transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white',
-                  activeRoutes[link.route]
+                  activeRoutes[link.route!]
                     ? 'text-gray-900 dark:text-white'
                     : 'text-gray-400 dark:text-gray-400',
                 ]"
@@ -72,21 +85,22 @@ const open = reactive<Record<string, boolean>>({})
             </router-link>
           </div>
 
+          <!-- Link con hijos (dropdown) -->
           <div v-else>
             <button
-              @click="open[link.name] = !open[link.name]"
+              @click="open[link.name!] = !open[link.name!]"
               type="button"
               :class="[
                 'flex items-center w-full justify-between p-2 rounded-lg text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group cursor-pointer',
-                activeRoutes[link.route] ? 'bg-gray-100 dark:bg-gray-700' : '',
+                activeRoutes[link.route!] ? 'bg-gray-100 dark:bg-gray-700' : '',
               ]"
             >
               <font-awesome-icon
-                :icon="link.icon"
+                :icon="link.icon!"
                 size="xl"
                 :class="[
                   'transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white',
-                  activeRoutes[link.route]
+                  activeRoutes[link.route!]
                     ? 'text-gray-900 dark:text-white'
                     : 'text-gray-400 dark:text-gray-400',
                 ]"
@@ -95,32 +109,33 @@ const open = reactive<Record<string, boolean>>({})
                 link.name
               }}</span>
               <font-awesome-icon
-                :icon="open[link.name] ? 'fa-solid fa-angle-up' : 'fa-solid fa-angle-down'"
+                :icon="open[link.name!] ? 'fa-solid fa-angle-up' : 'fa-solid fa-angle-down'"
                 size="xl"
                 :class="[
                   'transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white',
-                  activeRoutes[link.route]
+                  activeRoutes[link.route!]
                     ? 'text-gray-900 dark:text-white'
                     : 'text-gray-400 dark:text-gray-400',
                 ]"
               />
             </button>
 
-            <ul v-show="open[link.name]" class="py-2 space-y-2">
+            <!-- Submenu -->
+            <ul v-show="open[link.name!]" class="py-2 space-y-2">
               <li v-for="child in link.children" :key="child.name">
                 <router-link
                   :to="{ name: child.route }"
                   :class="[
                     'pl-6 flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group',
-                    activeRoutes[child.route] ? 'bg-gray-100 dark:bg-gray-700' : '',
+                    activeRoutes[child.route!] ? 'bg-gray-100 dark:bg-gray-700' : '',
                   ]"
                 >
                   <font-awesome-icon
-                    :icon="child.icon"
+                    :icon="child.icon!"
                     size="xl"
                     :class="[
                       'transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white',
-                      activeRoutes[child.route]
+                      activeRoutes[child.route!]
                         ? 'text-gray-900 dark:text-white'
                         : 'text-gray-400 dark:text-gray-400',
                     ]"

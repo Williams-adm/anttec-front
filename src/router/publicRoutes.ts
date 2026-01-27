@@ -1,5 +1,6 @@
 import ShopLayout from '@/layouts/shop/ShopLayout.vue'
 import LoginView from '@/views/auth/login/LoginView.vue'
+import RegisterView from '@/views/auth/register/RegisterView.vue'
 
 const publicRoutes = [
   {
@@ -62,6 +63,11 @@ const publicRoutes = [
     path: '/login',
     name: 'login',
     component: LoginView,
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: RegisterView,
   },
 ]
 
