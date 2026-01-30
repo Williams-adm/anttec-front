@@ -88,10 +88,5 @@ const emit = defineEmits<{
       v-if="selected"
       class="absolute inset-0 bg-green-600/5 dark:bg-green-400/5 pointer-events-none"
     ></div>
-
-    <!-- Borde animado al hover -->
-    <div
-      class="absolute inset-0 border border-transparent group-hover:border-green-400 dark:group-hover:border-green-500 rounded-xl pointer-events-none transition-colors duration-300"
-    ></div>
   </div>
 </template>

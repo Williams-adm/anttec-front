@@ -150,3 +150,46 @@ const open = reactive<Record<string, boolean>>({})
     </div>
   </aside>
 </template>
+<style scoped>
+/* ✅ ESTILOS PERSONALIZADOS PARA SCROLLBAR */
+
+/* Para navegadores basados en WebKit (Chrome, Safari, Edge) */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 10px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: rgb(243 244 246); /* gray-100 */
+  border-radius: 10px;
+  margin: 8px 0;
+}
+
+.dark .overflow-y-auto::-webkit-scrollbar-track {
+  background: rgb(31 41 55); /* gray-800 */
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgb(59 130 246), rgb(99 102 241)); /* blue-500 to indigo-500 */
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.dark .overflow-y-auto::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgb(59 130 246), rgb(99 102 241));
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgb(37 99 235), rgb(79 70 229)); /* blue-600 to indigo-600 */
+}
+
+/* Para Firefox */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(59 130 246) rgb(243 244 246);
+}
+
+.dark .overflow-y-auto {
+  scrollbar-color: rgb(59 130 246) rgb(31 41 55);
+}
+</style>

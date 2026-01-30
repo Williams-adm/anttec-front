@@ -40,7 +40,6 @@ const {
 
 // State local
 const selectedMethod = ref<'delivery' | 'pickup'>('delivery')
-const showAddressModal = ref(false)
 const editingAddress = ref<addressSI | null>(null)
 
 const customerForm = ref({
@@ -102,16 +101,6 @@ const handleSelectBranch = (branch: branchSI) => {
   saveToLocalStorage()
 }
 
-const handleOpenAddressModal = () => {
-  editingAddress.value = null
-  showAddressModal.value = true
-}
-
-const handleEditAddress = (address: addressSI) => {
-  editingAddress.value = address
-  showAddressModal.value = true
-}
-
 const handleDeleteAddress = async (address: addressSI) => {
   if (confirm('¿Estás seguro de eliminar esta dirección?')) {
     try {
@@ -136,13 +125,6 @@ const handleSetFavorite = async (address: addressSI) => {
   } catch (error) {
     console.error('Error al establecer favorita:', error)
   }
-}
-
-const handleAddressSaved = async (address: addressSI) => {
-  // Recargar direcciones
-  await loadAddresses()
-  // Seleccionar la nueva dirección
-  handleSelectAddress(address)
 }
 
 const handleContinue = () => {
@@ -171,6 +153,24 @@ const isDeliverySelected = computed(() => {
 const isPickupSelected = computed(() => {
   return selectedMethod.value === 'pickup' && deliveryInfo.value?.branch_id !== undefined
 })
+
+// ✅ Referencia al modal
+const addressModalRef = ref<InstanceType<typeof AddressModal> | null>(null)
+
+const handleOpenAddressModal = () => {
+  editingAddress.value = null
+  addressModalRef.value?.open() // ✅ Usar método open()
+}
+
+const handleEditAddress = (address: addressSI) => {
+  editingAddress.value = address
+  addressModalRef.value?.open() // ✅ Usar método open()
+}
+
+const handleAddressSaved = async (address: addressSI) => {
+  await loadAddresses()
+  handleSelectAddress(address)
+}
 </script>
 
 <template>
@@ -283,7 +283,7 @@ const isPickupSelected = computed(() => {
           </h2>
           <button
             @click="handleOpenAddressModal"
-            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center gap-2 shadow-md"
+            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center gap-2 shadow-md cursor-pointer"
           >
             <font-awesome-icon icon="fa-solid fa-plus" />
             <span class="hidden sm:inline">Nueva dirección</span>
@@ -298,7 +298,7 @@ const isPickupSelected = computed(() => {
         <!-- No hay direcciones -->
         <div
           v-else-if="!hasAddresses"
-          class="text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700"
+          class="text-center py-8 bg-gray-50 dark:bg-gray-900 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700"
         >
           <font-awesome-icon icon="fa-solid fa-location-dot" class="text-5xl text-gray-400 mb-4" />
           <p class="text-gray-600 dark:text-gray-400 mb-4">
@@ -306,14 +306,14 @@ const isPickupSelected = computed(() => {
           </p>
           <button
             @click="handleOpenAddressModal"
-            class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+            class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors cursor-pointer"
           >
             Agregar mi primera dirección
           </button>
         </div>
 
         <!-- Lista de direcciones -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div v-else class="grid grid-cols-1 gap-4">
           <AddressCard
             v-for="address in sortedAddresses"
             :key="address.id"
@@ -373,33 +373,6 @@ const isPickupSelected = computed(() => {
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Nombres -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Nombres *
-          </label>
-          <input
-            v-model="customerForm.first_name"
-            type="text"
-            required
-            placeholder="Ingresa tus nombres"
-            class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100"
-          />
-        </div>
-
-        <!-- Apellidos -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Apellidos *
-          </label>
-          <input
-            v-model="customerForm.last_name"
-            type="text"
-            required
-            placeholder="Ingresa tus apellidos"
-            class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100"
-          />
-        </div>
-
         <!-- Tipo de documento -->
         <div>
           <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -431,6 +404,33 @@ const isPickupSelected = computed(() => {
           />
         </div>
 
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            Nombres *
+          </label>
+          <input
+            v-model="customerForm.first_name"
+            type="text"
+            required
+            placeholder="Ingresa tus nombres"
+            class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100"
+          />
+        </div>
+
+        <!-- Apellidos -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            Apellidos *
+          </label>
+          <input
+            v-model="customerForm.last_name"
+            type="text"
+            required
+            placeholder="Ingresa tus apellidos"
+            class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100"
+          />
+        </div>
+
         <!-- Teléfono -->
         <div>
           <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -441,20 +441,6 @@ const isPickupSelected = computed(() => {
             type="tel"
             required
             placeholder="Ej: 999 999 999"
-            class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100"
-          />
-        </div>
-
-        <!-- Email -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Email *
-          </label>
-          <input
-            v-model="customerForm.email"
-            type="email"
-            required
-            placeholder="tu@email.com"
             class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100"
           />
         </div>
@@ -476,9 +462,9 @@ const isPickupSelected = computed(() => {
 
     <!-- Modal de dirección -->
     <AddressModal
-      :is-open="showAddressModal"
+      ref="addressModalRef"
       :edit-address="editingAddress"
-      @close="showAddressModal = false"
+      @close="editingAddress = null"
       @saved="handleAddressSaved"
     />
   </div>
