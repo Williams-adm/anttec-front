@@ -7,6 +7,8 @@ import MovementsService from '@/services/admin/MovementsService'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+const movementsService = new MovementsService()
+
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Movimientos', route: 'admin.store.movements' },
@@ -22,7 +24,7 @@ const error = ref<string | null>(null)
 
 const loadMovement = async () => {
   try {
-    movement.value = await MovementsService.getById(id)
+    movement.value = await movementsService.getById(id)
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'

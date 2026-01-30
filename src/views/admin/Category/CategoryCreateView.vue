@@ -11,6 +11,8 @@ import axios from 'axios'
 import { useSweetAlert } from '@/composables/useSweetAlert'
 import Swal from 'sweetalert2'
 
+const categoryService = new CategoryService()
+
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Categorías', route: 'admin.categories' },
@@ -33,7 +35,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       icon: 'loading',
     })
 
-    await CategoryService.create(values as categoryCreateDTO)
+    await categoryService.create(values as categoryCreateDTO)
     Swal.close()
 
     useSweetAlert({

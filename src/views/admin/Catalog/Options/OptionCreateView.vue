@@ -12,6 +12,8 @@ import Swal from 'sweetalert2'
 import { Field, FieldArray, useForm } from 'vee-validate'
 import { onMounted, ref, watch } from 'vue'
 
+const optionService = new OptionService()
+
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Opciones', route: 'admin.catalog.options' },
@@ -56,7 +58,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       icon: 'loading',
     })
     console.log(values)
-    await OptionService.create(values as optionCreateDTO)
+    await optionService.create(values as optionCreateDTO)
     Swal.close()
 
     useSweetAlert({
@@ -163,7 +165,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
                     </div>
                     <div v-show="type === 'color'" class="flex items-center gap-2">
                       <div
-                        class="border border-gray-300 rounded-md shadow-sm h-[46px] flex items-center px-3 justify-between w-full"
+                        class="border border-gray-300 rounded-md shadow-sm h-11.5 flex items-center px-3 justify-between w-full"
                       >
                         <p class="text-gray-900 dark:text-gray-200">
                           {{ values.option_values[idx].value || 'Seleccione un color' }}

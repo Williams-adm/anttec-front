@@ -13,6 +13,8 @@ import VariantSelector from './components/VariantSelector.vue'
 import VariantSpecifications from './components/VariantSpecifications.vue'
 import { useCart } from '@/composables/useCart'
 
+const variantSService = new VariantSService()
+
 const route = useRoute()
 const router = useRouter()
 
@@ -32,7 +34,7 @@ const loadProduct = async () => {
     const productId = route.params.productId as string
     const variantId = route.params.variantId as string
 
-    const data = await VariantSService.getVariant(productId, variantId)
+    const data = await variantSService.getVariant(productId, variantId)
 
     product.value = {
       ...data,

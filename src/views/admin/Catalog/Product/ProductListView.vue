@@ -11,6 +11,8 @@ import Swal from 'sweetalert2'
 import BadgeStatus from '@/components/Admin/BadgeStatus.vue'
 import type { ProductsI } from '@/interfaces/admin/product/ProductInterface'
 
+const productService = new ProductService()
+
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Productos' }])
 
 const products = ref<ProductsI | null>(null)
@@ -20,7 +22,7 @@ const isLoading = ref(true)
 
 const loadProducts = async () => {
   try {
-    products.value = await ProductService.getAll()
+    products.value = await productService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar los productos.'
@@ -42,7 +44,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
       text: 'Actualizando estado',
       icon: 'loading',
     })
-    await ProductService.update({ status: newStatus }, String(id))
+    await productService.update({ status: newStatus }, String(id))
 
     const product = productsList.value.find((c) => c.id === id)
     if (product) {

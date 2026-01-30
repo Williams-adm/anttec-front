@@ -15,6 +15,8 @@ import { Swiper, SwiperSlide } from 'swiper/vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
+const variantService = new VariantService()
+
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Inventario', route: 'admin.store.variants' },
@@ -44,7 +46,7 @@ watch(
 
 const loadVariant = async () => {
   try {
-    variant.value = await VariantService.getById(id)
+    variant.value = await variantService.getById(id)
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'

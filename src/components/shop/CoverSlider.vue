@@ -10,6 +10,8 @@ import { Autoplay, Navigation, Pagination } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { computed, onMounted, ref } from 'vue'
 
+const coverSService = new CoverSService()
+
 const covers = ref<coverSI[]>([])
 const isLoading = ref(true)
 const error = ref<string | null>(null)
@@ -18,7 +20,7 @@ const coversList = computed(() => covers.value ?? [])
 
 const loadCovers = async () => {
   try {
-    const data = await CoverSService.getAll()
+    const data = await coverSService.getAll()
     // Agregar imgLoaded en false a cada cover
     covers.value = data.map((cover) => ({ ...cover, imgLoaded: false }))
   } catch (err) {

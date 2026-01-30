@@ -11,6 +11,8 @@ import BrandService from '@/services/admin/BrandService'
 import { computed, onMounted, ref } from 'vue'
 import Swal from 'sweetalert2'
 
+const brandService = new BrandService()
+
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Marcas' }])
 
 const brands = ref<brandsI | null>(null)
@@ -20,7 +22,7 @@ const isLoading = ref(true)
 
 const loadBrands = async () => {
   try {
-    brands.value = await BrandService.getAll()
+    brands.value = await brandService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'
@@ -42,7 +44,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
       text: 'Actualizando estado',
       icon: 'loading',
     })
-    await BrandService.update({ status: newStatus }, String(id))
+    await brandService.update({ status: newStatus }, String(id))
 
     const category = brandsList.value.find((c) => c.id === id)
     if (category) {

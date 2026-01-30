@@ -60,15 +60,31 @@ const router = createRouter({
   },
 })
 
+let lastValidRoute = '/'
+
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated()) {
-    return next({ name: 'login' })
+  // Guardar última ruta válida (que no sea de error)
+  const errorRoutes = ['/server-error', '/unauthorized', '/not-found', '/session-expired', '/maintenance']
+  if (!errorRoutes.some(route => to.path.startsWith(route))) {
+    lastValidRoute = to.fullPath
   }
 
-  // 2. Si ya está logueado y va a login, redirigir según rol
+  if (to.meta.requiresAuth && !authStore.isAuthenticated()) {
+    return next({
+      name: 'login',
+      query: { redirect: to.fullPath }
+    })
+  }
+
   if (to.name === 'login' && authStore.isAuthenticated()) {
+    const redirectTo = to.query.redirect as string
+
+    if (redirectTo && redirectTo !== '/login') {
+      return next(redirectTo)
+    }
+
     if (authStore.isAdmin) {
       return next({ name: 'admin.dashboard' })
     } else {
@@ -76,7 +92,6 @@ router.beforeEach((to, from, next) => {
     }
   }
 
-  // 3. Verificar roles requeridos
   if (to.meta.roles) {
     const requiredRoles = Array.isArray(to.meta.roles) ? to.meta.roles : [to.meta.roles]
     const hasRequiredRole = requiredRoles.some((role) => authStore.hasRole(role))
@@ -91,7 +106,10 @@ router.beforeEach((to, from, next) => {
 
 router.onError((error) => {
   console.error('Router error:', error)
-  router.push({ name: 'server-error' })
+  router.push({ name: 'server-error', query: { from: lastValidRoute } })
 })
+
+// ← EXPORTAR para usar en errorHandler
+export { lastValidRoute }
 
 export default router

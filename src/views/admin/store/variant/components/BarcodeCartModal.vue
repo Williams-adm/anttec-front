@@ -7,6 +7,8 @@ import { Modal, type ModalInterface } from 'flowbite'
 import Swal from 'sweetalert2'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
+const variantBarcodeService = new VariantBarcodeService()
+
 const modalEl = ref<HTMLElement | null>(null)
 let modal: ModalInterface | null = null
 
@@ -111,7 +113,7 @@ const generatePDF = async () => {
       }))
     }
 
-    const blob = await VariantBarcodeService.generatePDF(payload as variantBarcodeDTO)
+    const blob = await variantBarcodeService.generatePDF(payload as variantBarcodeDTO)
 
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')

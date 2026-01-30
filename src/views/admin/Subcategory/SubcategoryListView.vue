@@ -11,6 +11,8 @@ import SubcategoryService from '@/services/admin/SubcategoryService'
 import Swal from 'sweetalert2'
 import { computed, onMounted, ref } from 'vue'
 
+const subcategoryService = new SubcategoryService()
+
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Subcategorías' }])
 
 const subcategories = ref<subcategoriesI | null>(null)
@@ -20,7 +22,7 @@ const isLoading = ref(true)
 
 const loadSubcategories = async () => {
   try {
-    subcategories.value = await SubcategoryService.getAll()
+    subcategories.value = await subcategoryService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'
@@ -42,7 +44,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
       text: 'Actualizando estado',
       icon: 'loading',
     })
-    await SubcategoryService.update({ status: newStatus }, String(id))
+    await subcategoryService.update({ status: newStatus }, String(id))
 
     const category = subcategoriesList.value.find((c) => c.id === id)
     if (category) {

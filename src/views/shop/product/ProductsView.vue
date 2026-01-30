@@ -12,6 +12,9 @@ import { useRoute, useRouter } from 'vue-router'
 import BreadCrumb from '@/components/shop/BreadCrumb.vue'
 import type { BreadcrumbInterface } from '@/components/shop/interface/breadcrumbInterface'
 
+const categorySService = new CategorySService()
+const productSService = new ProductSService()
+
 const route = useRoute()
 const router = useRouter()
 const products = ref<productSI[]>([])
@@ -23,7 +26,7 @@ const subcategoryInfo = ref<subSI | null>(null)
 const loadCategoryInfo = async () => {
   try {
     if (route.params.categoryId) {
-      categoryInfo.value = await CategorySService.getById(route.params.categoryId as string)
+      categoryInfo.value = await categorySService.getById(route.params.categoryId as string)
 
       // Si hay subcategoría, buscarla dentro de la categoría
       if (route.params.subcategoryId && categoryInfo.value.subcategories) {
@@ -79,7 +82,7 @@ const loadProducts = async () => {
     await loadCategoryInfo()
 
     // Cargar productos (los filtros ya tienen los IDs)
-    const data = await ProductSService.getWithFilters(filters.value)
+    const data = await productSService.getWithFilters(filters.value)
 
     // Agregar imgLoaded a cada producto
     products.value = data.data.map((product) => ({

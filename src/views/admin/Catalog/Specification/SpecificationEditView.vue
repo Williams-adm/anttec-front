@@ -13,6 +13,9 @@ import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+const specificationService = new SpecificationService()
+
+
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
@@ -33,7 +36,7 @@ const [name, nameAttrs] = defineField('name')
 
 const loadSpecification = async () => {
   try {
-    specification.value = await SpecificationService.getById(id)
+    specification.value = await specificationService.getById(id)
     resetForm({ values: { name: specification.value.name } })
   } catch (error) {
     console.error(error)
@@ -54,7 +57,7 @@ const onSubmit = handleSubmit(async (values) => {
       icon: 'loading',
     })
 
-    await SpecificationService.update(values as specificationUpdateDTO, id)
+    await specificationService.update(values as specificationUpdateDTO, id)
     Swal.close()
     useSweetAlert({
       title: 'Especificación actualizada',

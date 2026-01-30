@@ -15,6 +15,9 @@ import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+const countryService = new CountryService()
+const departmentService = new DepartmentService()
+
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
@@ -41,8 +44,8 @@ const [name, nameAttrs] = defineField('name')
 const loadData = async () => {
   try {
     const [deparmentRes, countryRes] = await Promise.all([
-      DepartmentService.getById(id),
-      CountryService.getAllList(),
+      departmentService.getById(id),
+      countryService.getAllList(),
     ])
 
     deparment.value = deparmentRes
@@ -79,7 +82,7 @@ const onSubmit = handleSubmit(async (values) => {
       icon: 'loading',
     })
 
-    await DepartmentService.update(values as departmentUpdateDTO, id)
+    await departmentService.update(values as departmentUpdateDTO, id)
     Swal.close()
     useSweetAlert({
       title: 'Departamento actualizada',

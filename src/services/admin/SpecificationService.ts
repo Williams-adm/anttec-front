@@ -5,7 +5,9 @@ import type { SpecificationI, SpecificationsI } from '@/interfaces/admin/Specifi
 import httpAdmin from '../httpAdmin'
 
 class SpecificationService {
-  private api = httpAdmin
+  private get api() {
+    return httpAdmin
+  }
 
   async getAll(): Promise<SpecificationsI> {
     const res = await this.api.get<SpecificationsI>('/admin/specifications')
@@ -41,4 +43,4 @@ class SpecificationService {
   }
 }
 
-export default new SpecificationService()
+export default SpecificationService

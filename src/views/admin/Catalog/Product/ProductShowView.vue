@@ -10,6 +10,9 @@ import VariantService from '@/services/admin/VariantService'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+const productService = new ProductService()
+const variantService = new VariantService()
+
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
@@ -28,9 +31,9 @@ const loadProduct = async () => {
   try {
     // Carga todo en paralelo con Promise.all
     const [productData, variantsData] = await Promise.all([
-      ProductService.getById(id),
-      VariantService.getAllShort(id),
-      ProductService.hasOptions(id),
+      productService.getById(id),
+      variantService.getAllShort(id),
+      productService.hasOptions(id),
     ])
 
     product.value = productData

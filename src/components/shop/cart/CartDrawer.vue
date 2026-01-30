@@ -28,7 +28,7 @@ const goToCart = () => {
 // Ir al checkout
 const goToCheckout = () => {
   closeDrawer()
-  router.push({ name: 'shop.checkout' })
+  router.push({ name: 'shop.checkout.delivery' })
 }
 
 watch(isDrawerOpen, (open) => {

@@ -7,6 +7,8 @@ import OptionService from '@/services/admin/OptionService'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+const optionService = new OptionService()
+
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 const option = ref<OptionExtendI | null>(null)
@@ -21,7 +23,7 @@ useBreadcrumb(() => [
 
 const loadOption = async () => {
   try {
-    option.value = await OptionService.getById(id)
+    option.value = await optionService.getById(id)
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'

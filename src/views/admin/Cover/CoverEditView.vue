@@ -24,6 +24,8 @@ import { nextTick, onMounted, ref, watch } from 'vue'
 import VueFilePond from 'vue-filepond'
 import { useRoute } from 'vue-router'
 
+const coverService = new CoverService()
+
 type DatepickerChangeEvent = CustomEvent<{
   date: Date | null
 }>
@@ -93,7 +95,7 @@ const onUpdateFiles = (files: FilePondFile[]) => {
 
 const loadcovers = async () => {
   try {
-    cover.value = await CoverService.getById(id)
+    cover.value = await coverService.getById(id)
     resetForm({
       values: {
         title: cover.value.title,
@@ -204,7 +206,7 @@ const onSubmit = handleSubmit(async (values) => {
     for (const [key, value] of formData.entries()) {
       console.log(key, value)
     }
-    await CoverService.update(formData, id)
+    await coverService.update(formData, id)
     Swal.close()
 
     useSweetAlert({

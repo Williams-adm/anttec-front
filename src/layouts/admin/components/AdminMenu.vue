@@ -9,6 +9,8 @@ import AuthService from '@/services/auth/AuthService'
 import Swal from 'sweetalert2'
 import router from '@/router'
 
+const authService = new AuthService()
+
 const ui = useUIStore()
 const toggleMenu = ui.toggleMenu
 
@@ -41,7 +43,7 @@ const handleLogout = async () => {
       icon: 'loading',
     })
 
-    await AuthService.logout()
+    await authService.logout()
     ui.isMenuOpen = false
     Swal.close()
     await router.push({ name: 'shop.home' })

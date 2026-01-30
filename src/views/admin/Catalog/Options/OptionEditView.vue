@@ -14,6 +14,8 @@ import { Field, FieldArray, useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+const optionService = new OptionService()
+
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
@@ -38,7 +40,7 @@ const [type, typeAttrs] = defineField('type')
 
 const loadOption = async () => {
   try {
-    option.value = await OptionService.getById(id)
+    option.value = await optionService.getById(id)
 
     // 👉 CAMBIO 1: Mantener ID en cada option_value
     resetForm({
@@ -77,7 +79,7 @@ const onSubmit = handleSubmit(async (values) => {
       name: values.name,
       option_values: values.option_values,
     }
-    await OptionService.update(payload as optionUpdateDTO, id)
+    await optionService.update(payload as optionUpdateDTO, id)
     await loadOption()
     Swal.close()
 

@@ -21,7 +21,7 @@ const continueShopping = () => {
 }
 
 const proceedToCheckout = () => {
-  router.push({ name: 'shop.checkout' })
+  router.push({ name: 'shop.checkout.delivery' })
 }
 </script>
 

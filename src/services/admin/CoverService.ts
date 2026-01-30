@@ -4,7 +4,9 @@ import type { coverI, coversI } from '@/interfaces/admin/CoverInterface'
 import httpAdmin from '../httpAdmin'
 
 class CoverService {
-  private api = httpAdmin
+  private get api() {
+    return httpAdmin
+  }
 
   async getAll(): Promise<coversI> {
     const res = await this.api.get<coversI>('/admin/covers')
@@ -53,4 +55,4 @@ class CoverService {
   }
 }
 
-export default new CoverService()
+export default CoverService

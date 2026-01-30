@@ -11,6 +11,8 @@ import ProvinceService from '@/services/admin/ProvinceService'
 import Swal from 'sweetalert2'
 import { computed, onMounted, ref } from 'vue'
 
+const provinceService = new ProvinceService()
+
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Provincias' }])
 
 const provinces = ref<provincesI | null>(null)
@@ -20,7 +22,7 @@ const isLoading = ref(true)
 
 const loadDepartments = async () => {
   try {
-    provinces.value = await ProvinceService.getAll()
+    provinces.value = await provinceService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar los departamentos.'
@@ -42,7 +44,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
       text: 'Actualizando estado',
       icon: 'loading',
     })
-    await ProvinceService.update({ status: newStatus }, String(id))
+    await provinceService.update({ status: newStatus }, String(id))
 
     const category = provincesList.value.find((c) => c.id === id)
     if (category) {

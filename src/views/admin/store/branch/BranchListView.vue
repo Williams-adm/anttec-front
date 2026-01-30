@@ -8,6 +8,8 @@ import type { branchesI } from '@/interfaces/admin/branch/BranchInterface'
 import BranchService from '@/services/admin/BranchService'
 import { computed, onMounted, ref } from 'vue'
 
+const branchService = new BranchService()
+
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Sucursal' }])
 
 const branches = ref<branchesI | null>(null)
@@ -17,7 +19,7 @@ const isLoading = ref(true)
 
 const loadBranches = async () => {
   try {
-    branches.value = await BranchService.getAll()
+    branches.value = await branchService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'

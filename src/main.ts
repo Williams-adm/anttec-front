@@ -56,6 +56,12 @@ import {
   faBarcode,
   faDownload,
   faEyeSlash,
+  faLock,
+  faHeadset,
+  faSpinner,
+  faStar,
+  faClock,
+  faCreditCard
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(
@@ -105,6 +111,12 @@ library.add(
   faBarcode,
   faDownload,
   faEyeSlash,
+  faLock,
+  faHeadset,
+  faSpinner,
+  faStar,
+  faClock,
+  faCreditCard,
 )
 
 import { faFacebookF, faInstagram } from '@fortawesome/free-brands-svg-icons'

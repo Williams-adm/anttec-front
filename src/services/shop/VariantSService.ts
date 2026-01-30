@@ -3,7 +3,9 @@ import httpPublic from '../httpPublic'
 import type { variantSI } from '@/interfaces/shop/Variant/VariantSInterface'
 
 class VariantSService {
-  private api = httpPublic
+  private get api() {
+    return httpPublic
+  }
 
   async getVariant(productId: string | number, variantId: string | number): Promise<variantSI> {
     const res = await this.api.get<ApiListResponseI<variantSI>>(
@@ -14,4 +16,4 @@ class VariantSService {
   }
 }
 
-export default new VariantSService()
+export default VariantSService

@@ -13,6 +13,8 @@ import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+const brandService = new BrandService()
+
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
@@ -35,7 +37,7 @@ const [name, nameAttrs] = defineField('name')
 
 const loadBrands = async () => {
   try {
-    brand.value = await BrandService.getById(id)
+    brand.value = await brandService.getById(id)
     resetForm({ values: { name: brand.value.name } })
   } catch (error) {
     console.error(error)
@@ -56,7 +58,7 @@ const onSubmit = handleSubmit(async (values) => {
       icon: 'loading',
     })
 
-    await BrandService.update(values as brandUpdateDTO, id)
+    await brandService.update(values as brandUpdateDTO, id)
     Swal.close()
     useSweetAlert({
       title: 'Marca actualizada',

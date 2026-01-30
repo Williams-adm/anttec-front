@@ -5,7 +5,9 @@ import type { categoriesI, categoryI, categorySubI } from '@/interfaces/admin/Ca
 import httpAdmin from '../httpAdmin'
 
 class CategoryService {
-  private api = httpAdmin
+  private get api() {
+    return httpAdmin
+  }
 
   async getAll(): Promise<categoriesI> {
     const res = await this.api.get<categoriesI>('/admin/categories')
@@ -46,4 +48,4 @@ class CategoryService {
   }
 }
 
-export default new CategoryService()
+export default CategoryService

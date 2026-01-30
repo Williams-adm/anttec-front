@@ -13,6 +13,9 @@ import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 import { createSubcategorySchema } from '../../../schemas/admin/subcategory/createSubcategoryValidationSchema'
 
+const categoryService = new CategoryService()
+const subcategoryService = new SubcategoryService()
+
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Subcategorías', route: 'admin.subcategories' },
@@ -27,7 +30,7 @@ const serverErrors = ref<Record<string, string[]>>({})
 
 const loadSubcategories = async () => {
   try {
-    categories.value = await CategoryService.getAllList()
+    categories.value = await categoryService.getAllList()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'
@@ -59,7 +62,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       icon: 'loading',
     })
 
-    await SubcategoryService.create(values as subcategoryCreateDTO)
+    await subcategoryService.create(values as subcategoryCreateDTO)
     Swal.close()
 
     useSweetAlert({

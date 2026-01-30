@@ -15,6 +15,9 @@ import { useForm } from 'vee-validate'
 import { nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
+const countryService = new CountryService()
+const provinceService = new ProvinceService()
+
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
@@ -55,7 +58,7 @@ const loadDepartments = async (countryIdValue: string | number) => {
 
   try {
     isDepartmentsLoading.value = true
-    departments.value = await CountryService.getAllDepartments(countryIdValue)
+    departments.value = await countryService.getAllDepartments(countryIdValue)
   } catch (err) {
     departments.value = []
     useSweetAlert({
@@ -96,8 +99,8 @@ const loadData = async () => {
 
     // Cargar países y provincia en paralelo
     const [countriesData, provinceData] = await Promise.all([
-      CountryService.getAllList(),
-      ProvinceService.getById(id),
+      countryService.getAllList(),
+      provinceService.getById(id),
     ])
 
     countries.value = countriesData
@@ -156,7 +159,7 @@ const onSubmit = handleSubmit(async (values) => {
       name: values.name,
     }
 
-    await ProvinceService.update(payload, id)
+    await provinceService.update(payload, id)
     Swal.close()
 
     useSweetAlert({

@@ -12,9 +12,12 @@ import { Datepicker } from 'flowbite'
 import Swal from 'sweetalert2'
 import { useForm } from 'vee-validate'
 import { nextTick, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+
+const authService = new AuthService()
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 
 const isLoading = ref(true)
@@ -53,7 +56,8 @@ const initDatepicker = async () => {
     new Datepicker(dateBirthDatepickerEl.value, {
       format: 'yyyy-mm-dd',
       autohide: true,
-      maxDate: new Date().toISOString(), // No permite fechas futuras
+      maxDate: new Date().toISOString(),// No permite fechas futuras
+      minDate: new Date('1940-01-01').toISOString(),
     })
 
     dateBirthDatepickerEl.value.addEventListener('changeDate', (e: Event) => {
@@ -71,7 +75,7 @@ const onSubmit = handleSubmit(async (values) => {
       icon: 'loading',
     })
 
-    const response = await AuthService.register(values as registerDTO)
+    const response = await authService.register(values as registerDTO)
     await authStore.setAuthData(response.token, response.user)
 
     Swal.close()
@@ -83,8 +87,19 @@ const onSubmit = handleSubmit(async (values) => {
       timer: 2000,
     })
 
+    const redirectTo = route.query.redirect as string
+
     setTimeout(() => {
-      router.push({ name: 'shop.home' })
+      if (redirectTo && redirectTo !== '/register' && redirectTo !== '/login') {
+        router.push(redirectTo)
+      } else {
+        // Si no, redirigir según rol
+        if (authStore.isAdmin) {
+          router.push({ name: 'admin.dashboard' })
+        } else {
+          router.push({ name: 'shop.home' })
+        }
+      }
     }, 1000)
   } catch (err) {
     Swal.close()
@@ -199,7 +214,11 @@ watch(isLoading, (val) => {
         </label>
         <div class="relative w-full">
           <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-            <font-awesome-icon icon="fa-solid fa-calendar" size="lg" class="text-gray-500 dark:text-gray-400" />
+            <font-awesome-icon
+              icon="fa-solid fa-calendar"
+              size="lg"
+              class="text-gray-500 dark:text-gray-400"
+            />
           </div>
           <input
             id="date_birth"
@@ -230,7 +249,7 @@ watch(isLoading, (val) => {
           <button
             type="button"
             @click="togglePasswordVisibility"
-            class="absolute right-3 top-5 transform -translate-y-1/2 mt-0.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none"
+            class="absolute right-3 top-5 transform -translate-y-1/2 mt-0.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none cursor-pointer"
           >
             <font-awesome-icon
               :icon="showPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"
@@ -262,7 +281,7 @@ watch(isLoading, (val) => {
           <button
             type="button"
             @click="togglePasswordConfirmationVisibility"
-            class="absolute right-3 top-5 transform -translate-y-1/2 mt-0.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none"
+            class="absolute right-3 top-5 transform -translate-y-1/2 mt-0.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none cursor-pointer"
           >
             <font-awesome-icon
               :icon="showPasswordConfirmation ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"

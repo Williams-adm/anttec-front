@@ -19,6 +19,11 @@ import { Field, FieldArray, useForm } from 'vee-validate'
 import { nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
+const brandService = new BrandService()
+const categoryService = new CategoryService()
+const productService = new ProductService()
+const specificationService = new SpecificationService()
+
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
@@ -62,7 +67,7 @@ const loadSubcategories = async (categoryIdValue: string | number) => {
 
   try {
     isSubcategoriesLoading.value = true
-    subcategories.value = await CategoryService.getAllSubcategories(categoryIdValue)
+    subcategories.value = await categoryService.getAllSubcategories(categoryIdValue)
   } catch (err) {
     subcategories.value = []
     useSweetAlert({
@@ -104,10 +109,10 @@ const loadData = async () => {
 
     // Cargar todos los datos en paralelo
     const [brandsData, categoriesData, specificationsData, productData] = await Promise.all([
-      BrandService.getAllList(),
-      CategoryService.getAllList(),
-      SpecificationService.getAllList(),
-      ProductService.getById(id),
+      brandService.getAllList(),
+      categoryService.getAllList(),
+      specificationService.getAllList(),
+      productService.getById(id),
     ])
 
     brands.value = brandsData
@@ -117,7 +122,7 @@ const loadData = async () => {
 
     // Si el producto tiene una categoría, cargar sus subcategorías
     if (product.value?.category?.id) {
-      subcategories.value = await CategoryService.getAllSubcategories(product.value.category.id)
+      subcategories.value = await categoryService.getAllSubcategories(product.value.category.id)
     }
 
     isSubcategoriesLoading.value = false
@@ -184,7 +189,7 @@ const onSubmit = handleSubmit(async (values) => {
       specifications: values.specifications,
     }
 
-    await ProductService.update(payload, id)
+    await productService.update(payload, id)
     Swal.close()
 
     useSweetAlert({

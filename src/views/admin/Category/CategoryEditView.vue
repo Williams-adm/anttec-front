@@ -13,6 +13,8 @@ import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { editCategorySchema } from '../../../schemas/admin/category/editCategoryValidationSchema'
 
+const categoryService = new CategoryService()
+
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
@@ -35,7 +37,7 @@ const [name, nameAttrs] = defineField('name')
 
 const loadCategories = async () => {
   try {
-    category.value = await CategoryService.getById(id)
+    category.value = await categoryService.getById(id)
     resetForm({ values: { name: category.value.name } })
   } catch (error) {
     console.error(error)
@@ -56,7 +58,7 @@ const onSubmit = handleSubmit(async (values) => {
       icon: 'loading',
     })
 
-    await CategoryService.update(values as categoryUpdateDTO, id)
+    await categoryService.update(values as categoryUpdateDTO, id)
     Swal.close()
     useSweetAlert({
       title: 'Categoría actualizada',

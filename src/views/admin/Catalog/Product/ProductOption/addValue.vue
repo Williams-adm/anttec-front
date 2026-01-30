@@ -10,6 +10,9 @@ import Swal from 'sweetalert2'
 import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 
+const optionProductService = new OptionProductService()
+const optionService = new OptionService()
+
 const options = ref<OptionValueShortI[]>([])
 const isLoading = ref(true)
 const error = ref<string | null>(null)
@@ -26,7 +29,7 @@ const emit = defineEmits<{
 
 const loadOption = async () => {
   try {
-    options.value = await OptionService.getAllOptionValues(props.option_id)
+    options.value = await optionService.getAllOptionValues(props.option_id)
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las opciones.'
@@ -60,7 +63,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       option_product_id: props.option_product,
       option_value_id: values.option_value_id,
     }
-    await OptionProductService.addValues(payload as addValuesDTO)
+    await optionProductService.addValues(payload as addValuesDTO)
     Swal.close()
 
     useSweetAlert({

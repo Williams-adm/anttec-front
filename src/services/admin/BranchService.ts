@@ -2,7 +2,9 @@ import type { branchesI } from '@/interfaces/admin/branch/BranchInterface'
 import httpAdmin from '../httpAdmin'
 
 class BranchService {
-  private api = httpAdmin
+  private get api() {
+    return httpAdmin
+  }
 
   async getAll(): Promise<branchesI> {
     const res = await this.api.get<branchesI>('/admin/branches')
@@ -11,4 +13,4 @@ class BranchService {
   }
 }
 
-export default new BranchService()
+export default BranchService

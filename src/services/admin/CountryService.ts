@@ -4,7 +4,9 @@ import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseIn
 import httpAdmin from '../httpAdmin'
 
 class CountryService {
-  private api = httpAdmin
+  private get api() {
+    return httpAdmin
+  }
 
   async getAll(): Promise<countriesI> {
     const res = await this.api.get<countriesI>('/admin/countries')
@@ -27,4 +29,4 @@ class CountryService {
   }
 }
 
-export default new CountryService()
+export default CountryService

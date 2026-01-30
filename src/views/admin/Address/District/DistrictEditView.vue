@@ -16,6 +16,10 @@ import { useForm } from 'vee-validate'
 import { nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
+const countryService = new CountryService()
+const departmentService = new DepartmentService()
+const districtService = new DistrictService()
+
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
@@ -62,7 +66,7 @@ const loadDepartments = async (countryIdValue: string | number) => {
 
   try {
     isDepartmentsLoading.value = true
-    departments.value = await CountryService.getAllDepartments(countryIdValue)
+    departments.value = await countryService.getAllDepartments(countryIdValue)
   } catch (err) {
     departments.value = []
     useSweetAlert({
@@ -85,7 +89,7 @@ const loadProvinces = async (departmentIdValue: string | number) => {
 
   try {
     isProvincesLoading.value = true
-    provinces.value = await DepartmentService.getAllProvinces(departmentIdValue)
+    provinces.value = await departmentService.getAllProvinces(departmentIdValue)
   } catch (err) {
     provinces.value = []
     useSweetAlert({
@@ -150,20 +154,20 @@ const loadData = async () => {
     isLoading.value = true
 
     // Primero obtenemos el distrito para saber qué país, departamento y provincia tiene
-    const districtData = await DistrictService.getById(id)
+    const districtData = await districtService.getById(id)
     district.value = districtData
 
     // Ahora cargamos todo en paralelo incluyendo departamentos y provincias
-    const promises = [CountryService.getAllList()]
+    const promises = [countryService.getAllList()]
 
     // Agregar la promesa de departamentos si existe un país
     if (district.value?.country?.id) {
-      promises.push(CountryService.getAllDepartments(district.value.country.id))
+      promises.push(countryService.getAllDepartments(district.value.country.id))
     }
 
     // Agregar la promesa de provincias si existe un departamento
     if (district.value?.department?.id) {
-      promises.push(DepartmentService.getAllProvinces(district.value.department.id))
+      promises.push(departmentService.getAllProvinces(district.value.department.id))
     }
 
     const results = await Promise.all(promises)
@@ -231,7 +235,7 @@ const onSubmit = handleSubmit(async (values) => {
       max_delivery_days: Number(values.max_delivery_days),
     }
 
-    await DistrictService.update(payload, id)
+    await districtService.update(payload, id)
     Swal.close()
 
     useSweetAlert({

@@ -3,7 +3,9 @@ import type { coverSI } from '@/interfaces/shop/CoverSInterface'
 import httpPublic from '../httpPublic'
 
 class CoverSService {
-  private api = httpPublic
+  private get api() {
+    return httpPublic
+  }
 
   async getAll(): Promise<coverSI[]> {
     const res = await this.api.get<ApiListResponseI<coverSI[]>>('covers')
@@ -12,4 +14,4 @@ class CoverSService {
   }
 }
 
-export default new CoverSService()
+export default CoverSService

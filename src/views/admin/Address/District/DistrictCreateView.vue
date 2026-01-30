@@ -14,6 +14,10 @@ import Swal from 'sweetalert2'
 import { useForm } from 'vee-validate'
 import { onMounted, ref, watch } from 'vue'
 
+const countryService = new CountryService()
+const departmentService = new DepartmentService()
+const districtService = new DistrictService()
+
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Distritos', route: 'admin.address.districts' },
@@ -32,7 +36,7 @@ const serverErrors = ref<Record<string, string[]>>({})
 
 const loadCountries = async () => {
   try {
-    countries.value = await CountryService.getAllList()
+    countries.value = await countryService.getAllList()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar los países.'
@@ -74,7 +78,7 @@ watch(countryId, async (newCountryId) => {
 
   try {
     isDepartmentsLoading.value = true
-    departments.value = await CountryService.getAllDepartments(newCountryId)
+    departments.value = await countryService.getAllDepartments(newCountryId)
   } catch (err) {
     useSweetAlert({
       title: 'Error',
@@ -96,7 +100,7 @@ watch(departmentId, async (newDepartmentId) => {
 
   try {
     isProvincesLoading.value = true
-    provinces.value = await DepartmentService.getAllProvinces(newDepartmentId)
+    provinces.value = await departmentService.getAllProvinces(newDepartmentId)
   } catch (err) {
     useSweetAlert({
       title: 'Error',
@@ -127,7 +131,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       min_delivery_days: Number(values.min_delivery_days),
       max_delivery_days: Number(values.max_delivery_days),
     }
-    await DistrictService.create(payload as districtCreateDTO)
+    await districtService.create(payload as districtCreateDTO)
     Swal.close()
 
     useSweetAlert({

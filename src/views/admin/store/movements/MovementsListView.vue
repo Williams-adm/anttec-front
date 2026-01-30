@@ -7,6 +7,8 @@ import type { movementsShortI } from '@/interfaces/admin/movement/MovementShortI
 import MovementsService from '@/services/admin/MovementsService'
 import { computed, onMounted, ref } from 'vue'
 
+const movementsService = new MovementsService()
+
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Movimientos' }])
 
 const movements = ref<movementsShortI | null>(null)
@@ -16,7 +18,7 @@ const isLoading = ref(true)
 
 const loadMovements = async () => {
   try {
-    movements.value = await MovementsService.getAll()
+    movements.value = await movementsService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar los movimientos.'

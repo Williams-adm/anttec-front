@@ -10,6 +10,8 @@ import { useRoute } from 'vue-router'
 import associateCreateModal from './associateCreateModal.vue'
 import addValue from './addValue.vue'
 
+const productService = new ProductService()
+
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Productos', route: 'admin.catalog.products' },
@@ -32,7 +34,7 @@ const openModal = () => {
 
 const loadProductOption = async () => {
   try {
-    options.value = await ProductService.getOptions(id)
+    options.value = await productService.getOptions(id)
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las opciones asociadas.'

@@ -14,6 +14,8 @@ import { computed, onMounted, ref, watch } from 'vue'
 import BarcodeQuantityModal from './components/BarcodeQuantityModal.vue'
 import BarcodeCartModal from './components/BarcodeCartModal.vue'
 
+const variantService = new VariantService()
+
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Inventario' }])
 
 const variants = ref<variantsI | null>(null)
@@ -44,7 +46,7 @@ watch(
 
 const loadVariants = async () => {
   try {
-    variants.value = await VariantService.getAll()
+    variants.value = await variantService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las variantes.'
@@ -66,7 +68,7 @@ const updateStatus = async (id: number | string, currentStatus: boolean) => {
       text: 'Actualizando estado',
       icon: 'loading',
     })
-    await VariantService.updateStatus({ status: newStatus }, String(id))
+    await variantService.updateStatus({ status: newStatus }, String(id))
 
     const product = variantsList.value.find((c) => c.id === id)
     if (product) {

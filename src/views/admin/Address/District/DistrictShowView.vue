@@ -7,6 +7,8 @@ import DistrictService from '@/services/admin/DistrictService'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+const districtService = new DistrictService()
+
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
@@ -22,7 +24,7 @@ useBreadcrumb(() => [
 
 const loadDistrict = async () => {
   try {
-    district.value = await DistrictService.getById(id)
+    district.value = await districtService.getById(id)
   } catch (err) {
     useSweetAlert({
       title: 'Algo salió mal',

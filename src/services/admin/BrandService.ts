@@ -5,7 +5,9 @@ import type { brandI, brandsI } from '@/interfaces/admin/BrandInterface'
 import httpAdmin from '../httpAdmin'
 
 class BrandService {
-  private api = httpAdmin
+  private get api() {
+    return httpAdmin
+  }
 
   async getAll(): Promise<brandsI> {
     const res = await this.api.get<brandsI>('/admin/brands')
@@ -38,4 +40,4 @@ class BrandService {
   }
 }
 
-export default new BrandService()
+export default BrandService

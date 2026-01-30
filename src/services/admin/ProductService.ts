@@ -8,7 +8,9 @@ import type { ProductOptionListI } from '@/interfaces/admin/product/ProductOptio
 import httpAdmin from '../httpAdmin'
 
 class ProductService {
-  private api = httpAdmin
+  private get api() {
+    return httpAdmin
+  }
 
   async getAll(): Promise<ProductsI> {
     const res = await this.api.get<ProductsI>('/admin/products')
@@ -60,4 +62,4 @@ class ProductService {
   }
 }
 
-export default new ProductService()
+export default ProductService

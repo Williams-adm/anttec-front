@@ -16,6 +16,9 @@ import Swal from 'sweetalert2'
 import { Field, FieldArray, useForm } from 'vee-validate'
 import { computed, onMounted, ref, watch } from 'vue'
 
+const branchVariantService = new BranchVariantService()
+const movementsService = new MovementsService()
+
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Movimientos', route: 'admin.store.movements' },
@@ -29,7 +32,7 @@ const serverErrors = ref<Record<string, string[]>>({})
 
 const loadSubcategories = async () => {
   try {
-    variants.value = await BranchVariantService.getAllList()
+    variants.value = await branchVariantService.getAllList()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'
@@ -85,7 +88,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       text: 'Procesando el formulario',
       icon: 'loading',
     })
-    await MovementsService.create(values as movementCreateDTO)
+    await movementsService.create(values as movementCreateDTO)
     Swal.close()
 
     useSweetAlert({

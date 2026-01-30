@@ -17,6 +17,11 @@ import Swal from 'sweetalert2'
 import { Field, FieldArray, useForm } from 'vee-validate'
 import { onMounted, ref, watch } from 'vue'
 
+const brandService = new BrandService()
+const categoryService = new CategoryService()
+const productService = new ProductService()
+const specificationService = new SpecificationService()
+
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Productos', route: 'admin.catalog.products' },
@@ -35,9 +40,9 @@ const serverErrors = ref<Record<string, string[]>>({})
 const loadData = async () => {
   try {
     ;[brands.value, categories.value, specifications.value] = await Promise.all([
-      BrandService.getAllList(),
-      CategoryService.getAllList(),
-      SpecificationService.getAllList(),
+      brandService.getAllList(),
+      categoryService.getAllList(),
+      specificationService.getAllList(),
     ])
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
@@ -76,7 +81,7 @@ watch(categoryId, async (newCategoryId) => {
 
   try {
     isSubcategoriesLoading.value = true
-    subcategories.value = await CategoryService.getAllSubcategories(newCategoryId)
+    subcategories.value = await categoryService.getAllSubcategories(newCategoryId)
   } catch (err) {
     useSweetAlert({
       title: 'Error',
@@ -108,7 +113,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       description: values.description,
       specifications: values.specifications,
     }
-    await ProductService.create(payload as productCreateDTO)
+    await productService.create(payload as productCreateDTO)
     Swal.close()
 
     useSweetAlert({

@@ -1,14 +1,22 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
 
 const goHome = () => {
   router.push({ name: 'shop.home' })
 }
 
 const reloadPage = () => {
-  window.location.reload()
+  const originalRoute = route.query.from as string || '/'
+
+  // Verificación de seguridad
+  if (originalRoute && originalRoute !== '/server-error') {
+    router.push(originalRoute)
+  } else {
+    router.push({ name: 'shop.home' })
+  }
 }
 </script>
 

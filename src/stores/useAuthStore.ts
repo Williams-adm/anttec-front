@@ -3,6 +3,8 @@ import AuthService from '@/services/auth/AuthService'
 import { defineStore } from 'pinia'
 import { useCartStore } from './useCartStore'
 
+const authService = new AuthService()
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: localStorage.getItem('access_token') || null,
@@ -53,7 +55,7 @@ export const useAuthStore = defineStore('auth', {
 
     // Método mejorado para logout con limpieza de carrito
     async logout() {
-      await AuthService.logout()
+      await authService.logout()
       // Limpiar datos de autenticación
       this.clear()
 

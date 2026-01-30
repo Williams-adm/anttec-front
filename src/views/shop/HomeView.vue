@@ -7,6 +7,8 @@ import type { productSI } from '@/interfaces/shop/Product/ProductSInterface'
 import ProductSService from '@/services/shop/ProductSService'
 import { computed, onMounted, ref } from 'vue'
 
+const productSService = new ProductSService()
+
 const productLasts = ref<productSI[] | null>(null)
 const error = ref<string | null>(null)
 const isLoading = ref(true)
@@ -14,7 +16,7 @@ const productLastList = computed(() => productLasts.value ?? [])
 
 const loadProductList = async () => {
   try {
-    const data = await ProductSService.getAllLasts()
+    const data = await productSService.getAllLasts()
     // Agregar imgLoaded en false a cada variante
     productLasts.value = data.map((product) => ({
       ...product,

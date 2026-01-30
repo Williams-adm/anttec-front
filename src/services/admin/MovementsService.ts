@@ -5,7 +5,9 @@ import type { movementsShortI } from '@/interfaces/admin/movement/MovementShortI
 import httpAdmin from '../httpAdmin'
 
 class MovementsService {
-  private api = httpAdmin
+  private get api() {
+    return httpAdmin
+  }
 
   async getAll(): Promise<movementsShortI> {
     const res = await this.api.get<movementsShortI>('/admin/movements')
@@ -26,4 +28,4 @@ class MovementsService {
   }
 }
 
-export default new MovementsService()
+export default MovementsService

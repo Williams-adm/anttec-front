@@ -10,7 +10,9 @@ import type {
 } from '@/interfaces/shop/Cart/DetailCartSInterface'
 
 class CartSService {
-  private api = httpPublic
+  private get api() {
+    return httpPublic
+  }
 
   async getCart(sessionId: string): Promise<cartResponseSI> {
     const res = await this.api.get<ApiListResponseI<cartResponseSI>>('cart', {
@@ -82,4 +84,4 @@ class CartSService {
   }
 }
 
-export default new CartSService()
+export default CartSService

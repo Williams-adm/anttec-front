@@ -11,6 +11,8 @@ import Swal from 'sweetalert2'
 import BadgeStatus from '@/components/Admin/BadgeStatus.vue'
 import type { categoriesI } from '@/interfaces/admin/CategoryInterface'
 
+const categoryService = new CategoryService()
+
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Categorías' }])
 
 const categories = ref<categoriesI | null>(null)
@@ -20,7 +22,7 @@ const isLoading = ref(true)
 
 const loadCategories = async () => {
   try {
-    categories.value = await CategoryService.getAll()
+    categories.value = await categoryService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'
@@ -42,7 +44,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
       text: 'Actualizando estado',
       icon: 'loading',
     })
-    await CategoryService.update({ status: newStatus }, String(id))
+    await categoryService.update({ status: newStatus }, String(id))
 
     const category = categoriesList.value.find((c) => c.id === id)
     if (category) {

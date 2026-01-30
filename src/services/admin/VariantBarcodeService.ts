@@ -2,7 +2,9 @@ import type { variantBarcodeDTO } from '@/DTOs/admin/VariantBarcodeDTO'
 import httpAdmin from '../httpAdmin'
 
 class VariantBarcodeService {
-  private api = httpAdmin
+  private get api() {
+    return httpAdmin
+  }
 
   async generatePDF(data: variantBarcodeDTO): Promise<Blob> {
     const res = await this.api.post<Blob>('/admin/variants/barcodes/generate', data, {
@@ -12,4 +14,4 @@ class VariantBarcodeService {
   }
 }
 
-export default new VariantBarcodeService()
+export default VariantBarcodeService

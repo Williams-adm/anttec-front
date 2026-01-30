@@ -11,6 +11,8 @@ import DepartmentService from '@/services/admin/DepartmentService'
 import Swal from 'sweetalert2'
 import { computed, onMounted, ref } from 'vue'
 
+const departmentService = new DepartmentService()
+
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Departamentos' }])
 
 const departments = ref<departmentsI | null>(null)
@@ -20,7 +22,7 @@ const isLoading = ref(true)
 
 const loadDepartments = async () => {
   try {
-    departments.value = await DepartmentService.getAll()
+    departments.value = await departmentService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar los departamentos.'
@@ -42,7 +44,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
       text: 'Actualizando estado',
       icon: 'loading',
     })
-    await DepartmentService.update({ status: newStatus }, String(id))
+    await departmentService.update({ status: newStatus }, String(id))
 
     const category = departmentsList.value.find((c) => c.id === id)
     if (category) {

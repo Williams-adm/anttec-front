@@ -11,6 +11,8 @@ import DistrictService from '@/services/admin/DistrictService'
 import Swal from 'sweetalert2'
 import { computed, onMounted, ref } from 'vue'
 
+const districtService = new DistrictService()
+
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Distritos' }])
 
 const districts = ref<districtShortsI | null>(null)
@@ -20,7 +22,7 @@ const isLoading = ref(true)
 
 const loadDistricts = async () => {
   try {
-    districts.value = await DistrictService.getAll()
+    districts.value = await districtService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar los departamentos.'
@@ -42,7 +44,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
       text: 'Actualizando estado',
       icon: 'loading',
     })
-    await DistrictService.update({ status: newStatus }, String(id))
+    await districtService.update({ status: newStatus }, String(id))
 
     const category = districtsList.value.find((c) => c.id === id)
     if (category) {

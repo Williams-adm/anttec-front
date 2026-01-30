@@ -6,7 +6,9 @@ import type { OptionValueShortI } from '@/interfaces/admin/options/OptionValueIn
 import httpAdmin from '../httpAdmin'
 
 class OptionService {
-  private api = httpAdmin
+  private get api() {
+    return httpAdmin
+  }
 
   async getAll(): Promise<OptionsI> {
     const res = await this.api.get<OptionsI>('/admin/options')
@@ -47,4 +49,4 @@ class OptionService {
   }
 }
 
-export default new OptionService()
+export default OptionService

@@ -11,6 +11,8 @@ import MobileDrawer from './header/MobileDrawer.vue'
 import DesktopMenu from './header/DesktopMenu.vue'
 import CartDrawer from '@/components/shop/cart/CartDrawer.vue'
 
+const categorySService = new CategorySService()
+
 const isCategoriesOpen = ref(false)
 const categoriesRef = ref<HTMLElement | null>(null)
 
@@ -37,7 +39,7 @@ const backToCategories = () => {
 
 const loadCategories = async () => {
   try {
-    categories.value = await CategorySService.getAll()
+    categories.value = await categorySService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'

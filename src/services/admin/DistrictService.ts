@@ -6,7 +6,9 @@ import httpAdmin from '../httpAdmin'
 import type { districtCreateDTO } from '@/DTOs/admin/district/DistrictCreateDTO'
 
 class DistrictService {
-  private api = httpAdmin
+  private get api() {
+    return httpAdmin
+  }
 
   async getAll(): Promise<districtShortsI> {
     const res = await this.api.get<districtShortsI>('/admin/districts')
@@ -33,4 +35,4 @@ class DistrictService {
   }
 }
 
-export default new DistrictService()
+export default DistrictService

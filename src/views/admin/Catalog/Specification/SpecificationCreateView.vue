@@ -11,6 +11,8 @@ import Swal from 'sweetalert2'
 import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 
+const specificationService = new SpecificationService()
+
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Especificaciones', route: 'admin.catalog.specifications' },
@@ -33,7 +35,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       icon: 'loading',
     })
 
-    await SpecificationService.create(values as specificationCreateDTO)
+    await specificationService.create(values as specificationCreateDTO)
     Swal.close()
 
     useSweetAlert({

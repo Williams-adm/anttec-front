@@ -15,6 +15,9 @@ import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+const categoryService = new CategoryService()
+const subcategoryService = new SubcategoryService()
+
 const route = useRoute()
 const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
@@ -41,8 +44,8 @@ const [categoryId, categoryIdAttrs] = defineField('category_id')
 const loadSubcategories = async () => {
   try {
     const [subcategoryRes, categoriesRes] = await Promise.all([
-      SubcategoryService.getById(id),
-      CategoryService.getAllList(),
+      subcategoryService.getById(id),
+      categoryService.getAllList(),
     ])
 
     subcategory.value = subcategoryRes
@@ -79,7 +82,7 @@ const onSubmit = handleSubmit(async (values) => {
       icon: 'loading',
     })
 
-    await SubcategoryService.update(values as subcategoryUpdateDTO, id)
+    await subcategoryService.update(values as subcategoryUpdateDTO, id)
     Swal.close()
     useSweetAlert({
       title: 'Subcategoría actualizada',

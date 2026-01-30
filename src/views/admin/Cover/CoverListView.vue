@@ -14,6 +14,8 @@ import Swal from 'sweetalert2'
 import { onMounted, ref } from 'vue'
 import Draggable from 'vuedraggable'
 
+const coverService = new CoverService()
+
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Portadas' }])
 
 const covers = ref<coversI | null>(null)
@@ -25,7 +27,7 @@ const loadedImages = ref<Record<number, boolean>>({})
 // Cargar covers desde el backend
 const loadCovers = async () => {
   try {
-    covers.value = await CoverService.getAll()
+    covers.value = await coverService.getAll()
     coversList.value = covers.value?.data ?? []
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
@@ -49,7 +51,7 @@ const updateStatus = async (id: number | string, currentStatus: boolean) => {
       text: 'Actualizando estado',
       icon: 'loading',
     })
-    await CoverService.updateStatus({ status: newStatus }, String(id))
+    await coverService.updateStatus({ status: newStatus }, String(id))
 
     const cover = coversList.value.find((c) => c.id === id)
     if (cover) {
@@ -67,7 +69,7 @@ const updateStatus = async (id: number | string, currentStatus: boolean) => {
 const onDragEnd = async () => {
   try {
     const data = { sorts: coversList.value.map((c) => c.id) }
-    await CoverService.order(data as coverOrderDTO)
+    await coverService.order(data as coverOrderDTO)
 
     useSweetAlert({
       title: 'Éxito',

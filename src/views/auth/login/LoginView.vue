@@ -10,10 +10,13 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router' // ← AGREGAR useRoute
 import { loginSchema } from '../../../schemas/auth/loginValidationSchema'
 
+const authService = new AuthService()
+
 const router = useRouter()
+const route = useRoute() // ← AGREGAR
 const authStore = useAuthStore()
 
 const isLoading = ref(true)
@@ -39,12 +42,26 @@ const onSubmit = handleSubmit(async (values) => {
     })
 
     // 1. Hacer login
-    const response = await AuthService.login(values as loginDTO)
+    const response = await authService.login(values as loginDTO)
     // 2. Guardar datos de autenticación Y sincronizar carrito
     await authStore.setAuthData(response.token, response.user)
 
     Swal.close()
-    router.push({ name: 'shop.home' })
+
+    // ← NUEVA LÓGICA: Leer el redirect de la query
+    const redirectTo = route.query.redirect as string
+
+    if (redirectTo && redirectTo !== '/login') {
+      // Si hay un redirect específico, ir ahí
+      router.push(redirectTo)
+    } else {
+      // Si no, redirigir según rol
+      if (authStore.isAdmin) {
+        router.push({ name: 'admin.dashboard' })
+      } else {
+        router.push({ name: 'shop.home' })
+      }
+    }
   } catch (err) {
     Swal.close()
     if (axios.isAxiosError(err)) {
@@ -127,25 +144,30 @@ onMounted(async () => {
             class="absolute right-3 top-5 transform -translate-y-1/2 mt-0.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none cursor-pointer"
           >
             <span v-if="!showPassword">
-              <font-awesome-icon
-                icon="fa-solid fa-eye"
-                size="lg"
-                class="text-gray-300"
-              />
+              <font-awesome-icon icon="fa-solid fa-eye" size="lg" class="text-gray-300" />
             </span>
             <span v-else>
-              <font-awesome-icon
-                icon="fa-solid fa-eye-slash"
-                size="lg"
-                class="text-gray-300"
-              />
+              <font-awesome-icon icon="fa-solid fa-eye-slash" size="lg" class="text-gray-300" />
             </span>
           </button>
         </div>
         <span class="text-red-400">{{ errors.password }}</span>
       </div>
 
-      <div class="flex justify-end">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <p class="text-sm text-gray-500 dark:text-gray-500">
+          ¿No tienes cuenta?
+          <router-link
+            :to="{
+              name: 'register',
+              query: route.query.redirect ? { redirect: route.query.redirect } : {},
+            }"
+            class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+          >
+            Crear cuenta
+          </router-link>
+        </p>
+
         <ButtonAuth name="INICIAR SESIÓN" :disabled="!meta.valid" />
       </div>
     </form>

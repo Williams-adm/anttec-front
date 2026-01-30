@@ -11,6 +11,8 @@ import { computed, onMounted, ref } from 'vue'
 import ToggleSwitch from '@/components/Admin/ToggleSwitch.vue'
 import Swal from 'sweetalert2'
 
+const specificationService = new SpecificationService()
+
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Especificaciones' }])
 
 const specifications = ref<SpecificationsI | null>(null)
@@ -20,7 +22,7 @@ const isLoading = ref(true)
 
 const loadSpecifications = async () => {
   try {
-    specifications.value = await SpecificationService.getAll()
+    specifications.value = await specificationService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'
@@ -42,7 +44,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
       text: 'Actualizando estado',
       icon: 'loading',
     })
-    await SpecificationService.update({ status: newStatus }, String(id))
+    await specificationService.update({ status: newStatus }, String(id))
 
     const category = specificationsList.value.find((c) => c.id === id)
     if (category) {

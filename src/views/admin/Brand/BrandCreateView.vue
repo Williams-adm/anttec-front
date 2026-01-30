@@ -11,6 +11,8 @@ import BrandService from '@/services/admin/BrandService'
 import type { brandCreateDTO } from '@/DTOs/admin/brand/BrandCreateDTO'
 import axios from 'axios'
 
+const brandService = new BrandService()
+
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Marcas', route: 'admin.brands' },
@@ -38,7 +40,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       icon: 'loading',
     })
 
-    await BrandService.create(values as brandCreateDTO)
+    await brandService.create(values as brandCreateDTO)
     Swal.close()
 
     useSweetAlert({

@@ -4,6 +4,8 @@ import CartSService from '@/services/shop/CartSService'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
+const cartSService = new CartSService()
+
 export const useCartStore = defineStore('cart', () => {
   const cart = ref<cartSI | null>(null)
   const items = ref<detailCartSI[]>([])
@@ -45,7 +47,7 @@ export const useCartStore = defineStore('cart', () => {
     isLoading.value = true
     try {
       initSessionId()
-      const data = await CartSService.getCart(sessionId.value)
+      const data = await cartSService.getCart(sessionId.value)
       cart.value = data.cart
       items.value = data.cart.detail_cart || []
       totals.value = data.totals
@@ -66,7 +68,7 @@ export const useCartStore = defineStore('cart', () => {
   const addItem = async (branchVariantId: number, quantity: number = 1) => {
     isLoading.value = true
     try {
-      const data = await CartSService.addItem(sessionId.value, {
+      const data = await cartSService.addItem(sessionId.value, {
         branch_variant_id: branchVariantId,
         quantity: quantity,
       })
@@ -104,7 +106,7 @@ export const useCartStore = defineStore('cart', () => {
         return
       }
 
-      const data = await CartSService.updateItemQuantity(sessionId.value, branchVariantId, {
+      const data = await cartSService.updateItemQuantity(sessionId.value, branchVariantId, {
         quantity: quantity,
       })
 
@@ -130,7 +132,7 @@ export const useCartStore = defineStore('cart', () => {
   const removeItem = async (branchVariantId: number) => {
     isLoading.value = true
     try {
-      const data = await CartSService.removeItem(sessionId.value, branchVariantId)
+      const data = await cartSService.removeItem(sessionId.value, branchVariantId)
       items.value = items.value.filter((item) => item.branch_variant_id !== branchVariantId)
       totals.value = data.totals
     } catch (error) {
@@ -145,7 +147,7 @@ export const useCartStore = defineStore('cart', () => {
   const clearCart = async () => {
     isLoading.value = true
     try {
-      await CartSService.clearCart(sessionId.value)
+      await cartSService.clearCart(sessionId.value)
       items.value = []
       totals.value = {
         total: 0,
@@ -170,6 +172,7 @@ export const useCartStore = defineStore('cart', () => {
     cart.value = null
 
     localStorage.removeItem('cart_session_id')
+    initSessionId()
 
     // Cerrar drawer si está abierto
     isDrawerOpen.value = false
@@ -187,7 +190,7 @@ export const useCartStore = defineStore('cart', () => {
     }
     isLoading.value = true
     try {
-      const data = await CartSService.mergeCart(sessionId.value)
+      const data = await cartSService.mergeCart(sessionId.value)
       cart.value = data.cart
       items.value = data.cart.detail_cart || []
       totals.value = data.totals

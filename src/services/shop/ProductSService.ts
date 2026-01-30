@@ -4,7 +4,9 @@ import type { productSI, productsSI } from '@/interfaces/shop/Product/ProductSIn
 import httpPublic from '../httpPublic'
 
 class ProductSService {
-  private api = httpPublic
+  private get api() {
+    return httpPublic
+  }
 
   async getAllLasts(): Promise<productSI[]> {
     const res = await this.api.get<ApiListResponseI<productSI[]>>('products/last')
@@ -53,4 +55,4 @@ class ProductSService {
   }
 }
 
-export default new ProductSService()
+export default ProductSService

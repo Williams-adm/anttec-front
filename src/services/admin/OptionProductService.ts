@@ -7,7 +7,9 @@ import type { OptionProductValuesI } from '@/interfaces/admin/optionProduct/Opti
 import httpAdmin from '../httpAdmin'
 
 class OptionProductService {
-  private api = httpAdmin
+  private get api() {
+    return httpAdmin
+  }
 
   async getById(id: string): Promise<OptionProductI> {
     const res = await this.api.get<ApiListResponseI<OptionProductI>>(`/admin/option-products/${id}`)
@@ -45,4 +47,4 @@ class OptionProductService {
   }
 }
 
-export default new OptionProductService()
+export default OptionProductService

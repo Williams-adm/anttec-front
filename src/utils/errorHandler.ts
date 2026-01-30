@@ -1,6 +1,6 @@
 // src/utils/errorHandler.ts
 
-import router from '@/router'
+import router, { lastValidRoute } from '@/router'
 import { useAuthStore } from '@/stores/useAuthStore'
 import type { AxiosError } from 'axios'
 
@@ -52,12 +52,18 @@ export function handleHttpError(error: AxiosError, options: ErrorHandlerOptions 
     case 500:
     case 502:
       console.error('Server error:', status, error.config?.url)
-      router.push({ name: 'server-error' })
+      router.push({
+        name: 'server-error',
+        query: { from: lastValidRoute }, // ← Usar la última ruta válida guardada
+      })
       break
 
     case 503:
       console.warn('Service unavailable:', error.config?.url)
-      router.push({ name: 'maintenance' })
+      router.push({
+        name: 'server-error',
+        query: { from: lastValidRoute }, // ← Usar la última ruta válida guardada
+      })
       break
 
     default:

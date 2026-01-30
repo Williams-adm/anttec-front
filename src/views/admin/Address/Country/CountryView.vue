@@ -10,6 +10,8 @@ import { computed, onMounted, ref } from 'vue'
 
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Paises' }])
 
+const countryService = new CountryService()
+
 const countries = ref<countriesI | null>(null)
 const error = ref<string | null>(null)
 const countriesList = computed(() => countries.value?.data ?? [])
@@ -17,7 +19,7 @@ const isLoading = ref(true)
 
 const loadCountries = async () => {
   try {
-    countries.value = await CountryService.getAll()
+    countries.value = await countryService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar los países.'

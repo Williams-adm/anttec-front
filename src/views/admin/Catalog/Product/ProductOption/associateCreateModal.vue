@@ -12,6 +12,9 @@ import Swal from 'sweetalert2'
 import { Field, FieldArray, useForm } from 'vee-validate'
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 
+const optionProductService = new OptionProductService()
+const optionService = new OptionService()
+
 const modalEl = ref<HTMLElement | null>(null)
 let modal: ModalInterface | null = null
 
@@ -28,7 +31,7 @@ const props = defineProps<{
 
 const loadData = async () => {
   try {
-    ;[options.value] = await Promise.all([OptionService.getAllList()])
+    ;[options.value] = await Promise.all([optionService.getAllList()])
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     console.error(err)
@@ -55,7 +58,7 @@ watch(optionId, async (newOptionId) => {
 
   try {
     isOptionValuesLoading.value = true
-    optionValues.value = await OptionService.getAllOptionValues(newOptionId)
+    optionValues.value = await optionService.getAllOptionValues(newOptionId)
   } catch (err) {
     useSweetAlert({
       title: 'Error',
@@ -111,7 +114,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       option_id: values.option_id,
       values: values.values,
     }
-    await OptionProductService.create(payload as productOptionCreateDTO)
+    await optionProductService.create(payload as productOptionCreateDTO)
     Swal.close()
 
     useSweetAlert({

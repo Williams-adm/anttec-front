@@ -11,6 +11,8 @@ import OptionService from '@/services/admin/OptionService'
 import Swal from 'sweetalert2'
 import { computed, onMounted, ref } from 'vue'
 
+const optionService = new OptionService()
+
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Opciones' }])
 
 const options = ref<OptionsI | null>(null)
@@ -20,7 +22,7 @@ const isLoading = ref(true)
 
 const loadBrands = async () => {
   try {
-    options.value = await OptionService.getAll()
+    options.value = await optionService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'
@@ -42,7 +44,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
       text: 'Actualizando estado',
       icon: 'loading',
     })
-    await OptionService.update({ status: newStatus }, String(id))
+    await optionService.update({ status: newStatus }, String(id))
 
     const category = optionsList.value.find((c) => c.id === id)
     if (category) {

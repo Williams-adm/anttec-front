@@ -6,7 +6,9 @@ import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseIn
 import httpAdmin from '../httpAdmin'
 
 class DepartmentService {
-  private api = httpAdmin
+  private get api() {
+    return httpAdmin
+  }
 
   async getAll(): Promise<departmentsI> {
     const res = await this.api.get<departmentsI>('/admin/departments')
@@ -44,4 +46,4 @@ class DepartmentService {
   }
 }
 
-export default new DepartmentService()
+export default DepartmentService

@@ -24,6 +24,10 @@ import { onMounted, ref, watch } from 'vue'
 import vueFilePond from 'vue-filepond'
 import { useRoute } from 'vue-router'
 
+const productService = new ProductService()
+const variantService = new VariantService()
+const optionProductService = new OptionProductService()
+
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Productos', route: 'admin.catalog.products' },
@@ -60,8 +64,8 @@ const filePondRef = ref<FilePondInstance | null>(null)
 const loadData = async () => {
   try {
     const [optionsList, optionsStatus] = await Promise.all([
-      ProductService.getAllOptionsList(id),
-      ProductService.hasOptions(id),
+      productService.getAllOptionsList(id),
+      productService.hasOptions(id),
     ])
     options.value = optionsList
     hasOptions.value = optionsStatus
@@ -120,7 +124,7 @@ watch(
 
       try {
         loadingMap.value[idx] = true
-        valuesMap.value[idx] = await OptionProductService.getAllValues(id, optionId)
+        valuesMap.value[idx] = await optionProductService.getAllValues(id, optionId)
       } catch (e) {
         useSweetAlert({
           title: 'Error',
@@ -175,7 +179,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
     values.images.forEach((img, index) => {
       formData.append(`images[${index}][image]`, img.image)
     })
-    await VariantService.create(formData)
+    await variantService.create(formData)
     Swal.close()
 
     useSweetAlert({

@@ -3,7 +3,9 @@ import type { branchVariantI } from '@/interfaces/admin/BranchVariantInterface'
 import httpAdmin from '../httpAdmin'
 
 class BranchVariantService {
-  private api = httpAdmin
+  private get api() {
+    return httpAdmin
+  }
 
   async getAllList(): Promise<branchVariantI[]> {
     const res = await this.api.get<ApiListResponseI<branchVariantI[]>>(
@@ -14,4 +16,4 @@ class BranchVariantService {
   }
 }
 
-export default new BranchVariantService()
+export default BranchVariantService

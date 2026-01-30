@@ -20,6 +20,8 @@ import { useField, useForm } from 'vee-validate'
 import { nextTick, onMounted, ref, watch } from 'vue'
 import vueFilePond from 'vue-filepond'
 
+const coverService = new CoverService()
+
 useBreadcrumb([
   { name: 'Dashboard', route: 'admin.dashboard' },
   { name: 'Portadas', route: 'admin.covers' },
@@ -135,7 +137,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       formData.append('image', values.image)
     }
 
-    await CoverService.create(formData)
+    await coverService.create(formData)
     Swal.close()
 
     useSweetAlert({

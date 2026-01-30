@@ -4,7 +4,9 @@ import type { variantShortsI } from '@/interfaces/admin/variant/variantShortInte
 import httpAdmin from '../httpAdmin'
 
 class VariantService {
-  private api = httpAdmin
+  private get api() {
+    return httpAdmin
+  }
 
   async getAll(): Promise<variantsI> {
     const res = await this.api.get<variantsI>('/admin/variants')
@@ -51,4 +53,4 @@ class VariantService {
   }
 }
 
-export default new VariantService()
+export default VariantService
