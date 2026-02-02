@@ -56,7 +56,7 @@ const initDatepicker = async () => {
     new Datepicker(dateBirthDatepickerEl.value, {
       format: 'yyyy-mm-dd',
       autohide: true,
-      maxDate: new Date().toISOString(),// No permite fechas futuras
+      maxDate: new Date().toISOString(), // No permite fechas futuras
       minDate: new Date('1940-01-01').toISOString(),
     })
 

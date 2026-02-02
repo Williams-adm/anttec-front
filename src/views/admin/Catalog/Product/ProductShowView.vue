@@ -2,7 +2,6 @@
 import AnimationLoader from '@/components/AnimationLoader.vue'
 import productVariantView from './Variant/productVariantView.vue'
 import { useBreadcrumb } from '@/composables/useBreadcrumb'
-import { useSweetAlert } from '@/composables/useSweetAlert'
 import type { ProductExtendI } from '@/interfaces/admin/product/ProductInterface'
 import type { variantShortsI } from '@/interfaces/admin/variant/variantShortInterface'
 import ProductService from '@/services/admin/ProductService'
@@ -39,12 +38,6 @@ const loadProduct = async () => {
     product.value = productData
     variants.value = variantsData
   } catch (err) {
-    useSweetAlert({
-      title: 'Algo salió mal',
-      text: 'No se pudo cargar la información del producto',
-      icon: 'error',
-      timer: 0,
-    })
     error.value = 'Error al cargar los datos.'
     console.error(err)
   } finally {

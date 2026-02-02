@@ -2,7 +2,6 @@
 import noImg from '@/assets/img/no-image.jpg'
 import AnimationLoader from '@/components/AnimationLoader.vue'
 import { useBreadcrumb } from '@/composables/useBreadcrumb'
-import { useSweetAlert } from '@/composables/useSweetAlert'
 import type { variantI } from '@/interfaces/admin/variant/variantInterface'
 import VariantService from '@/services/admin/VariantService'
 import type { Swiper as SwiperClass } from 'swiper'
@@ -48,7 +47,6 @@ const loadVariant = async () => {
   try {
     variant.value = await variantService.getById(id)
   } catch (err) {
-    useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'
     console.error(err)
   } finally {

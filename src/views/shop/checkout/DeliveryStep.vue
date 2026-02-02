@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import AddressCard from '@/components/shop/checkout/AddressCard.vue'
+import { ref, onMounted, watch } from 'vue'
+import AddressCard from '@/components/shop/checkout/address/AddressCard.vue'
 import BranchCard from '@/components/shop/checkout/address/BranchCard.vue'
-import AddressModal from '@/components/shop/checkout/address/AddressModal.vue'
 import { useCheckout } from '@/composables/usecheckout'
 import { useAddress } from '@/composables/useaddress'
 import type { addressSI } from '@/interfaces/shop/AddressSInterface'
 import type { branchSI } from '@/interfaces/shop/BranchSInterface'
-
-const router = useRouter()
+import AddressModalCreate from '@/components/shop/checkout/address/AddressModalCreate.vue'
+import AddressModalEdit from '@/components/shop/checkout/address/AddressModalEdit.vue'
+import CustomerInfo from '@/components/shop/checkout/address/CustomerInfo.vue'
 
 const {
   deliveryInfo,
@@ -18,13 +17,10 @@ const {
   setShippingMethod,
   setDeliveryAddress,
   setPickupBranch,
-  setCustomerData,
-  updateCustomerData,
   loadAvailableBranches,
   saveToLocalStorage,
   initCheckout,
-  canProceedToNextStep,
-  nextStep,
+  clearDeliveryAddress,
 } = useCheckout()
 
 const {
@@ -38,59 +34,43 @@ const {
   deleteAddress,
 } = useAddress()
 
-// State local
 const selectedMethod = ref<'delivery' | 'pickup'>('delivery')
-const editingAddress = ref<addressSI | null>(null)
 
-const customerForm = ref({
-  first_name: '',
-  last_name: '',
-  document_type: 'DNI' as 'DNI' | 'CE' | 'Pasaporte' | 'RUC',
-  document_number: '',
-  phone: '',
-  email: '',
-})
+const createModalRef = ref<InstanceType<typeof AddressModalCreate> | null>(null)
+const editModalRef = ref<InstanceType<typeof AddressModalEdit> | null>(null)
 
-// Cargar datos iniciales
+// ✅ Función para seleccionar la dirección favorita automáticamente
+const autoSelectFavorite = () => {
+  if (
+    selectedMethod.value === 'delivery' &&
+    favoriteAddress.value &&
+    !deliveryInfo.value?.address_id
+  ) {
+    handleSelectAddress(favoriteAddress.value)
+  }
+}
+
 onMounted(async () => {
   await initCheckout()
-  await Promise.all([
-    loadAddresses(),
-    loadFavoriteAddress(),
-    loadAvailableBranches(),
-  ])
 
-  // Pre-seleccionar método de envío si ya existe
+  // Cargar datos en paralelo
+  await Promise.all([loadAddresses(), loadFavoriteAddress(), loadAvailableBranches()])
+
   if (deliveryInfo.value) {
     selectedMethod.value = deliveryInfo.value.shipping_method
-    // Pre-llenar formulario de cliente si ya existe
-    if (deliveryInfo.value.customer) {
-      customerForm.value = { ...deliveryInfo.value.customer }
-    }
   } else {
-    // Inicializar con delivery por defecto
     setShippingMethod('delivery')
   }
 
-  // Si hay dirección favorita y es delivery, pre-seleccionarla
-  if (selectedMethod.value === 'delivery' && favoriteAddress.value && !deliveryInfo.value?.address_id) {
-    handleSelectAddress(favoriteAddress.value)
-  }
+  // ✅ Auto-seleccionar favorita después de cargar
+  autoSelectFavorite()
 })
 
-// Watch para cambios en el método de envío
 watch(selectedMethod, (newMethod) => {
   setShippingMethod(newMethod)
   saveToLocalStorage()
 })
 
-// Watch para cambios en el formulario de cliente
-watch(customerForm, (newData) => {
-  updateCustomerData(newData)
-  saveToLocalStorage()
-}, { deep: true })
-
-// Handlers
 const handleSelectAddress = (address: addressSI) => {
   setDeliveryAddress(address)
   saveToLocalStorage()
@@ -102,84 +82,73 @@ const handleSelectBranch = (branch: branchSI) => {
 }
 
 const handleDeleteAddress = async (address: addressSI) => {
-  if (confirm('¿Estás seguro de eliminar esta dirección?')) {
-    try {
-      await deleteAddress(address.id)
-      // Si era la dirección seleccionada, limpiar selección
-      if (deliveryInfo.value?.address_id === address.id) {
-        // Seleccionar la primera dirección disponible o limpiar
-        if (sortedAddresses.value.length > 0) {
-          handleSelectAddress(sortedAddresses.value[0])
-        }
-      }
-    } catch (error) {
-      console.error('Error al eliminar dirección:', error)
-      alert('Error al eliminar la dirección')
+  try {
+    const deletedAddressId = address.id
+    await deleteAddress(address.id)
+
+    // ✅ Usar el método del store
+    if (deliveryInfo.value?.address_id === deletedAddressId) {
+      clearDeliveryAddress()
     }
+
+    autoSelectFavorite()
+  } catch (error) {
+    console.error('Error al eliminar dirección:', error)
+    alert('Error al eliminar la dirección')
   }
 }
 
 const handleSetFavorite = async (address: addressSI) => {
   try {
     await setFavoriteAddress(address.id)
+    // loadAddresses() ya se llamó dentro de setFavoriteAddress
+
+    // ✅ Auto-seleccionar la nueva favorita
+    autoSelectFavorite()
   } catch (error) {
     console.error('Error al establecer favorita:', error)
   }
 }
 
-const handleContinue = () => {
-  if (canProceedToNextStep.value) {
-    nextStep()
-    router.push({ name: 'checkout.payment' })
-  }
-}
-
-// Validación del formulario de cliente
-const isCustomerFormValid = computed(() => {
-  return (
-    customerForm.value.first_name.trim() !== '' &&
-    customerForm.value.last_name.trim() !== '' &&
-    customerForm.value.document_number.trim() !== '' &&
-    customerForm.value.phone.trim() !== '' &&
-    customerForm.value.email.trim() !== '' &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerForm.value.email)
-  )
-})
-
-const isDeliverySelected = computed(() => {
-  return selectedMethod.value === 'delivery' && deliveryInfo.value?.address_id !== undefined
-})
-
-const isPickupSelected = computed(() => {
-  return selectedMethod.value === 'pickup' && deliveryInfo.value?.branch_id !== undefined
-})
-
-// ✅ Referencia al modal
-const addressModalRef = ref<InstanceType<typeof AddressModal> | null>(null)
-
-const handleOpenAddressModal = () => {
-  editingAddress.value = null
-  addressModalRef.value?.open() // ✅ Usar método open()
+const handleOpenCreateModal = () => {
+  createModalRef.value?.open()
 }
 
 const handleEditAddress = (address: addressSI) => {
-  editingAddress.value = address
-  addressModalRef.value?.open() // ✅ Usar método open()
+  // Pasar solo el ID, el modal se encarga de cargar los datos
+  editModalRef.value?.open(address.id)
 }
 
-const handleAddressSaved = async (address: addressSI) => {
+// ✅ CORREGIDO: Recargar direcciones y re-seleccionar la dirección actual
+const handleAddressSaved = async () => {
+  // Guardar el ID de la dirección actualmente seleccionada
+  const currentAddressId = deliveryInfo.value?.address_id
+
+  // Recargar todas las direcciones para obtener los datos actualizados
   await loadAddresses()
-  handleSelectAddress(address)
+  await loadFavoriteAddress()
+
+  // Si había una dirección seleccionada, re-seleccionarla con los datos actualizados
+  if (currentAddressId) {
+    const updatedAddress = sortedAddresses.value.find((addr) => addr.id === currentAddressId)
+    if (updatedAddress) {
+      // ✅ Forzar re-selección para actualizar el precio
+      handleSelectAddress(updatedAddress)
+    }
+  } else {
+    // Si no había dirección seleccionada, auto-seleccionar favorita
+    autoSelectFavorite()
+  }
 }
 </script>
 
 <template>
   <div class="space-y-6">
     <!-- Selector de método de envío -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-md border border-gray-200 dark:border-gray-700">
-      <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">
-        Método de envío
-      </h2>
+    <div
+      class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-md border border-gray-200 dark:border-gray-700"
+    >
+      <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">Método de envío</h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Delivery -->
@@ -188,19 +157,16 @@ const handleAddressSaved = async (address: addressSI) => {
           :class="[
             selectedMethod === 'delivery'
               ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20'
-              : 'border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600'
+              : 'border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600',
           ]"
         >
-          <input
-            type="radio"
-            v-model="selectedMethod"
-            value="delivery"
-            class="sr-only"
-          />
+          <input type="radio" v-model="selectedMethod" value="delivery" class="sr-only" />
           <div class="flex items-center gap-3 w-full">
             <div
               class="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-              :class="selectedMethod === 'delivery' ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'"
+              :class="
+                selectedMethod === 'delivery' ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
+              "
             >
               <font-awesome-icon
                 icon="fa-solid fa-truck-fast"
@@ -211,13 +177,15 @@ const handleAddressSaved = async (address: addressSI) => {
             <div class="flex-1">
               <p
                 class="font-bold"
-                :class="selectedMethod === 'delivery' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-gray-100'"
+                :class="
+                  selectedMethod === 'delivery'
+                    ? 'text-blue-600 dark:text-blue-400'
+                    : 'text-gray-900 dark:text-gray-100'
+                "
               >
                 Envío a domicilio
               </p>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
-                Recibe en tu dirección
-              </p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">Recibe en tu dirección</p>
             </div>
             <font-awesome-icon
               v-if="selectedMethod === 'delivery'"
@@ -233,15 +201,10 @@ const handleAddressSaved = async (address: addressSI) => {
           :class="[
             selectedMethod === 'pickup'
               ? 'border-green-500 bg-green-50 dark:bg-green-900/20 shadow-lg shadow-green-500/20'
-              : 'border-gray-300 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-600'
+              : 'border-gray-300 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-600',
           ]"
         >
-          <input
-            type="radio"
-            v-model="selectedMethod"
-            value="pickup"
-            class="sr-only"
-          />
+          <input type="radio" v-model="selectedMethod" value="pickup" class="sr-only" />
           <div class="flex items-center gap-3 w-full">
             <div
               class="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
@@ -256,13 +219,15 @@ const handleAddressSaved = async (address: addressSI) => {
             <div class="flex-1">
               <p
                 class="font-bold"
-                :class="selectedMethod === 'pickup' ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-gray-100'"
+                :class="
+                  selectedMethod === 'pickup'
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-gray-900 dark:text-gray-100'
+                "
               >
                 Recojo en tienda
               </p>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
-                Retira en nuestro local
-              </p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">Retira en nuestro local</p>
             </div>
             <font-awesome-icon
               v-if="selectedMethod === 'pickup'"
@@ -276,13 +241,13 @@ const handleAddressSaved = async (address: addressSI) => {
 
     <!-- Sección de direcciones (si es delivery) -->
     <div v-if="selectedMethod === 'delivery'" class="space-y-4">
-      <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md border border-gray-200 dark:border-gray-700">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md border border-gray-200 dark:border-gray-700"
+      >
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">
-            Dirección de entrega
-          </h2>
+          <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">Dirección de entrega</h2>
           <button
-            @click="handleOpenAddressModal"
+            @click="handleOpenCreateModal"
             class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center gap-2 shadow-md cursor-pointer"
           >
             <font-awesome-icon icon="fa-solid fa-plus" />
@@ -301,11 +266,9 @@ const handleAddressSaved = async (address: addressSI) => {
           class="text-center py-8 bg-gray-50 dark:bg-gray-900 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700"
         >
           <font-awesome-icon icon="fa-solid fa-location-dot" class="text-5xl text-gray-400 mb-4" />
-          <p class="text-gray-600 dark:text-gray-400 mb-4">
-            No tienes direcciones registradas
-          </p>
+          <p class="text-gray-600 dark:text-gray-400 mb-4">No tienes direcciones registradas</p>
           <button
-            @click="handleOpenAddressModal"
+            @click="handleOpenCreateModal"
             class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors cursor-pointer"
           >
             Agregar mi primera dirección
@@ -330,7 +293,9 @@ const handleAddressSaved = async (address: addressSI) => {
 
     <!-- Sección de sucursales (si es pickup) -->
     <div v-if="selectedMethod === 'pickup'" class="space-y-4">
-      <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md border border-gray-200 dark:border-gray-700">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md border border-gray-200 dark:border-gray-700"
+      >
         <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
           Selecciona la tienda para recojo
         </h2>
@@ -346,7 +311,7 @@ const handleAddressSaved = async (address: addressSI) => {
             v-for="branch in availableBranches"
             :key="branch.id"
             :branch="branch"
-            :selected="deliveryInfo?.branch_id === branch.id"
+            :selected="deliveryInfo?.branch_id === branch.address.id"
             @select="handleSelectBranch"
           />
         </div>
@@ -364,108 +329,11 @@ const handleAddressSaved = async (address: addressSI) => {
       </div>
     </div>
 
-    <!-- Datos del cliente -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md border border-gray-200 dark:border-gray-700">
-      <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-        <font-awesome-icon icon="fa-solid fa-user" />
-        Datos del cliente
-      </h2>
+    <CustomerInfo />
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Nombres -->
-        <!-- Tipo de documento -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Tipo de documento *
-          </label>
-          <select
-            v-model="customerForm.document_type"
-            required
-            class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100"
-          >
-            <option value="DNI">DNI</option>
-            <option value="CE">Carnet de Extranjería</option>
-            <option value="Pasaporte">Pasaporte</option>
-            <option value="RUC">RUC</option>
-          </select>
-        </div>
+    <!-- Modales -->
+    <AddressModalCreate ref="createModalRef" @saved="handleAddressSaved" />
 
-        <!-- Número de documento -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Número de documento *
-          </label>
-          <input
-            v-model="customerForm.document_number"
-            type="text"
-            required
-            placeholder="Ingresa tu documento"
-            class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100"
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Nombres *
-          </label>
-          <input
-            v-model="customerForm.first_name"
-            type="text"
-            required
-            placeholder="Ingresa tus nombres"
-            class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100"
-          />
-        </div>
-
-        <!-- Apellidos -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Apellidos *
-          </label>
-          <input
-            v-model="customerForm.last_name"
-            type="text"
-            required
-            placeholder="Ingresa tus apellidos"
-            class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100"
-          />
-        </div>
-
-        <!-- Teléfono -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Teléfono *
-          </label>
-          <input
-            v-model="customerForm.phone"
-            type="tel"
-            required
-            placeholder="Ej: 999 999 999"
-            class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- Botones de navegación -->
-    <div class="flex flex-col sm:flex-row gap-4">
-
-      <button
-        @click="handleContinue"
-        :disabled="!canProceedToNextStep || !isCustomerFormValid"
-        class="flex-1 px-6 py-4 bg-linear-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/30 text-lg"
-      >
-        Continuar al pago
-        <font-awesome-icon icon="fa-solid fa-angle-right" class="ml-2" />
-      </button>
-    </div>
-
-    <!-- Modal de dirección -->
-    <AddressModal
-      ref="addressModalRef"
-      :edit-address="editingAddress"
-      @close="editingAddress = null"
-      @saved="handleAddressSaved"
-    />
+    <AddressModalEdit ref="editModalRef" @saved="handleAddressSaved" />
   </div>
 </template>

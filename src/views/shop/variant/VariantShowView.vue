@@ -51,13 +51,7 @@ const loadProduct = async () => {
     swiperKey.value++
   } catch (error) {
     console.error('Error cargando producto:', error)
-    useSweetAlert({
-      title: 'Error',
-      text: 'No se pudo cargar el producto',
-      icon: 'error',
-      timer: 3000,
-    })
-    router.push({ name: 'shop.home' })
+    
   } finally {
     isLoading.value = false
   }

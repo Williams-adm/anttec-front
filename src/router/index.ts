@@ -42,7 +42,6 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-  // ← Aquí agregamos scrollBehavior
   scrollBehavior(to, from, savedPosition) {
     // Si hay posición guardada (volver atrás con el botón de navegador)
     if (savedPosition) {
@@ -62,22 +61,31 @@ const router = createRouter({
 
 let lastValidRoute = '/'
 
+// Lista de rutas de error (para no guardarlas como "última válida")
+const ERROR_ROUTE_NAMES = [
+  'server-error',
+  'unauthorized',
+  'not-found',
+  'session-expired',
+  'maintenance',
+]
+
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
 
-  // Guardar última ruta válida (que no sea de error)
-  const errorRoutes = ['/server-error', '/unauthorized', '/not-found', '/session-expired', '/maintenance']
-  if (!errorRoutes.some(route => to.path.startsWith(route))) {
+  if (!ERROR_ROUTE_NAMES.includes(to.name as string)) {
     lastValidRoute = to.fullPath
   }
 
+  // 1. Validar autenticación
   if (to.meta.requiresAuth && !authStore.isAuthenticated()) {
     return next({
       name: 'login',
-      query: { redirect: to.fullPath }
+      query: { redirect: to.fullPath },
     })
   }
 
+  // 2. Redirigir si ya está logueado e intenta ir a login
   if (to.name === 'login' && authStore.isAuthenticated()) {
     const redirectTo = to.query.redirect as string
 
@@ -92,6 +100,7 @@ router.beforeEach((to, from, next) => {
     }
   }
 
+  // 3. Validar roles
   if (to.meta.roles) {
     const requiredRoles = Array.isArray(to.meta.roles) ? to.meta.roles : [to.meta.roles]
     const hasRequiredRole = requiredRoles.some((role) => authStore.hasRole(role))
@@ -105,8 +114,22 @@ router.beforeEach((to, from, next) => {
 })
 
 router.onError((error) => {
-  console.error('Router error:', error)
-  router.push({ name: 'server-error', query: { from: lastValidRoute } })
+  console.error('Router navigation error:', error)
+
+  // Si el error es porque la ruta no existe, ir a 404
+  // (esto captura errores de lazy loading o rutas mal formadas)
+  if (
+    error.message.includes('Failed to fetch dynamically imported module') ||
+    error.message.includes('error loading dynamically imported module')
+  ) {
+    router.push({ name: 'not-found' })
+  } else {
+    // Otros errores de navegación -> server error
+    router.push({
+      name: 'server-error',
+      query: { from: lastValidRoute },
+    })
+  }
 })
 
 // ← EXPORTAR para usar en errorHandler

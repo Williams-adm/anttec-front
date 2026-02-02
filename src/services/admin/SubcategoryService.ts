@@ -3,10 +3,15 @@ import type { subcategoryUpdateDTO } from '@/DTOs/admin/subcategory/SubcategoryU
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
 import type { subcategoriesI, subcategoryI } from '../../interfaces/admin/SubcategoryInterface'
 import httpAdmin from '../httpAdmin'
+import httpStrict from '../httpStrict'
 
 class SubcategoryService {
   private get api() {
     return httpAdmin
+  }
+
+  private get apiStrict() {
+    return httpStrict
   }
 
   async getAll(): Promise<subcategoriesI> {
@@ -16,7 +21,9 @@ class SubcategoryService {
   }
 
   async getById(id: string): Promise<subcategoryI> {
-    const res = await this.api.get<ApiListResponseI<subcategoryI>>(`/admin/subcategories/${id}`)
+    const res = await this.apiStrict.get<ApiListResponseI<subcategoryI>>(
+      `/admin/subcategories/${id}`,
+    )
     console.log(res.data.message)
     return res.data.data
   }

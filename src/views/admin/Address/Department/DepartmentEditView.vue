@@ -59,12 +59,6 @@ const loadData = async () => {
     })
   } catch (error) {
     console.error(error)
-    useSweetAlert({
-      title: 'Error',
-      text: 'No se pudieron cargar los datos',
-      icon: 'error',
-      timer: 0,
-    })
   } finally {
     isLoading.value = false
   }

@@ -3,10 +3,15 @@ import type { specificationUpdateDTO } from '@/DTOs/admin/specification/Specific
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
 import type { SpecificationI, SpecificationsI } from '@/interfaces/admin/SpecificationInterface'
 import httpAdmin from '../httpAdmin'
+import httpStrict from '../httpStrict'
 
 class SpecificationService {
   private get api() {
     return httpAdmin
+  }
+
+  private get apiStrict() {
+    return httpStrict
   }
 
   async getAll(): Promise<SpecificationsI> {
@@ -16,7 +21,9 @@ class SpecificationService {
   }
 
   async getById(id: string): Promise<SpecificationI> {
-    const res = await this.api.get<ApiListResponseI<SpecificationI>>(`/admin/specifications/${id}`)
+    const res = await this.apiStrict.get<ApiListResponseI<SpecificationI>>(
+      `/admin/specifications/${id}`,
+    )
     console.log(res.data.message)
     return res.data.data
   }

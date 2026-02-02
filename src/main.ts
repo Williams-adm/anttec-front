@@ -61,7 +61,8 @@ import {
   faSpinner,
   faStar,
   faClock,
-  faCreditCard
+  faCreditCard,
+  faPen,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(
@@ -117,6 +118,7 @@ library.add(
   faStar,
   faClock,
   faCreditCard,
+  faPen,
 )
 
 import { faFacebookF, faInstagram } from '@fortawesome/free-brands-svg-icons'

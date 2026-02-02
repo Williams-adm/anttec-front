@@ -155,12 +155,6 @@ const loadData = async () => {
     await nextTick()
     isInitialLoad.value = false
   } catch (err) {
-    useSweetAlert({
-      title: 'Algo salió mal',
-      text: 'No se pudieron cargar los datos. Intenta de nuevo',
-      icon: 'error',
-      timer: 0,
-    })
     console.error(err)
   } finally {
     isSubcategoriesLoading.value = false

@@ -31,17 +31,74 @@ export const useCheckoutStore = defineStore('checkout', () => {
   const shippingCost = computed(() => deliveryInfo.value?.shipping_cost || 0)
 
   const summary = computed((): CheckoutSummarySI => {
-    const cartTotal = cartStore.totals.total
-    const shipping = shippingCost.value
+    const cartTotal = Number(cartStore.totals.total)
+    const shipping = Number(shippingCost.value)
     const discount = 0
 
     return {
-      subtotal: cartTotal,
-      shipping_cost: shipping,
-      discount: discount,
-      total: cartTotal + shipping - discount,
+      subtotal: Number(cartTotal),
+      shipping_cost: Number(shipping),
+      discount: Number(discount),
+      total: Number(cartTotal + shipping - discount),
       items_count: cartStore.totals.items_count,
     }
+  })
+
+  // ✅ NUEVO: Validación mejorada del customerInfo
+  const isCustomerInfoValid = computed(() => {
+    const customer = deliveryInfo.value?.reciber
+    if (!customer) return false
+
+    // ✅ 1. Validar que los campos no estén vacíos
+    if (
+      !customer.first_name?.trim() ||
+      !customer.last_name?.trim() ||
+      !customer.document_number?.trim() ||
+      !customer.phone?.trim() ||
+      !customer.document_type
+    ) {
+      return false
+    }
+
+    // ✅ 2. Validar tipo de documento
+    const validDocumentTypes = ['DNI', 'CE'] as const
+    if (!validDocumentTypes.includes(customer.document_type)) {
+      return false
+    }
+
+    // ✅ 3. Validar nombres (min 3, max 100 caracteres)
+    if (customer.first_name.length < 3 || customer.first_name.length > 100) {
+      return false
+    }
+
+    // ✅ 4. Validar apellidos (min 3, max 100 caracteres)
+    if (customer.last_name.length < 3 || customer.last_name.length > 100) {
+      return false
+    }
+
+    // ✅ 5. Validar teléfono (solo números, exactamente 9 dígitos)
+    const phoneRegex = /^[0-9]+$/
+    if (!phoneRegex.test(customer.phone) || customer.phone.length !== 9) {
+      return false
+    }
+
+    // ✅ 6. Validar número de documento según tipo
+    const documentRegex = /^[0-9]+$/
+    if (!documentRegex.test(customer.document_number)) {
+      return false
+    }
+
+    // DNI: exactamente 8 dígitos, CE: exactamente 12 dígitos
+    if (customer.document_type === 'DNI' && customer.document_number.length !== 8) {
+      return false
+    }
+
+    if (customer.document_type === 'CE' && customer.document_number.length !== 12) {
+      return false
+    }
+
+    // ✅ Si pasó todas las validaciones, el formulario es válido
+    return true
   })
 
   // Validación de pasos
@@ -57,17 +114,13 @@ export const useCheckoutStore = defineStore('checkout', () => {
     const delivery = deliveryInfo.value
     if (!delivery) return false
 
-    // Validar datos del cliente
-    const customerValid =
-      delivery.customer.first_name.trim() !== '' &&
-      delivery.customer.last_name.trim() !== '' &&
-      delivery.customer.document_number.trim() !== '' &&
-      delivery.customer.phone.trim() !== '' &&
-      delivery.customer.email.trim() !== ''
+    // ✅ 1. Validar que haya método de envío seleccionado
+    if (!delivery.shipping_method) return false
 
-    if (!customerValid) return false
+    // ✅ 2. Validar datos del cliente
+    if (!isCustomerInfoValid.value) return false
 
-    // Validar según método de envío
+    // ✅ 3. Validar según método de envío
     if (delivery.shipping_method === 'delivery') {
       return delivery.address_id !== undefined && delivery.shipping_cost !== undefined
     } else if (delivery.shipping_method === 'pickup') {
@@ -117,13 +170,12 @@ export const useCheckoutStore = defineStore('checkout', () => {
     if (!checkoutState.value.delivery) {
       checkoutState.value.delivery = {
         shipping_method: method,
-        customer: {
+        reciber: {
           first_name: '',
           last_name: '',
           document_type: 'DNI',
           document_number: '',
           phone: '',
-          email: '',
         },
       }
     } else {
@@ -131,10 +183,8 @@ export const useCheckoutStore = defineStore('checkout', () => {
 
       if (method === 'delivery') {
         delete checkoutState.value.delivery.branch_id
-        delete checkoutState.value.delivery.branch
       } else {
         delete checkoutState.value.delivery.address_id
-        delete checkoutState.value.delivery.address
         checkoutState.value.delivery.shipping_cost = 0
       }
     }
@@ -148,7 +198,6 @@ export const useCheckoutStore = defineStore('checkout', () => {
     }
 
     checkoutState.value.delivery.address_id = address.id
-    checkoutState.value.delivery.address = address
     checkoutState.value.delivery.shipping_cost = address.delivery_price
     saveToLocalStorage()
   }
@@ -159,8 +208,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
       return
     }
 
-    checkoutState.value.delivery.branch_id = branch.id
-    checkoutState.value.delivery.branch = branch
+    checkoutState.value.delivery.branch_id = branch.address.id
     checkoutState.value.delivery.shipping_cost = branch.delivery_price
     saveToLocalStorage()
   }
@@ -169,10 +217,10 @@ export const useCheckoutStore = defineStore('checkout', () => {
     if (!checkoutState.value.delivery) {
       checkoutState.value.delivery = {
         shipping_method: 'delivery',
-        customer: customer,
+        reciber: customer,
       }
     } else {
-      checkoutState.value.delivery.customer = customer
+      checkoutState.value.delivery.reciber = customer
     }
     saveToLocalStorage()
   }
@@ -183,8 +231,8 @@ export const useCheckoutStore = defineStore('checkout', () => {
       return
     }
 
-    checkoutState.value.delivery.customer = {
-      ...checkoutState.value.delivery.customer,
+    checkoutState.value.delivery.reciber = {
+      ...checkoutState.value.delivery.reciber,
       ...updates,
     }
     saveToLocalStorage()
@@ -230,6 +278,14 @@ export const useCheckoutStore = defineStore('checkout', () => {
     }
   }
 
+  const clearDeliveryAddress = () => {
+    if (!checkoutState.value.delivery) return
+
+    delete checkoutState.value.delivery.address_id
+    checkoutState.value.delivery.shipping_cost = undefined
+    saveToLocalStorage()
+  }
+
   const clearCheckout = () => {
     checkoutState.value = {}
     currentStep.value = 2
@@ -245,13 +301,12 @@ export const useCheckoutStore = defineStore('checkout', () => {
     if (!checkoutState.value.delivery) {
       checkoutState.value.delivery = {
         shipping_method: 'delivery',
-        customer: {
+        reciber: {
           first_name: '',
           last_name: '',
           document_type: 'DNI',
           document_number: '',
           phone: '',
-          email: '',
         },
       }
     }
@@ -279,6 +334,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     summary,
     stepValidation,
     isDeliveryStepValid,
+    isCustomerInfoValid,
     canProceedToNextStep,
 
     goToStep,
@@ -294,6 +350,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
 
     saveToLocalStorage,
     loadFromLocalStorage,
+    clearDeliveryAddress,
     clearCheckout,
     initCheckout,
     prepareOrderData,

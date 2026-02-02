@@ -32,10 +32,7 @@
             </a>
 
             <p class="text-sm font-medium mt-4 mb-1">Correo</p>
-            <a
-              href="mailto:anttecshop@gmail.com"
-              class="block text-sm hover:text-white transition"
-            >
+            <a href="mailto:anttecshop@gmail.com" class="block text-sm hover:text-white transition">
               anttecshop@gmail.com
             </a>
 

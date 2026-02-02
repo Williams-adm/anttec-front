@@ -9,7 +9,7 @@ const goHome = () => {
 }
 
 const reloadPage = () => {
-  const originalRoute = route.query.from as string || '/'
+  const originalRoute = (route.query.from as string) || '/'
 
   // Verificación de seguridad
   if (originalRoute && originalRoute !== '/server-error') {

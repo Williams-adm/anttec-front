@@ -48,7 +48,7 @@ useBreadcrumb(() => [
   },
 ])
 
-const { meta, handleSubmit, errors, defineField, resetForm, setFieldValue, setErrors, values } =
+const { meta, handleSubmit, errors, defineField, resetForm, setFieldValue, setErrors } =
   useForm({
     validationSchema: editCoverSchema,
   })
@@ -128,12 +128,6 @@ const loadcovers = async () => {
     pondReady.value = true
   } catch (error) {
     console.error(error)
-    useSweetAlert({
-      title: 'Error',
-      text: 'No se pudieron cargar los datos',
-      icon: 'error',
-      timer: 0,
-    })
   } finally {
     isLoading.value = false
   }
@@ -236,9 +230,6 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <template>
-  <pre class="text-gray-100">
-    {{ values }}
-  </pre>
   <AnimationLoader v-if="isLoading" />
   <div
     v-else

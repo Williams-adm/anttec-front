@@ -3,10 +3,15 @@ import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseIn
 import type { movementI } from '@/interfaces/admin/movement/MovementInterface'
 import type { movementsShortI } from '@/interfaces/admin/movement/MovementShortInterface'
 import httpAdmin from '../httpAdmin'
+import httpStrict from '../httpStrict'
 
 class MovementsService {
   private get api() {
     return httpAdmin
+  }
+
+  private get apiStrict() {
+    return httpStrict
   }
 
   async getAll(): Promise<movementsShortI> {
@@ -22,7 +27,7 @@ class MovementsService {
   }
 
   async getById(id: string | number): Promise<movementI> {
-    const res = await this.api.get<ApiListResponseI<movementI>>(`/admin/movements/${id}`)
+    const res = await this.apiStrict.get<ApiListResponseI<movementI>>(`/admin/movements/${id}`)
     console.log(res.data.message)
     return res.data.data
   }

@@ -2,10 +2,15 @@ import type { coverOrderDTO } from '@/DTOs/admin/cover/CoverOrderDTO'
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
 import type { coverI, coversI } from '@/interfaces/admin/CoverInterface'
 import httpAdmin from '../httpAdmin'
+import httpStrict from '../httpStrict'
 
 class CoverService {
   private get api() {
     return httpAdmin
+  }
+
+  private get apiStrict() {
+    return httpStrict
   }
 
   async getAll(): Promise<coversI> {
@@ -15,7 +20,7 @@ class CoverService {
   }
 
   async getById(id: string): Promise<coverI> {
-    const res = await this.api.get<ApiListResponseI<coverI>>(`/admin/covers/${id}`)
+    const res = await this.apiStrict.get<ApiListResponseI<coverI>>(`/admin/covers/${id}`)
     console.log(res.data.message)
     return res.data.data
   }

@@ -7,6 +7,7 @@ export const useAddress = () => {
   const {
     addresses,
     favoriteAddress,
+    currentAddress, // 👈 NUEVO
     isLoading,
     error,
     departments,
@@ -20,6 +21,7 @@ export const useAddress = () => {
   const {
     loadAddresses,
     loadFavoriteAddress,
+    loadAddressById, // 👈 NUEVO
     createAddress,
     updateAddress,
     deleteAddress,
@@ -30,6 +32,7 @@ export const useAddress = () => {
     getDistrictDeliveryPrice,
     clearProvinces,
     clearDistricts,
+    clearCurrentAddress, // 👈 NUEVO
     reset,
   } = addressStore
 
@@ -37,6 +40,7 @@ export const useAddress = () => {
     // State
     addresses,
     favoriteAddress,
+    currentAddress, // 👈 NUEVO
     isLoading,
     error,
     departments,
@@ -51,6 +55,7 @@ export const useAddress = () => {
     // Actions
     loadAddresses,
     loadFavoriteAddress,
+    loadAddressById, // 👈 NUEVO
     createAddress,
     updateAddress,
     deleteAddress,
@@ -61,6 +66,7 @@ export const useAddress = () => {
     getDistrictDeliveryPrice,
     clearProvinces,
     clearDistricts,
+    clearCurrentAddress, // 👈 NUEVO
     reset,
   }
 }

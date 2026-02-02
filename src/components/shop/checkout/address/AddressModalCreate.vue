@@ -1,22 +1,14 @@
 <script setup lang="ts">
-import { useAddress } from '@/composables/useaddress';
-import type { addressCheckoutCreateDTO } from '@/DTOs/shop/address/AddressCheckoutCreateDTO';
-import type { addressSI } from '@/interfaces/shop/AddressSInterface';
+import { useAddress } from '@/composables/useaddress'
+import type { addressCheckoutCreateDTO } from '@/DTOs/shop/address/AddressCheckoutCreateDTO'
+import type { addressSI } from '@/interfaces/shop/AddressSInterface'
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { Modal, type ModalInterface } from 'flowbite'
-import { useForm } from 'vee-validate';
-import { createCheckoutAddressSchema } from '@/schemas/shop/checkoutAddress/createCheckoutAddressSchema';
+import { useForm } from 'vee-validate'
+import { createCheckoutAddressSchema } from '@/schemas/shop/checkoutAddress/createCheckoutAddressSchema'
 import { useSweetAlert } from '@/composables/useSweetAlert'
 import axios from 'axios'
 import Swal from 'sweetalert2'
-
-interface Props {
-  editAddress?: addressSI | null
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  editAddress: null,
-})
 
 const emit = defineEmits<{
   close: []
@@ -32,19 +24,15 @@ const {
   loadProvinces,
   loadDistricts,
   createAddress,
-  updateAddress,
 } = useAddress()
 
-// ✅ Flowbite Modal
 const modalEl = ref<HTMLElement | null>(null)
 let modal: ModalInterface | null = null
 
 const isSubmitting = ref(false)
 const isDepartmentsLoading = ref(false)
 const isProvincesLoading = ref(false)
-const serverErrors = ref<Record<string, string[]>>({})
 
-// ✅ VeeValidate Setup
 const { meta, handleSubmit, errors, defineField, setErrors, resetForm, resetField } = useForm({
   validationSchema: createCheckoutAddressSchema,
   initialValues: {
@@ -57,7 +45,6 @@ const { meta, handleSubmit, errors, defineField, setErrors, resetForm, resetFiel
   },
 })
 
-// ✅ Define Fields
 const [departmentId, departmentIdAttrs] = defineField('department_id')
 const [provinceId, provinceIdAttrs] = defineField('province_id')
 const [districtId, districtIdAttrs] = defineField('district_id')
@@ -65,7 +52,6 @@ const [street, streetAttrs] = defineField('street')
 const [streetNumber, streetNumberAttrs] = defineField('street_number')
 const [reference, referenceAttrs] = defineField('reference')
 
-// ✅ Inicializar modal de Flowbite
 onMounted(async () => {
   await loadDepartments()
 
@@ -83,7 +69,6 @@ onUnmounted(() => {
   modal = null
 })
 
-// ✅ Métodos públicos para abrir/cerrar
 const open = () => {
   modal?.show()
 }
@@ -94,7 +79,6 @@ const close = () => {
   emit('close')
 }
 
-// ✅ Watch para cargar provincias cuando cambia departamento
 watch(departmentId, async (newDepartmentId) => {
   provinces.value = []
   districts.value = []
@@ -118,7 +102,6 @@ watch(departmentId, async (newDepartmentId) => {
   }
 })
 
-// ✅ Watch para cargar distritos cuando cambia provincia
 watch(provinceId, async (newProvinceId) => {
   districts.value = []
   resetField('district_id')
@@ -140,36 +123,16 @@ watch(provinceId, async (newProvinceId) => {
   }
 })
 
-// ✅ Si es modo edición, pre-cargar datos
-watch(() => props.editAddress, (address) => {
-  if (address && modal) {
-    // Aquí necesitarías extraer los IDs de departamento, provincia del address
-    // Asumiendo que tienes esa info en el objeto address
-    resetForm({
-      values: {
-        department_id: '', // Necesitarías obtener esto del address
-        province_id: '', // Necesitarías obtener esto del address
-        district_id: String(address.district || ''),
-        street: address.street.split(' ')[0] || '',
-        street_number: address.street.split(' ').slice(1).join(' ') || '',
-        reference: address.reference || '',
-      }
-    })
-  }
-}, { immediate: true })
-
-// ✅ Submit Handler
 const onSubmit = handleSubmit(async (values) => {
   try {
     isSubmitting.value = true
 
     useSweetAlert({
       title: 'Enviando...',
-      text: 'Guardando dirección',
+      text: 'Creando dirección',
       icon: 'loading',
     })
 
-    // ✅ Payload solo con los datos que necesita el backend
     const payload: addressCheckoutCreateDTO = {
       district_id: Number(values.district_id),
       street: values.street,
@@ -177,64 +140,49 @@ const onSubmit = handleSubmit(async (values) => {
       reference: values.reference || '',
     }
 
-    let savedAddress: addressSI
-
-    if (props.editAddress) {
-      // Modo edición
-      savedAddress = await updateAddress(props.editAddress.id, payload)
-    } else {
-      // Modo creación
-      savedAddress = await createAddress(payload)
-    }
+    const savedAddress = await createAddress(payload)
 
     Swal.close()
     useSweetAlert({
       title: '¡Éxito!',
-      text: props.editAddress ? 'Dirección actualizada correctamente' : 'Dirección creada correctamente',
+      text: 'Dirección creada correctamente',
       icon: 'success',
     })
 
     emit('saved', savedAddress)
     close()
-
   } catch (err) {
     Swal.close()
 
-    // ✅ Manejo de errores de validación del servidor
     if (axios.isAxiosError(err) && err.response?.status === 422) {
       const validationErrors = err.response.data.errors
-      serverErrors.value = validationErrors
-
       const veeValidateErrors: Record<string, string> = {}
       Object.keys(validationErrors).forEach((field) => {
         veeValidateErrors[field] = validationErrors[field][0]
       })
-
       setErrors(veeValidateErrors)
     }
 
     useSweetAlert({
       title: 'Error',
-      text: 'No se pudo guardar la dirección. Verifica los datos e intenta de nuevo.',
+      text: 'No se pudo crear la dirección. Verifica los datos e intenta de nuevo.',
       icon: 'error',
       timer: 0,
     })
 
-    console.error('Error al guardar dirección:', err)
+    console.error('Error al crear dirección:', err)
   } finally {
     isSubmitting.value = false
   }
 })
 
-// ✅ Exponer métodos para usar con ref
 defineExpose({
   open,
-  close
+  close,
 })
 </script>
 
 <template>
-  <!-- ✅ Modal de Flowbite -->
   <div
     ref="modalEl"
     tabindex="-1"
@@ -244,10 +192,12 @@ defineExpose({
     <div class="relative p-4 w-full max-w-2xl max-h-full">
       <div class="relative bg-white rounded-2xl shadow-2xl dark:bg-gray-800">
         <!-- Header -->
-        <div class="sticky top-0 z-10 bg-linear-to-r from-blue-600 to-indigo-600 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+        <div
+          class="sticky top-0 z-10 bg-linear-to-r from-blue-600 to-indigo-600 px-6 py-4 flex items-center justify-between rounded-t-2xl"
+        >
           <h2 class="text-2xl font-bold text-white flex items-center gap-3">
             <font-awesome-icon icon="fa-solid fa-location-dot" />
-            {{ props.editAddress ? 'Editar dirección' : 'Nueva dirección' }}
+            Nueva dirección
           </h2>
           <button
             @click="close"
@@ -262,7 +212,10 @@ defineExpose({
         <form @submit="onSubmit" class="p-6 space-y-5 max-h-[calc(90vh-120px)] overflow-y-auto">
           <!-- Departamento -->
           <div>
-            <label for="department_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <label
+              for="department_id"
+              class="block text-md font-semibold text-gray-700 dark:text-gray-300 mb-2"
+            >
               Departamento *
             </label>
             <select
@@ -270,21 +223,24 @@ defineExpose({
               v-bind="departmentIdAttrs"
               id="department_id"
               :disabled="isLoadingLocations"
-              class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed focus:outline-none focus:ring-1"
             >
               <option disabled value="">Seleccione un departamento</option>
               <option v-for="dept in departments" :key="dept.id" :value="dept.id">
                 {{ dept.name }}
               </option>
             </select>
-            <span v-if="errors.department_id" class="text-sm text-red-500 mt-1 block">
+            <span v-if="errors.department_id" class="text-sm text-red-400 mt-1 block">
               {{ errors.department_id }}
             </span>
           </div>
 
           <!-- Provincia -->
           <div>
-            <label for="province_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <label
+              for="province_id"
+              class="block text-md font-semibold text-gray-700 dark:text-gray-300 mb-2"
+            >
               Provincia *
             </label>
             <select
@@ -292,7 +248,7 @@ defineExpose({
               v-bind="provinceIdAttrs"
               id="province_id"
               :disabled="!departmentId || isDepartmentsLoading || isLoadingLocations"
-              class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed focus:outline-none focus:ring-1"
             >
               <option disabled value="">
                 {{ isDepartmentsLoading ? 'Cargando...' : 'Seleccione una provincia' }}
@@ -301,14 +257,17 @@ defineExpose({
                 {{ prov.name }}
               </option>
             </select>
-            <span v-if="errors.province_id" class="text-sm text-red-500 mt-1 block">
+            <span v-if="errors.province_id" class="text-sm text-red-400 mt-1 block">
               {{ errors.province_id }}
             </span>
           </div>
 
           <!-- Distrito -->
           <div>
-            <label for="district_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <label
+              for="district_id"
+              class="block text-md font-semibold text-gray-700 dark:text-gray-300 mb-2"
+            >
               Distrito *
             </label>
             <select
@@ -316,7 +275,7 @@ defineExpose({
               v-bind="districtIdAttrs"
               id="district_id"
               :disabled="!provinceId || isProvincesLoading || isLoadingLocations"
-              class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed focus:outline-none focus:ring-1"
             >
               <option disabled value="">
                 {{ isProvincesLoading ? 'Cargando...' : 'Seleccione un distrito' }}
@@ -325,16 +284,18 @@ defineExpose({
                 {{ dist.name }}
               </option>
             </select>
-            <span v-if="errors.district_id" class="text-sm text-red-500 mt-1 block">
+            <span v-if="errors.district_id" class="text-sm text-red-400 mt-1 block">
               {{ errors.district_id }}
             </span>
           </div>
 
-          <!-- Calle y Número en grid -->
+          <!-- Calle y Número -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Calle -->
             <div>
-              <label for="street" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                for="street"
+                class="block text-md font-semibold text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Calle / Avenida *
               </label>
               <input
@@ -343,16 +304,18 @@ defineExpose({
                 id="street"
                 type="text"
                 placeholder="Ej: Av. José Pardo"
-                class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100"
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
               />
-              <span v-if="errors.street" class="text-sm text-red-500 mt-1 block">
+              <span v-if="errors.street" class="text-sm text-red-400 mt-1 block">
                 {{ errors.street }}
               </span>
             </div>
 
-            <!-- Número -->
             <div>
-              <label for="street_number" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                for="street_number"
+                class="block text-md font-semibold text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Número *
               </label>
               <input
@@ -361,9 +324,9 @@ defineExpose({
                 id="street_number"
                 type="text"
                 placeholder="Ej: 123"
-                class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100"
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
               />
-              <span v-if="errors.street_number" class="text-sm text-red-500 mt-1 block">
+              <span v-if="errors.street_number" class="text-sm text-red-400 mt-1 block">
                 {{ errors.street_number }}
               </span>
             </div>
@@ -371,35 +334,23 @@ defineExpose({
 
           <!-- Referencia -->
           <div>
-            <label for="reference" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-              Referencia (opcional)
+            <label
+              for="reference"
+              class="block text-md font-semibold text-gray-700 dark:text-gray-300 mb-2"
+            >
+              Referencia
             </label>
-            <textarea
+            <input
               v-model="reference"
               v-bind="referenceAttrs"
               id="reference"
-              rows="3"
+              type="text"
               placeholder="Ej: Casa blanca con puerta verde, cerca al parque"
-              class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 dark:text-gray-100 resize-none"
-            ></textarea>
-            <span v-if="errors.reference" class="text-sm text-red-500 mt-1 block">
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
+            />
+            <span v-if="errors.reference" class="text-sm text-red-400 mt-1 block">
               {{ errors.reference }}
             </span>
-          </div>
-
-          <!-- Info del precio -->
-          <div
-            v-if="districtId"
-            class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800"
-          >
-            <div class="flex items-center gap-3">
-              <font-awesome-icon icon="fa-solid fa-info-circle" class="text-blue-600 dark:text-blue-400" />
-              <div class="flex-1">
-                <p class="text-sm font-medium text-blue-900 dark:text-blue-100">
-                  El costo de envío se calculará al guardar la dirección
-                </p>
-              </div>
-            </div>
           </div>
 
           <!-- Botones -->
@@ -420,9 +371,7 @@ defineExpose({
                 <font-awesome-icon icon="fa-solid fa-spinner" spin />
                 Guardando...
               </span>
-              <span v-else>
-                {{ props.editAddress ? 'Guardar cambios' : 'Agregar dirección' }}
-              </span>
+              <span v-else> Agregar dirección </span>
             </button>
           </div>
         </form>
@@ -432,25 +381,22 @@ defineExpose({
 </template>
 
 <style scoped>
-/* ✅ ESTILOS PERSONALIZADOS PARA SCROLLBAR */
-
-/* Para navegadores basados en WebKit (Chrome, Safari, Edge) */
 .overflow-y-auto::-webkit-scrollbar {
   width: 10px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: rgb(243 244 246); /* gray-100 */
+  background: rgb(243 244 246);
   border-radius: 10px;
   margin: 8px 0;
 }
 
 .dark .overflow-y-auto::-webkit-scrollbar-track {
-  background: rgb(31 41 55); /* gray-800 */
+  background: rgb(31 41 55);
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgb(59 130 246), rgb(99 102 241)); /* blue-500 to indigo-500 */
+  background: linear-gradient(180deg, rgb(59 130 246), rgb(99 102 241));
   border-radius: 10px;
   border: 2px solid transparent;
   background-clip: padding-box;
@@ -461,10 +407,9 @@ defineExpose({
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgb(37 99 235), rgb(79 70 229)); /* blue-600 to indigo-600 */
+  background: linear-gradient(180deg, rgb(37 99 235), rgb(79 70 229));
 }
 
-/* Para Firefox */
 .overflow-y-auto {
   scrollbar-width: thin;
   scrollbar-color: rgb(59 130 246) rgb(243 244 246);

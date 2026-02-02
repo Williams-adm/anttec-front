@@ -30,7 +30,12 @@ httpPublic.interceptors.request.use(
 httpPublic.interceptors.response.use(
   (response) => response,
   (error) => {
-    handleHttpError(error)
+    // Endpoints públicos - el 401 es esperado si no estás logueado
+    handleHttpError(error, {
+      isPublicEndpoint: true,
+      redirect404: false, // No redirigir automáticamente en 404
+      silent: error.response?.status === 401, // No loguear 401 en endpoints públicos
+    })
 
     return Promise.reject(error)
   },

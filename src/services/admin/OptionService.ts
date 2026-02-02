@@ -4,10 +4,15 @@ import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseIn
 import type { OptionExtendI, OptionI, OptionsI } from '@/interfaces/admin/options/OptionInterface'
 import type { OptionValueShortI } from '@/interfaces/admin/options/OptionValueInterface'
 import httpAdmin from '../httpAdmin'
+import httpStrict from '../httpStrict'
 
 class OptionService {
   private get api() {
     return httpAdmin
+  }
+
+  private get apiStrict() {
+    return httpStrict
   }
 
   async getAll(): Promise<OptionsI> {
@@ -23,7 +28,7 @@ class OptionService {
   }
 
   async getById(id: string): Promise<OptionExtendI> {
-    const res = await this.api.get<ApiListResponseI<OptionExtendI>>(`/admin/options/${id}`)
+    const res = await this.apiStrict.get<ApiListResponseI<OptionExtendI>>(`/admin/options/${id}`)
     console.log(res.data.message)
     return res.data.data
   }

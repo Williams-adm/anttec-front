@@ -1,15 +1,12 @@
-import type { addressSI } from './AddressSInterface'
-import type { branchSI } from './BranchSInterface'
 import type { ShippingMethodType } from './Shippingsinterface '
 
 // Datos del cliente para el pedido
 export interface CustomerDataSI {
   first_name: string
   last_name: string
-  document_type: 'DNI' | 'CE' | 'Pasaporte' | 'RUC'
+  document_type: 'DNI' | 'CE'
   document_number: string
   phone: string
-  email: string
 }
 
 // Información de entrega
@@ -18,15 +15,13 @@ export interface DeliveryInfoSI {
 
   // Para delivery
   address_id?: number
-  address?: addressSI
   shipping_cost?: number
 
   // Para pickup
   branch_id?: number
-  branch?: branchSI
 
   // Datos del cliente
-  customer: CustomerDataSI
+  reciber: CustomerDataSI
 }
 
 // Estado completo del checkout

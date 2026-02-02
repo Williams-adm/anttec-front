@@ -1,6 +1,7 @@
 import type { addressCheckoutCreateDTO } from '@/DTOs/shop/address/AddressCheckoutCreateDTO'
 import type { addressCheckoutUpdateDTO } from '@/DTOs/shop/address/AddressCheckoutUpdateDTO'
 import type { generalI } from '@/interfaces/admin/address/generalnterface'
+import type { addressExtendSI } from '@/interfaces/shop/AddressExtendSInterface'
 import type { addressSI } from '@/interfaces/shop/AddressSInterface'
 import AddressSService from '@/services/shop/AddressSService'
 import LocationSService from '@/services/shop/LocationSService'
@@ -14,6 +15,7 @@ export const useAddressStore = defineStore('address', () => {
   // State
   const addresses = ref<addressSI[]>([])
   const favoriteAddress = ref<addressSI | null>(null)
+  const currentAddress = ref<addressExtendSI | null>(null)
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
@@ -26,7 +28,6 @@ export const useAddressStore = defineStore('address', () => {
   // Getters
   const hasAddresses = computed(() => addresses.value.length > 0)
   const sortedAddresses = computed(() => {
-    // Ordenar poniendo primero la dirección favorita
     return [...addresses.value].sort((a, b) => {
       if (a.favorite) return -1
       if (b.favorite) return 1
@@ -40,6 +41,12 @@ export const useAddressStore = defineStore('address', () => {
     error.value = null
     try {
       addresses.value = await addressSService.getAll()
+      // Actualizar favoriteAddress si existe
+      const favorite = addresses.value.find((addr) => addr.favorite)
+      favoriteAddress.value = favorite || null
+
+      // ✅ NUEVO: Retornar la dirección favorita para que el componente la use
+      return favorite || null
     } catch (err) {
       error.value = 'Error al cargar las direcciones'
       console.error('Error loading addresses:', err)
@@ -57,8 +64,23 @@ export const useAddressStore = defineStore('address', () => {
     } catch (err) {
       error.value = 'Error al cargar la dirección favorita'
       console.error('Error loading favorite address:', err)
-      // No hacer throw aquí, ya que puede no existir dirección favorita
       favoriteAddress.value = null
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const loadAddressById = async (id: string | number): Promise<addressExtendSI> => {
+    isLoading.value = true
+    error.value = null
+    try {
+      const address = await addressSService.getById(id)
+      currentAddress.value = address
+      return address
+    } catch (err) {
+      error.value = 'Error al cargar la dirección'
+      console.error('Error loading address by id:', err)
+      throw err
     } finally {
       isLoading.value = false
     }
@@ -69,18 +91,8 @@ export const useAddressStore = defineStore('address', () => {
     error.value = null
     try {
       const newAddress = await addressSService.create(data)
-      addresses.value.push(newAddress)
-
-      // Si es la nueva dirección favorita, actualizar
-      if (newAddress.favorite) {
-        favoriteAddress.value = newAddress
-        // Actualizar las demás direcciones localmente
-        addresses.value = addresses.value.map((addr) => ({
-          ...addr,
-          favorite: addr.id === newAddress.id,
-        }))
-      }
-
+      // Recargar todas las direcciones después de crear
+      await loadAddresses()
       return newAddress
     } catch (err) {
       error.value = 'Error al crear la dirección'
@@ -91,27 +103,13 @@ export const useAddressStore = defineStore('address', () => {
     }
   }
 
-  const updateAddress = async (id: number, data: addressCheckoutUpdateDTO): Promise<addressSI> => {
+  const updateAddress = async (id: number, data: addressCheckoutUpdateDTO): Promise<void> => {
     isLoading.value = true
     error.value = null
     try {
-      const updatedAddress = await addressSService.update(id, data)
-
-      const index = addresses.value.findIndex((addr) => addr.id === id)
-      if (index !== -1) {
-        // Si se estableció como favorita, actualizar las demás
-        if (updatedAddress.favorite) {
-          addresses.value = addresses.value.map((addr) => ({
-            ...addr,
-            favorite: addr.id === id,
-          }))
-          favoriteAddress.value = updatedAddress
-        }
-
-        addresses.value[index] = updatedAddress
-      }
-
-      return updatedAddress
+      await addressSService.update(id, data)
+      // Recargar todas las direcciones después de actualizar
+      await loadAddresses()
     } catch (err) {
       error.value = 'Error al actualizar la dirección'
       console.error('Error updating address:', err)
@@ -126,11 +124,12 @@ export const useAddressStore = defineStore('address', () => {
     error.value = null
     try {
       await addressSService.delete(id)
-      addresses.value = addresses.value.filter((addr) => addr.id !== id)
+      // Recargar todas las direcciones después de eliminar
+      await loadAddresses()
 
-      // Si era la dirección favorita, limpiar
-      if (favoriteAddress.value?.id === id) {
-        favoriteAddress.value = null
+      // Si era la dirección actual, limpiarla
+      if (currentAddress.value?.id === id) {
+        currentAddress.value = null
       }
     } catch (err) {
       error.value = 'Error al eliminar la dirección'
@@ -141,21 +140,13 @@ export const useAddressStore = defineStore('address', () => {
     }
   }
 
-  const setFavoriteAddress = async (id: number): Promise<addressSI> => {
+  const setFavoriteAddress = async (id: number): Promise<void> => {
     isLoading.value = true
     error.value = null
     try {
-      // Usar update con favorite: true
-      const updatedAddress = await addressSService.update(id, { favorite: true })
-
-      // Actualizar todas las direcciones
-      addresses.value = addresses.value.map((addr) => ({
-        ...addr,
-        favorite: addr.id === id,
-      }))
-
-      favoriteAddress.value = updatedAddress
-      return updatedAddress
+      await addressSService.update(id, { favorite: true })
+      // Recargar todas las direcciones después de cambiar favorita
+      await loadAddresses()
     } catch (err) {
       error.value = 'Error al establecer dirección favorita'
       console.error('Error setting favorite address:', err)
@@ -167,7 +158,7 @@ export const useAddressStore = defineStore('address', () => {
 
   // Actions - Ubicaciones geográficas
   const loadDepartments = async () => {
-    if (departments.value.length > 0) return // Ya cargados
+    if (departments.value.length > 0) return
 
     isLoadingLocations.value = true
     try {
@@ -184,7 +175,6 @@ export const useAddressStore = defineStore('address', () => {
     isLoadingLocations.value = true
     try {
       provinces.value = await locationSService.getAllProvinces(departmentId)
-      // Limpiar distritos al cambiar de departamento
       districts.value = []
     } catch (err) {
       console.error('Error loading provinces:', err)
@@ -206,15 +196,11 @@ export const useAddressStore = defineStore('address', () => {
     }
   }
 
-  // Obtener precio de envío de un distrito específico
   const getDistrictDeliveryPrice = (districtId: number): number => {
     districts.value.find((d) => d.id === districtId)
-    // Nota: el backend devuelve districts como generalI (solo id y name)
-    // El precio de envío vendrá en la dirección cuando se cree/actualice
-    return 0 // Por defecto, el precio lo obtendremos de la dirección creada
+    return 0
   }
 
-  // Limpiar provincias y distritos
   const clearProvinces = () => {
     provinces.value = []
     districts.value = []
@@ -224,10 +210,14 @@ export const useAddressStore = defineStore('address', () => {
     districts.value = []
   }
 
-  // Reset
+  const clearCurrentAddress = () => {
+    currentAddress.value = null
+  }
+
   const reset = () => {
     addresses.value = []
     favoriteAddress.value = null
+    currentAddress.value = null
     error.value = null
     departments.value = []
     provinces.value = []
@@ -238,6 +228,7 @@ export const useAddressStore = defineStore('address', () => {
     // State
     addresses,
     favoriteAddress,
+    currentAddress,
     isLoading,
     error,
     departments,
@@ -252,6 +243,7 @@ export const useAddressStore = defineStore('address', () => {
     // Actions
     loadAddresses,
     loadFavoriteAddress,
+    loadAddressById,
     createAddress,
     updateAddress,
     deleteAddress,
@@ -262,6 +254,7 @@ export const useAddressStore = defineStore('address', () => {
     getDistrictDeliveryPrice,
     clearProvinces,
     clearDistricts,
+    clearCurrentAddress,
     reset,
   }
 })

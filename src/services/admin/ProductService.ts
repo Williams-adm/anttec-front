@@ -6,10 +6,15 @@ import type { ProductHasOptionsI } from '@/interfaces/admin/product/ProductHasOp
 import type { ProductExtendI, ProductsI } from '@/interfaces/admin/product/ProductInterface'
 import type { ProductOptionListI } from '@/interfaces/admin/product/ProductOptionListInterface'
 import httpAdmin from '../httpAdmin'
+import httpStrict from '../httpStrict'
 
 class ProductService {
   private get api() {
     return httpAdmin
+  }
+
+  private get apiStrict() {
+    return httpStrict
   }
 
   async getAll(): Promise<ProductsI> {
@@ -25,7 +30,7 @@ class ProductService {
   }
 
   async getById(id: string): Promise<ProductExtendI> {
-    const res = await this.api.get<ApiListResponseI<ProductExtendI>>(`/admin/products/${id}`)
+    const res = await this.apiStrict.get<ApiListResponseI<ProductExtendI>>(`/admin/products/${id}`)
     console.log(res.data.message)
     return res.data.data
   }

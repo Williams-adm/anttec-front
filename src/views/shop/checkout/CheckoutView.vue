@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import CheckoutSummary from '@/components/shop/checkout/CheckoutSummary.vue'
+import CheckoutSummary from '@/components/shop/checkout/address/CheckoutSummary.vue'
+import CheckoutSkeleton from './components/CheckoutSkeleton.vue'
 import { useCheckout } from '@/composables/usecheckout'
-import { computed, onMounted, watch } from 'vue'
+import { computed, onBeforeMount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import HeaderCheckout from './components/HeaderCheckout.vue'
 
 const router = useRouter()
 const route = useRoute()
 const { currentStep, goToStep, stepValidation } = useCheckout()
+
+const isInitialLoading = ref(true)
 
 interface Step {
   number: number
@@ -41,9 +44,17 @@ const steps = computed<Step[]>(() => [
   },
 ])
 
+onBeforeMount(() => {
+  isInitialLoading.value = true
+})
+
 // Sincronizar currentStep con la ruta actual
 onMounted(() => {
-  syncStepWithRoute()
+  // ✅ CAMBIO: Ocultar skeleton después de que se monte el componente
+  setTimeout(() => {
+    syncStepWithRoute()
+    isInitialLoading.value = false
+  }, 400) // Aumentado a 600ms para dar tiempo a que cargue
 })
 
 watch(
@@ -130,117 +141,141 @@ const getLineClasses = (index: number) => {
 </script>
 
 <template>
-  <HeaderCheckout />
-  <div
-    class="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900"
-  >
-    <!-- Stepper -->
+  <CheckoutSkeleton v-if="isInitialLoading" />
+  <div v-else>
+    <HeaderCheckout />
     <div
-      class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-20 backdrop-blur-sm"
+      class="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900"
     >
-      <div class="container mx-auto px-4 py-6">
-        <div class="max-w-3xl mx-auto">
-          <ol class="flex items-center w-full">
-            <li
-              v-for="(step, index) in steps"
-              :key="step.number"
-              class="flex items-center"
-              :class="[
-                index < steps.length - 1 ? 'flex-1' : '',
-                index < steps.length - 1
-                  ? `after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block after:mx-2 md:after:mx-4 after:rounded-full ${getLineClasses(index)}`
-                  : '',
-              ]"
-            >
-              <div class="flex flex-col items-center gap-2 shrink-0">
-                <!-- Círculo del paso -->
-                <span
-                  class="flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 transition-all duration-300"
-                  :class="[
-                    getCircleClasses(step),
-                    isStepClickable(step.number)
-                      ? 'cursor-pointer hover:scale-105'
-                      : 'cursor-not-allowed',
-                  ]"
-                  @click="handleStepClick(step.number)"
-                >
-                  <font-awesome-icon
-                    v-if="step.completed && currentStep > step.number"
-                    :icon="step.icon"
-                    class="text-base lg:text-lg"
-                    :class="getIconClasses(step)"
-                  />
+      <!-- Stepper -->
+      <div
+        class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-20 backdrop-blur-sm"
+      >
+        <div class="container mx-auto px-4 py-6">
+          <div class="max-w-3xl mx-auto">
+            <ol class="flex items-center w-full">
+              <li
+                v-for="(step, index) in steps"
+                :key="step.number"
+                class="flex items-center"
+                :class="[
+                  index < steps.length - 1 ? 'flex-1' : '',
+                  index < steps.length - 1
+                    ? `after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block after:mx-2 md:after:mx-4 after:rounded-full ${getLineClasses(index)}`
+                    : '',
+                ]"
+              >
+                <div class="flex flex-col items-center gap-2 shrink-0">
+                  <!-- Círculo del paso -->
+                  <span
+                    class="flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 transition-all duration-300"
+                    :class="[
+                      getCircleClasses(step),
+                      isStepClickable(step.number)
+                        ? 'cursor-pointer hover:scale-105'
+                        : 'cursor-not-allowed',
+                    ]"
+                    @click="handleStepClick(step.number)"
+                  >
+                    <font-awesome-icon
+                      v-if="step.completed && currentStep > step.number"
+                      :icon="step.icon"
+                      class="text-base lg:text-lg"
+                      :class="getIconClasses(step)"
+                    />
 
-                  <!-- Icono del paso -->
-                  <font-awesome-icon
-                    v-else
-                    :icon="step.icon"
-                    class="text-base lg:text-lg"
-                    :class="getIconClasses(step)"
-                  />
-                </span>
+                    <!-- Icono del paso -->
+                    <font-awesome-icon
+                      v-else
+                      :icon="step.icon"
+                      class="text-base lg:text-lg"
+                      :class="getIconClasses(step)"
+                    />
+                  </span>
 
-                <!-- Nombre del paso -->
-                <span
-                  class="text-xs md:text-sm font-medium text-center whitespace-nowrap"
-                  :class="getTextClasses(step)"
-                >
-                  {{ step.name }}
-                </span>
-              </div>
-            </li>
-          </ol>
-        </div>
-      </div>
-    </div>
-
-    <!-- Contenido principal -->
-    <div class="container mx-auto px-4 py-6 md:py-8">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-        <div class="lg:col-span-2 space-y-6">
-          <router-view v-slot="{ Component }">
-            <transition
-              enter-active-class="transition-all duration-300 ease-out"
-              enter-from-class="opacity-0 translate-x-8"
-              enter-to-class="opacity-100 translate-x-0"
-              leave-active-class="transition-all duration-200 ease-in"
-              leave-from-class="opacity-100 translate-x-0"
-              leave-to-class="opacity-0 -translate-x-8"
-              mode="out-in"
-            >
-              <component :is="Component" />
-            </transition>
-          </router-view>
-        </div>
-
-        <div class="lg:col-span-1">
-          <div>
-            <CheckoutSummary />
+                  <!-- Nombre del paso -->
+                  <span
+                    class="text-xs md:text-sm font-medium text-center whitespace-nowrap"
+                    :class="getTextClasses(step)"
+                  >
+                    {{ step.name }}
+                  </span>
+                </div>
+              </li>
+            </ol>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Footer -->
-    <div class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-12">
-      <div class="container mx-auto px-4 py-6 text-center text-sm text-gray-600 dark:text-gray-400">
-        <div class="flex items-center justify-center gap-4 flex-wrap">
-          <span class="flex items-center gap-2">
-            <font-awesome-icon icon="fa-solid fa-lock" class="text-green-600" />
-            Pago seguro
-          </span>
-          <span class="hidden md:inline text-gray-300 dark:text-gray-700">|</span>
-          <span class="flex items-center gap-2">
-            <font-awesome-icon icon="fa-solid fa-truck-fast" class="text-blue-600" />
-            Envío a todo el país
-          </span>
-          <span class="hidden md:inline text-gray-300 dark:text-gray-700">|</span>
-          <span class="flex items-center gap-2">
-            <font-awesome-icon icon="fa-solid fa-headset" class="text-indigo-600" />
-            Soporte 24/7
-          </span>
+      <!-- Contenido principal -->
+      <div class="container mx-auto px-4 pt-6 md:pt-8 pb-2">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div class="lg:col-span-2 space-y-6">
+            <router-view v-slot="{ Component }">
+              <transition
+                enter-active-class="transition-all duration-300 ease-out"
+                enter-from-class="opacity-0 translate-x-8"
+                enter-to-class="opacity-100 translate-x-0"
+                leave-active-class="transition-all duration-200 ease-in"
+                leave-from-class="opacity-100 translate-x-0"
+                leave-to-class="opacity-0 -translate-x-8"
+                mode="out-in"
+              >
+                <component :is="Component" />
+              </transition>
+            </router-view>
+          </div>
+
+          <div class="lg:col-span-1">
+            <div>
+              <CheckoutSummary />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+        <div
+          class="container mx-auto px-4 py-6 text-center text-sm text-gray-600 dark:text-gray-400"
+        >
+          <div class="flex items-center justify-center gap-4 flex-wrap">
+            <span class="flex items-center gap-2">
+              <font-awesome-icon icon="fa-solid fa-lock" class="text-green-600" />
+              Pago seguro
+            </span>
+            <span class="hidden md:inline text-gray-300 dark:text-gray-700">|</span>
+            <!-- <span class="flex items-center gap-2">
+              <font-awesome-icon icon="fa-solid fa-truck-fast" class="text-blue-600" />
+              Envío a todo el país
+            </span> -->
+            <!-- <span class="hidden md:inline text-gray-300 dark:text-gray-700">|</span> -->
+            <span class="flex items-center gap-2">
+              <font-awesome-icon icon="fa-solid fa-headset" class="text-indigo-600" />
+              Soporte 24/7
+            </span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Animación suave para el stepper */
+@keyframes pulse-ring {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.ring-4 {
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+</style>

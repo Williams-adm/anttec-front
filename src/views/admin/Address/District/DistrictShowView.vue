@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import AnimationLoader from '@/components/AnimationLoader.vue'
 import { useBreadcrumb } from '@/composables/useBreadcrumb'
-import { useSweetAlert } from '@/composables/useSweetAlert'
 import type { districtI } from '@/interfaces/admin/address/districtInterface'
 import DistrictService from '@/services/admin/DistrictService'
 import { onMounted, ref } from 'vue'
@@ -26,12 +25,6 @@ const loadDistrict = async () => {
   try {
     district.value = await districtService.getById(id)
   } catch (err) {
-    useSweetAlert({
-      title: 'Algo salió mal',
-      text: 'No se pudo cargar la información del distrito',
-      icon: 'error',
-      timer: 0,
-    })
     error.value = 'Error al cargar los datos.'
     console.error(err)
   } finally {

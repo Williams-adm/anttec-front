@@ -15,6 +15,7 @@ export const useCheckout = () => {
     summary,
     stepValidation,
     isDeliveryStepValid,
+    isCustomerInfoValid,
     canProceedToNextStep,
   } = storeToRefs(checkoutStore)
 
@@ -31,6 +32,7 @@ export const useCheckout = () => {
     saveToLocalStorage,
     loadFromLocalStorage,
     clearCheckout,
+    clearDeliveryAddress,
     initCheckout,
     prepareOrderData,
   } = checkoutStore
@@ -49,6 +51,7 @@ export const useCheckout = () => {
     summary,
     stepValidation,
     isDeliveryStepValid,
+    isCustomerInfoValid,
     canProceedToNextStep,
 
     // Actions
@@ -64,6 +67,7 @@ export const useCheckout = () => {
     saveToLocalStorage,
     loadFromLocalStorage,
     clearCheckout,
+    clearDeliveryAddress,
     initCheckout,
     prepareOrderData,
   }

@@ -41,6 +41,7 @@ const publicRoutes = [
         meta: {
           title: 'Carrito de compras',
           step: 1,
+          showGlobalLoading: true,
         },
       },
       {
@@ -78,7 +79,7 @@ const publicRoutes = [
   {
     path: '/checkout',
     component: () => import('@/views/shop/checkout/CheckoutView.vue'),
-    meta: { requiresAuth: true, title: 'Checkout' },
+    meta: { requiresAuth: true, title: 'Checkout', showGlobalLoading: true },
     // ← AGREGAR beforeEnter
     beforeEnter: async (
       to: RouteLocationNormalized,
@@ -142,6 +143,7 @@ const publicRoutes = [
           title: 'Información de entrega',
           step: 2,
           requiresStep: 1, // Requiere haber completado el paso 1
+          showGlobalLoading: true,
         },
       },
       {
@@ -152,6 +154,7 @@ const publicRoutes = [
           title: 'Método de pago',
           step: 3,
           requiresStep: 2, // Requiere haber completado el paso 2
+          showGlobalLoading: true,
         },
       },
     ],

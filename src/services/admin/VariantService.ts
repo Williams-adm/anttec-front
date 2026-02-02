@@ -2,10 +2,15 @@ import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseIn
 import type { variantI, variantsI } from '@/interfaces/admin/variant/variantInterface'
 import type { variantShortsI } from '@/interfaces/admin/variant/variantShortInterface'
 import httpAdmin from '../httpAdmin'
+import httpStrict from '../httpStrict'
 
 class VariantService {
   private get api() {
     return httpAdmin
+  }
+
+  private get apiStrict() {
+    return httpStrict
   }
 
   async getAll(): Promise<variantsI> {
@@ -15,7 +20,7 @@ class VariantService {
   }
 
   async getById(id: string): Promise<variantI> {
-    const res = await this.api.get<ApiListResponseI<variantI>>(`/admin/variants/${id}`)
+    const res = await this.apiStrict.get<ApiListResponseI<variantI>>(`/admin/variants/${id}`)
     console.log(res.data.message)
     return res.data.data
   }

@@ -41,7 +41,7 @@ watch(
       cartItemsCount.value = 0
     }
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 )
 
 const loadVariants = async () => {
@@ -89,7 +89,7 @@ const openBarcodeModal = (variant: variantI) => {
 }
 
 const handleBarcodeConfirm = (variantId: number | string, quantity: number) => {
-  const variant = variantsList.value.find(v => v.id === variantId)
+  const variant = variantsList.value.find((v) => v.id === variantId)
 
   if (!variant) return
 
@@ -98,7 +98,7 @@ const handleBarcodeConfirm = (variantId: number | string, quantity: number) => {
     quantity: quantity,
     variant_name: `${variant.product.name} - ${variant.product.model}`,
     sku: variant.sku,
-    features: variant.features.map(f => `${f.option}: ${f.description}`).join(', ')
+    features: variant.features.map((f) => `${f.option}: ${f.description}`).join(', '),
   }
 
   barcodeCartModalRef.value?.addItem(item)
@@ -124,7 +124,7 @@ const openCart = () => {
         'transition-all duration-200',
         cartItemsCount > 0
           ? 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-xl cursor-pointer'
-          : 'bg-gray-400 text-gray-500 cursor-not-allowed opacity-60'
+          : 'bg-gray-400 text-gray-500 cursor-not-allowed opacity-60',
       ]"
     >
       <font-awesome-icon icon="fa-solid fa-barcode" size="lg" />
@@ -257,10 +257,7 @@ const openCart = () => {
     <InfoAlert v-else message="Todavía no hay productos registrados" />
 
     <!-- ✅ Modales -->
-    <BarcodeQuantityModal
-      ref="barcodeQuantityModalRef"
-      @confirm="handleBarcodeConfirm"
-    />
+    <BarcodeQuantityModal ref="barcodeQuantityModalRef" @confirm="handleBarcodeConfirm" />
     <BarcodeCartModal ref="barcodeCartModalRef" />
   </div>
 </template>

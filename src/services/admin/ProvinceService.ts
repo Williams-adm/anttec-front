@@ -3,10 +3,15 @@ import type { provinceUpdateDTO } from '@/DTOs/admin/province/ProvinceUpdateDTO'
 import type { provinceI, provincesI } from '@/interfaces/admin/address/provinceInterface'
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
 import httpAdmin from '../httpAdmin'
+import httpStrict from '../httpStrict'
 
 class ProvinceService {
   private get api() {
     return httpAdmin
+  }
+
+  private get apiStrict() {
+    return httpStrict
   }
 
   async getAll(): Promise<provincesI> {
@@ -16,7 +21,7 @@ class ProvinceService {
   }
 
   async getById(id: string): Promise<provinceI> {
-    const res = await this.api.get<ApiListResponseI<provinceI>>(`/admin/provinces/${id}`)
+    const res = await this.apiStrict.get<ApiListResponseI<provinceI>>(`/admin/provinces/${id}`)
     console.log(res.data.message)
     return res.data.data
   }

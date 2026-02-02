@@ -4,10 +4,15 @@ import type { districtShortsI } from '@/interfaces/admin/address/districtShortIn
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
 import httpAdmin from '../httpAdmin'
 import type { districtCreateDTO } from '@/DTOs/admin/district/DistrictCreateDTO'
+import httpStrict from '../httpStrict'
 
 class DistrictService {
   private get api() {
     return httpAdmin
+  }
+
+  private get apiStrict() {
+    return httpStrict
   }
 
   async getAll(): Promise<districtShortsI> {
@@ -17,7 +22,7 @@ class DistrictService {
   }
 
   async getById(id: string): Promise<districtI> {
-    const res = await this.api.get<ApiListResponseI<districtI>>(`/admin/districts/${id}`)
+    const res = await this.apiStrict.get<ApiListResponseI<districtI>>(`/admin/districts/${id}`)
     console.log(res.data.message)
     return res.data.data
   }

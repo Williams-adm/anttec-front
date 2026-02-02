@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import AnimationLoader from '@/components/AnimationLoader.vue'
 import { useBreadcrumb } from '@/composables/useBreadcrumb'
-import { useSweetAlert } from '@/composables/useSweetAlert'
 import type { movementI } from '@/interfaces/admin/movement/MovementInterface'
 import MovementsService from '@/services/admin/MovementsService'
 import { onMounted, ref } from 'vue'
@@ -26,7 +25,6 @@ const loadMovement = async () => {
   try {
     movement.value = await movementsService.getById(id)
   } catch (err) {
-    useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'
     console.error(err)
   } finally {

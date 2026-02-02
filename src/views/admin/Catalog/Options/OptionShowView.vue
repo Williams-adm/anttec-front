@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import AnimationLoader from '@/components/AnimationLoader.vue'
 import { useBreadcrumb } from '@/composables/useBreadcrumb'
-import { useSweetAlert } from '@/composables/useSweetAlert'
 import type { OptionExtendI } from '@/interfaces/admin/options/OptionInterface'
 import OptionService from '@/services/admin/OptionService'
 import { onMounted, ref } from 'vue'
@@ -25,7 +24,6 @@ const loadOption = async () => {
   try {
     option.value = await optionService.getById(id)
   } catch (err) {
-    useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'
     console.error(err)
   } finally {

@@ -42,7 +42,7 @@ const close = () => {
 }
 
 const addItem = (item: BarcodeItemI) => {
-  const existingIndex = items.value.findIndex(i => i.variant_id === item.variant_id)
+  const existingIndex = items.value.findIndex((i) => i.variant_id === item.variant_id)
 
   if (existingIndex !== -1) {
     items.value[existingIndex].quantity += item.quantity
@@ -81,7 +81,7 @@ const clearAll = async () => {
     confirmButtonColor: '#3085d6',
     cancelButtonColor: '#d33',
     confirmButtonText: 'Sí, limpiar',
-    cancelButtonText: 'Cancelar'
+    cancelButtonText: 'Cancelar',
   })
 
   if (result.isConfirmed) {
@@ -94,7 +94,7 @@ const generatePDF = async () => {
     useSweetAlert({
       title: 'Carrito vacío',
       text: 'Agrega al menos una variante',
-      icon: 'warning'
+      icon: 'warning',
     })
     return
   }
@@ -103,14 +103,14 @@ const generatePDF = async () => {
     useSweetAlert({
       title: 'Generando PDF...',
       text: 'Por favor espera',
-      icon: 'loading'
+      icon: 'loading',
     })
 
     const payload = {
-      items: items.value.map(item => ({
+      items: items.value.map((item) => ({
         variant_id: item.variant_id,
-        quantity: item.quantity
-      }))
+        quantity: item.quantity,
+      })),
     }
 
     const blob = await variantBarcodeService.generatePDF(payload as variantBarcodeDTO)
@@ -128,7 +128,7 @@ const generatePDF = async () => {
     useSweetAlert({
       title: '¡Éxito!',
       text: 'PDF generado correctamente',
-      icon: 'success'
+      icon: 'success',
     })
 
     items.value = [] // ✅ Limpiar después de generar
@@ -139,7 +139,7 @@ const generatePDF = async () => {
       title: 'Error',
       text: 'No se pudo generar el PDF',
       icon: 'error',
-      timer: 0
+      timer: 0,
     })
     console.error(error)
   }
@@ -149,7 +149,7 @@ defineExpose({
   open,
   close,
   addItem,
-  items
+  items,
 })
 
 // Prevenir entrada de caracteres no numéricos
@@ -173,7 +173,9 @@ const handleKeypress = (event: KeyboardEvent) => {
       <div
         class="relative bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"
       >
-        <div class="flex items-center justify-between border-b border-gray-200 p-4 dark:border-gray-600">
+        <div
+          class="flex items-center justify-between border-b border-gray-200 p-4 dark:border-gray-600"
+        >
           <div>
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
               Códigos de Barras Seleccionados
@@ -188,7 +190,13 @@ const handleKeypress = (event: KeyboardEvent) => {
             class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer"
           >
             <svg class="w-3 h-3" fill="none" viewBox="0 0 14 14">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+              />
             </svg>
           </button>
         </div>
@@ -208,9 +216,7 @@ const handleKeypress = (event: KeyboardEvent) => {
                 <p class="font-medium text-gray-900 dark:text-white truncate">
                   {{ item.variant_name }}
                 </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                  SKU: {{ item.sku }}
-                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">SKU: {{ item.sku }}</p>
                 <p v-if="item.features" class="text-xs text-gray-500 dark:text-gray-400 truncate">
                   {{ item.features }}
                 </p>
@@ -254,7 +260,9 @@ const handleKeypress = (event: KeyboardEvent) => {
           </div>
         </div>
 
-        <div class="flex items-center justify-between border-t border-gray-200 p-4 dark:border-gray-600">
+        <div
+          class="flex items-center justify-between border-t border-gray-200 p-4 dark:border-gray-600"
+        >
           <button
             v-if="items.length > 0"
             @click="clearAll"

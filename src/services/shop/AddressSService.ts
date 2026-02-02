@@ -3,6 +3,7 @@ import type { addressSI } from '@/interfaces/shop/AddressSInterface'
 import httpAdmin from '../httpAdmin'
 import type { addressCheckoutCreateDTO } from '@/DTOs/shop/address/AddressCheckoutCreateDTO'
 import type { addressCheckoutUpdateDTO } from '@/DTOs/shop/address/AddressCheckoutUpdateDTO'
+import type { addressExtendSI } from '@/interfaces/shop/AddressExtendSInterface'
 
 class AddressSService {
   private get api() {
@@ -15,8 +16,8 @@ class AddressSService {
     return res.data.data
   }
 
-  async getById(id: string | number): Promise<addressSI> {
-    const res = await this.api.get<ApiListResponseI<addressSI>>(`/checkout/address/${id}`)
+  async getById(id: string | number): Promise<addressExtendSI> {
+    const res = await this.api.get<ApiListResponseI<addressExtendSI>>(`/checkout/address/${id}`)
     console.log(res.data.message)
     return res.data.data
   }
@@ -33,8 +34,11 @@ class AddressSService {
     return res.data.data
   }
 
-  async update(id: string | number, data: addressCheckoutUpdateDTO): Promise<addressSI> {
-    const res = await this.api.patch<ApiListResponseI<addressSI>>(`/checkout/address/${id}`, data)
+  async update(id: string | number, data: addressCheckoutUpdateDTO): Promise<addressExtendSI> {
+    const res = await this.api.patch<ApiListResponseI<addressExtendSI>>(
+      `/checkout/address/${id}`,
+      data,
+    )
     console.log(res.data.message)
     return res.data.data
   }

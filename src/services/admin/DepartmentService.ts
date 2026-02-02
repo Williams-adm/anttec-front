@@ -4,10 +4,15 @@ import type { departmentI, departmentsI } from '@/interfaces/admin/address/depar
 import type { generalI } from '@/interfaces/admin/address/generalnterface'
 import type { ApiListResponseI } from '@/interfaces/admin/base/ApiListResponseInterface'
 import httpAdmin from '../httpAdmin'
+import httpStrict from '../httpStrict'
 
 class DepartmentService {
   private get api() {
     return httpAdmin
+  }
+
+  private get apiStrict() {
+    return httpStrict
   }
 
   async getAll(): Promise<departmentsI> {
@@ -17,7 +22,7 @@ class DepartmentService {
   }
 
   async getById(id: string): Promise<departmentI> {
-    const res = await this.api.get<ApiListResponseI<departmentI>>(`/admin/departments/${id}`)
+    const res = await this.apiStrict.get<ApiListResponseI<departmentI>>(`/admin/departments/${id}`)
     console.log(res.data.message)
     return res.data.data
   }

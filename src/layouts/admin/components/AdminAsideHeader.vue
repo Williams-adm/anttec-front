@@ -53,7 +53,6 @@ const open = reactive<Record<string, boolean>>({})
     <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
       <ul class="space-y-2 font-medium">
         <li v-for="(link, index) in links" :key="link.header || link.name || index">
-
           <!-- ✅ HEADER -->
           <div
             v-if="link.header"
@@ -169,7 +168,11 @@ const open = reactive<Record<string, boolean>>({})
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgb(59 130 246), rgb(99 102 241)); /* blue-500 to indigo-500 */
+  background: linear-gradient(
+    180deg,
+    rgb(59 130 246),
+    rgb(99 102 241)
+  ); /* blue-500 to indigo-500 */
   border-radius: 10px;
   border: 2px solid transparent;
   background-clip: padding-box;
