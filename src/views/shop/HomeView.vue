@@ -99,7 +99,7 @@ onMounted(() => {
           class="flex flex-col h-full"
         >
           <!-- Image Container -->
-          <div class="relative w-full h-64 bg-gray-100 dark:bg-gray-700 overflow-hidden">
+          <div class="relative w-full h-64 bg-gray-100 dark:bg-gray-50 overflow-hidden p-2">
             <!-- Skeleton for image -->
             <div
               v-if="!product.variant.imgLoaded"
@@ -113,7 +113,7 @@ onMounted(() => {
               :src="product.variant.image || noImg"
               :alt="`${product.name} - ${product.model}`"
               loading="lazy"
-              class="w-full h-full object-cover object-center transition-all duration-300 group-hover:scale-110"
+              class="w-full h-full object-contain object-center transition-all duration-300 group-hover:scale-110"
               :class="{ 'opacity-0': !product.variant.imgLoaded }"
               @load="handleImageLoad(index)"
               @error="handleImageLoad(index)"

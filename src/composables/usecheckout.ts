@@ -16,6 +16,7 @@ export const useCheckout = () => {
     stepValidation,
     isDeliveryStepValid,
     isCustomerInfoValid,
+    isBillingInfoValid,
     canProceedToNextStep,
   } = storeToRefs(checkoutStore)
 
@@ -52,6 +53,7 @@ export const useCheckout = () => {
     stepValidation,
     isDeliveryStepValid,
     isCustomerInfoValid,
+    isBillingInfoValid,
     canProceedToNextStep,
 
     // Actions

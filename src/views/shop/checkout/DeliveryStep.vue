@@ -39,30 +39,36 @@ const selectedMethod = ref<'delivery' | 'pickup'>('delivery')
 const createModalRef = ref<InstanceType<typeof AddressModalCreate> | null>(null)
 const editModalRef = ref<InstanceType<typeof AddressModalEdit> | null>(null)
 
-// ✅ Función para seleccionar la dirección favorita automáticamente
+// Función para seleccionar la dirección favorita automáticamente
 const autoSelectFavorite = () => {
+  // ✅ Solo auto-seleccionar si NO hay dirección ya seleccionada
   if (
     selectedMethod.value === 'delivery' &&
     favoriteAddress.value &&
     !deliveryInfo.value?.address_id
   ) {
     handleSelectAddress(favoriteAddress.value)
+  } else if (deliveryInfo.value?.address_id) {
+    console.log('✅ Ya hay dirección seleccionada:', deliveryInfo.value.address_id)
   }
 }
 
 onMounted(async () => {
+  // ✅ CAMBIO IMPORTANTE: initCheckout() ya no sobrescribe
   await initCheckout()
-
   // Cargar datos en paralelo
   await Promise.all([loadAddresses(), loadFavoriteAddress(), loadAvailableBranches()])
 
-  if (deliveryInfo.value) {
+  // ✅ Sincronizar el método seleccionado con el estado del store
+  if (deliveryInfo.value?.shipping_method) {
     selectedMethod.value = deliveryInfo.value.shipping_method
   } else {
+    // Solo establecer por defecto si no hay nada guardado
+    console.log('⚠️ No hay método de envío guardado, estableciendo "delivery" por defecto')
     setShippingMethod('delivery')
   }
 
-  // ✅ Auto-seleccionar favorita después de cargar
+  // ✅ Auto-seleccionar favorita SOLO si no hay dirección ya seleccionada
   autoSelectFavorite()
 })
 
@@ -73,12 +79,12 @@ watch(selectedMethod, (newMethod) => {
 
 const handleSelectAddress = (address: addressSI) => {
   setDeliveryAddress(address)
-  saveToLocalStorage()
+  // saveToLocalStorage() ya se llama dentro de setDeliveryAddress
 }
 
 const handleSelectBranch = (branch: branchSI) => {
   setPickupBranch(branch)
-  saveToLocalStorage()
+  // saveToLocalStorage() ya se llama dentro de setPickupBranch
 }
 
 const handleDeleteAddress = async (address: addressSI) => {
@@ -86,14 +92,13 @@ const handleDeleteAddress = async (address: addressSI) => {
     const deletedAddressId = address.id
     await deleteAddress(address.id)
 
-    // ✅ Usar el método del store
     if (deliveryInfo.value?.address_id === deletedAddressId) {
       clearDeliveryAddress()
     }
 
     autoSelectFavorite()
   } catch (error) {
-    console.error('Error al eliminar dirección:', error)
+    console.error('❌ Error al eliminar dirección:', error)
     alert('Error al eliminar la dirección')
   }
 }
@@ -101,12 +106,9 @@ const handleDeleteAddress = async (address: addressSI) => {
 const handleSetFavorite = async (address: addressSI) => {
   try {
     await setFavoriteAddress(address.id)
-    // loadAddresses() ya se llamó dentro de setFavoriteAddress
-
-    // ✅ Auto-seleccionar la nueva favorita
     autoSelectFavorite()
   } catch (error) {
-    console.error('Error al establecer favorita:', error)
+    console.error('❌ Error al establecer favorita:', error)
   }
 }
 
@@ -115,28 +117,21 @@ const handleOpenCreateModal = () => {
 }
 
 const handleEditAddress = (address: addressSI) => {
-  // Pasar solo el ID, el modal se encarga de cargar los datos
   editModalRef.value?.open(address.id)
 }
 
-// ✅ CORREGIDO: Recargar direcciones y re-seleccionar la dirección actual
 const handleAddressSaved = async () => {
-  // Guardar el ID de la dirección actualmente seleccionada
   const currentAddressId = deliveryInfo.value?.address_id
 
-  // Recargar todas las direcciones para obtener los datos actualizados
   await loadAddresses()
   await loadFavoriteAddress()
 
-  // Si había una dirección seleccionada, re-seleccionarla con los datos actualizados
   if (currentAddressId) {
     const updatedAddress = sortedAddresses.value.find((addr) => addr.id === currentAddressId)
     if (updatedAddress) {
-      // ✅ Forzar re-selección para actualizar el precio
       handleSelectAddress(updatedAddress)
     }
   } else {
-    // Si no había dirección seleccionada, auto-seleccionar favorita
     autoSelectFavorite()
   }
 }
@@ -329,11 +324,11 @@ const handleAddressSaved = async () => {
       </div>
     </div>
 
+    <!-- Información del cliente -->
     <CustomerInfo />
 
     <!-- Modales -->
     <AddressModalCreate ref="createModalRef" @saved="handleAddressSaved" />
-
     <AddressModalEdit ref="editModalRef" @saved="handleAddressSaved" />
   </div>
 </template>

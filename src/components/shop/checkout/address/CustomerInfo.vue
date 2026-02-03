@@ -61,9 +61,9 @@ const searchDNI = async () => {
 
     // ✅ SOLUCIÓN: Usar setFieldValue para actualizar solo campos específicos
     // Esto NO marca otros campos como "touched"
-    await setFieldValue('name', customer.name)
-    await setFieldValue('last_name', customer.last_name)
-    await setFieldValue('document_number', customer.document_number)
+    setFieldValue('name', customer.name)
+    setFieldValue('last_name', customer.last_name)
+    setFieldValue('document_number', customer.document_number)
 
     // NO tocar phone ni document_type
 

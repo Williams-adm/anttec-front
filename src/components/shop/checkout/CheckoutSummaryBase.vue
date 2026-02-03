@@ -2,12 +2,29 @@
 import { useCart } from '@/composables/useCart'
 import { useCheckout } from '@/composables/usecheckout'
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import noImg from '@/assets/img/no-image.jpg'
 
-const router = useRouter()
-const { summary, shippingCost, deliveryInfo, canProceedToNextStep, nextStep, isCustomerInfoValid } =
-  useCheckout()
+// Props para personalización
+interface Props {
+  showButton?: boolean
+  buttonText?: string
+  buttonDisabled?: boolean
+  buttonVariant?: 'blue' | 'green' | 'purple'
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  showButton: true,
+  buttonText: 'Continuar',
+  buttonDisabled: false,
+  buttonVariant: 'blue',
+})
+
+// Emits
+const emit = defineEmits<{
+  (e: 'button-click'): void
+}>()
+
+const { summary, shippingCost, deliveryInfo } = useCheckout()
 const { items } = useCart()
 
 // Track de imágenes cargadas
@@ -43,38 +60,25 @@ const shippingCostText = computed(() => {
   return shippingCost.value === 0 ? 'GRATIS' : `S/ ${shippingCost.value}`
 })
 
-// ✅ NUEVO: Mensaje dinámico del botón
-const buttonMessage = computed(() => {
-  if (!deliveryInfo.value?.shipping_method) {
-    return 'Selecciona un método de envío'
+// Variantes de color del botón
+const buttonClasses = computed(() => {
+  const variants = {
+    blue: 'from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-blue-500/30',
+    green: 'from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-green-500/30',
+    purple: 'from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-purple-500/30',
   }
 
-  if (!hasShippingDestinationSelected.value) {
-    if (deliveryInfo.value.shipping_method === 'delivery') {
-      return 'Selecciona una dirección de entrega'
-    } else {
-      return 'Selecciona una sucursal'
-    }
-  }
-
-  if (!isCustomerInfoValid.value) {
-    return 'Completa tus datos personales'
-  }
-
-  return 'Continuar al pago'
+  return variants[props.buttonVariant]
 })
 
-const handleContinue = () => {
-  if (canProceedToNextStep.value) {
-    nextStep()
-    router.push({ name: 'shop.checkout.payment' })
-  }
+const handleButtonClick = () => {
+  emit('button-click')
 }
 </script>
 
 <template>
   <div
-    class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+    class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden sticky top-6"
   >
     <!-- Header -->
     <div class="bg-linear-to-r from-blue-600 to-indigo-600 px-6 py-4">
@@ -186,16 +190,24 @@ const handleContinue = () => {
         </div>
       </div>
 
-      <!-- Botón de continuar al pago -->
+      <!-- Slot para contenido adicional antes del botón -->
+      <slot name="before-button"></slot>
+
+      <!-- Botón (opcional) -->
       <button
-        @click="handleContinue"
-        :disabled="!canProceedToNextStep"
-        class="w-full px-6 py-4 bg-linear-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50 shadow-lg shadow-blue-500/30 text-lg mt-4 cursor-pointer disabled:cursor-not-allowed"
+        v-if="showButton"
+        @click="handleButtonClick"
+        :disabled="buttonDisabled"
+        class="w-full px-6 py-4 bg-linear-to-r text-white font-bold rounded-xl transition-all disabled:opacity-50 shadow-lg text-lg mt-4 cursor-pointer disabled:cursor-not-allowed"
+        :class="buttonClasses"
       >
         <span class="text-sm md:text-base">
-          {{ buttonMessage }}
+          {{ buttonText }}
         </span>
       </button>
+
+      <!-- Slot para contenido adicional después del botón -->
+      <slot name="after-button"></slot>
 
       <!-- Info adicional -->
       <div

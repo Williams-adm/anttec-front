@@ -17,9 +17,35 @@ const branchSService = new BranchSService()
 export const useCheckoutStore = defineStore('checkout', () => {
   const cartStore = useCartStore()
 
-  // State
-  const checkoutState = ref<CheckoutStateSI>({})
-  const currentStep = ref<number>(2) // 1: Carrito (fuera), 2: Entrega, 3: Pago
+  // ✅ CORREGIDO: Cargar estado inicial desde localStorage
+  const loadInitialState = (): CheckoutStateSI => {
+    try {
+      const savedState = localStorage.getItem('checkout_state')
+      if (savedState) {
+        const parsed = JSON.parse(savedState)
+        return parsed
+      }
+    } catch (error) {
+      console.error('Error al cargar estado inicial:', error)
+    }
+    return {}
+  }
+
+  const loadInitialStep = (): number => {
+    try {
+      const savedStep = localStorage.getItem('checkout_step')
+      if (savedStep) {
+        return parseInt(savedStep, 10)
+      }
+    } catch (error) {
+      console.error('Error al cargar paso inicial:', error)
+    }
+    return 2 // Paso por defecto
+  }
+
+  // State - ✅ Inicializar con datos del localStorage
+  const checkoutState = ref<CheckoutStateSI>(loadInitialState())
+  const currentStep = ref<number>(loadInitialStep())
   const isLoading = ref(false)
 
   // State para sucursales disponibles
@@ -44,12 +70,10 @@ export const useCheckoutStore = defineStore('checkout', () => {
     }
   })
 
-  // ✅ NUEVO: Validación mejorada del customerInfo
   const isCustomerInfoValid = computed(() => {
     const customer = deliveryInfo.value?.reciber
     if (!customer) return false
 
-    // ✅ 1. Validar que los campos no estén vacíos
     if (
       !customer.first_name?.trim() ||
       !customer.last_name?.trim() ||
@@ -60,35 +84,29 @@ export const useCheckoutStore = defineStore('checkout', () => {
       return false
     }
 
-    // ✅ 2. Validar tipo de documento
     const validDocumentTypes = ['DNI', 'CE'] as const
     if (!validDocumentTypes.includes(customer.document_type)) {
       return false
     }
 
-    // ✅ 3. Validar nombres (min 3, max 100 caracteres)
     if (customer.first_name.length < 3 || customer.first_name.length > 100) {
       return false
     }
 
-    // ✅ 4. Validar apellidos (min 3, max 100 caracteres)
     if (customer.last_name.length < 3 || customer.last_name.length > 100) {
       return false
     }
 
-    // ✅ 5. Validar teléfono (solo números, exactamente 9 dígitos)
     const phoneRegex = /^[0-9]+$/
     if (!phoneRegex.test(customer.phone) || customer.phone.length !== 9) {
       return false
     }
 
-    // ✅ 6. Validar número de documento según tipo
     const documentRegex = /^[0-9]+$/
     if (!documentRegex.test(customer.document_number)) {
       return false
     }
 
-    // DNI: exactamente 8 dígitos, CE: exactamente 12 dígitos
     if (customer.document_type === 'DNI' && customer.document_number.length !== 8) {
       return false
     }
@@ -97,16 +115,14 @@ export const useCheckoutStore = defineStore('checkout', () => {
       return false
     }
 
-    // ✅ Si pasó todas las validaciones, el formulario es válido
     return true
   })
 
-  // Validación de pasos
   const stepValidation = computed((): StepValidationSI => {
     return {
-      cart: !cartStore.isEmpty, // Paso 1: Carrito tiene items
-      delivery: isDeliveryStepValid.value, // Paso 2: Entrega completada
-      payment: false, // Paso 3: Pago (se validará después)
+      cart: !cartStore.isEmpty,
+      delivery: isDeliveryStepValid.value,
+      payment: isBillingInfoValid.value,
     }
   })
 
@@ -114,13 +130,10 @@ export const useCheckoutStore = defineStore('checkout', () => {
     const delivery = deliveryInfo.value
     if (!delivery) return false
 
-    // ✅ 1. Validar que haya método de envío seleccionado
     if (!delivery.shipping_method) return false
 
-    // ✅ 2. Validar datos del cliente
     if (!isCustomerInfoValid.value) return false
 
-    // ✅ 3. Validar según método de envío
     if (delivery.shipping_method === 'delivery') {
       return delivery.address_id !== undefined && delivery.shipping_cost !== undefined
     } else if (delivery.shipping_method === 'pickup') {
@@ -252,29 +265,38 @@ export const useCheckoutStore = defineStore('checkout', () => {
     }
   }
 
+  // ✅ CORREGIDO: Guardar con logs para debug
   const saveToLocalStorage = () => {
     try {
-      localStorage.setItem('checkout_state', JSON.stringify(checkoutState.value))
-      localStorage.setItem('checkout_step', String(currentStep.value))
+      const stateToSave = JSON.stringify(checkoutState.value)
+      const stepToSave = String(currentStep.value)
+
+      localStorage.setItem('checkout_state', stateToSave)
+      localStorage.setItem('checkout_step', stepToSave)
     } catch (error) {
-      console.error('Error guardando estado del checkout:', error)
+      console.error('❌ Error guardando estado del checkout:', error)
     }
   }
 
+  // ✅ CORREGIDO: Cargar con logs para debug
   const loadFromLocalStorage = () => {
     try {
       const savedState = localStorage.getItem('checkout_state')
       const savedStep = localStorage.getItem('checkout_step')
 
       if (savedState) {
-        checkoutState.value = JSON.parse(savedState)
+        const parsed = JSON.parse(savedState)
+        checkoutState.value = parsed
+      } else {
+        console.log('⚠️ No hay estado guardado en localStorage')
       }
 
       if (savedStep) {
         currentStep.value = parseInt(savedStep, 10)
+        console.log('✅ Paso cargado:', currentStep.value)
       }
     } catch (error) {
-      console.error('Error cargando estado del checkout:', error)
+      console.error('❌ Error cargando estado del checkout:', error)
     }
   }
 
@@ -295,9 +317,9 @@ export const useCheckoutStore = defineStore('checkout', () => {
     localStorage.removeItem('checkout_step')
   }
 
+  // ✅ CORREGIDO: No sobrescribe si ya existe data
   const initCheckout = async () => {
-    loadFromLocalStorage()
-
+    // Solo inicializar si NO hay delivery info
     if (!checkoutState.value.delivery) {
       checkoutState.value.delivery = {
         shipping_method: 'delivery',
@@ -309,6 +331,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
           phone: '',
         },
       }
+      saveToLocalStorage()
     }
   }
 
@@ -321,6 +344,105 @@ export const useCheckoutStore = defineStore('checkout', () => {
       summary: summary.value,
     }
   }
+
+  const isBillingInfoValid = computed(() => {
+    const billing = checkoutState.value.billing
+    if (!billing) return false
+
+    // Validar que exista el tipo de documento
+    if (!billing.document_type) return false
+
+    // ========================================
+    // Validación para BOLETA (boletaSchema)
+    // ========================================
+    if (billing.document_type === 'boleta') {
+      // 1. Verificar que existan todos los campos requeridos
+      if (
+        !billing.customer_document_type ||
+        !billing.document_number?.trim() ||
+        !billing.name?.trim() ||
+        !billing.last_name?.trim()
+      ) {
+        return false
+      }
+
+      // 2. Validar tipo de documento (solo DNI o CE)
+      const validDocumentTypes = ['DNI', 'CE'] as const
+      if (!validDocumentTypes.includes(billing.customer_document_type)) {
+        return false
+      }
+
+      // 3. Validar nombre (min 3, max 100)
+      if (billing.name.length < 3 || billing.name.length > 100) {
+        return false
+      }
+
+      // 4. Validar apellido (min 3, max 100)
+      if (billing.last_name.length < 3 || billing.last_name.length > 100) {
+        return false
+      }
+
+      // 5. Validar formato de número de documento (solo números)
+      const documentRegex = /^[0-9]+$/
+      if (!documentRegex.test(billing.document_number)) {
+        return false
+      }
+
+      // 6. Validar longitud según tipo de documento
+      if (billing.customer_document_type === 'DNI') {
+        // DNI debe tener exactamente 8 dígitos
+        if (billing.document_number.length !== 8) {
+          return false
+        }
+      } else if (billing.customer_document_type === 'CE') {
+        // CE debe tener exactamente 12 dígitos
+        if (billing.document_number.length !== 12) {
+          return false
+        }
+      }
+
+      return true
+    }
+
+    // ========================================
+    // Validación para FACTURA (facturaSchema)
+    // ========================================
+    if (billing.document_type === 'factura') {
+      // 1. Verificar que existan todos los campos requeridos
+      if (
+        !billing.document_number?.trim() ||
+        !billing.business_name?.trim() ||
+        !billing.address?.trim()
+      ) {
+        return false
+      }
+
+      // 2. Validar razón social (min 3, max 100)
+      if (billing.business_name.length < 3 || billing.business_name.length > 100) {
+        return false
+      }
+
+      // 3. Validar dirección fiscal (min 1, max 150)
+      if (billing.address.length < 1 || billing.address.length > 150) {
+        return false
+      }
+
+      // 4. Validar formato de RUC (solo números)
+      const rucRegex = /^[0-9]+$/
+      if (!rucRegex.test(billing.document_number)) {
+        return false
+      }
+
+      // 5. Validar longitud de RUC (exactamente 11 dígitos)
+      if (billing.document_number.length !== 11) {
+        return false
+      }
+
+      return true
+    }
+
+    return false
+  })
 
   return {
     checkoutState,
@@ -336,6 +458,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     isDeliveryStepValid,
     isCustomerInfoValid,
     canProceedToNextStep,
+    isBillingInfoValid,
 
     goToStep,
     nextStep,

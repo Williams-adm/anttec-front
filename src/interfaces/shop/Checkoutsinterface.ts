@@ -30,12 +30,7 @@ export interface CheckoutStateSI {
   delivery?: DeliveryInfoSI
 
   // Paso 2: Facturación (para futuro)
-  billing?: {
-    requires_invoice: boolean
-    company_name?: string
-    ruc?: string
-    fiscal_address?: string
-  }
+  billing?: BillingInfoSI
 
   // Paso 3: Pago (para futuro)
   payment?: {
@@ -45,6 +40,16 @@ export interface CheckoutStateSI {
 
   // Resumen
   summary?: CheckoutSummarySI
+}
+
+export interface BillingInfoSI {
+  document_type: 'boleta' | 'factura'
+  customer_document_type?: 'DNI' | 'CE'
+  document_number?: string
+  name?: string
+  last_name?: string
+  business_name?: string
+  address?: string
 }
 
 // Resumen del checkout

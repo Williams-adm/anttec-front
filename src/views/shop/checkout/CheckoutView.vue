@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import CheckoutSummary from '@/components/shop/checkout/address/CheckoutSummary.vue'
 import CheckoutSkeleton from './components/CheckoutSkeleton.vue'
+import DeliverySummary from '@/components/shop/checkout/address/DeliverySummary.vue'
+import PaymentSummary from '@/components/shop/checkout/payment/PaymentSummary.vue'
 import { useCheckout } from '@/composables/usecheckout'
 import { computed, onBeforeMount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -50,11 +51,10 @@ onBeforeMount(() => {
 
 // Sincronizar currentStep con la ruta actual
 onMounted(() => {
-  // ✅ CAMBIO: Ocultar skeleton después de que se monte el componente
   setTimeout(() => {
     syncStepWithRoute()
     isInitialLoading.value = false
-  }, 400) // Aumentado a 600ms para dar tiempo a que cargue
+  }, 400)
 })
 
 watch(
@@ -84,7 +84,6 @@ const handleStepClick = (stepNumber: number) => {
     goToStep(stepNumber)
     router.push({ name: step.route })
   }
-  // No permitir avanzar ni clickear el paso actual
 }
 
 const isStepClickable = (stepNumber: number) => {
@@ -131,7 +130,6 @@ const getTextClasses = (step: Step) => {
 }
 
 const getLineClasses = (index: number) => {
-  // La línea se pinta de azul si el paso actual es mayor que este índice
   if (currentStep.value > index + 1) {
     return 'after:border-blue-600 dark:after:border-blue-600'
   } else {
@@ -226,9 +224,14 @@ const getLineClasses = (index: number) => {
             </router-view>
           </div>
 
+          <!-- ✅ Summary dinámico según el paso actual -->
           <div class="lg:col-span-1">
             <div>
-              <CheckoutSummary />
+              <!-- Paso 2: Entrega - Muestra DeliverySummary -->
+              <DeliverySummary v-if="currentStep === 2" />
+
+              <!-- Paso 3: Pago - Muestra PaymentSummary -->
+              <PaymentSummary v-else-if="currentStep === 3" />
             </div>
           </div>
         </div>
@@ -245,11 +248,6 @@ const getLineClasses = (index: number) => {
               Pago seguro
             </span>
             <span class="hidden md:inline text-gray-300 dark:text-gray-700">|</span>
-            <!-- <span class="flex items-center gap-2">
-              <font-awesome-icon icon="fa-solid fa-truck-fast" class="text-blue-600" />
-              Envío a todo el país
-            </span> -->
-            <!-- <span class="hidden md:inline text-gray-300 dark:text-gray-700">|</span> -->
             <span class="flex items-center gap-2">
               <font-awesome-icon icon="fa-solid fa-headset" class="text-indigo-600" />
               Soporte 24/7
