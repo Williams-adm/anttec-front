@@ -74,6 +74,11 @@ export const adminSidebarLinks: adminAsideInterface[] = [
     route: 'admin.covers',
   },
   {
+    name: 'Pago QR',
+    icon: 'fa-solid fa-money-bill-1',
+    route: 'admin.paymentMethod',
+  },
+  {
     header: 'Órdenes y envío',
   },
   {

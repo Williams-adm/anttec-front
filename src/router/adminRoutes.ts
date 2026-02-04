@@ -307,6 +307,16 @@ const adminRoutes = [
           },
         ],
       },
+      {
+        path: 'payment-methods',
+        children: [
+          {
+            path: '',
+            name: 'admin.paymentMethod',
+            component: () => import('@/views/admin/PaymentMethod/PaymentMethodView.vue'),
+          },
+        ],
+      },
     ],
   },
 ]

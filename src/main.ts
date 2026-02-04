@@ -63,6 +63,7 @@ import {
   faClock,
   faCreditCard,
   faPen,
+  faMoneyBill1
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(
@@ -119,6 +120,7 @@ library.add(
   faClock,
   faCreditCard,
   faPen,
+  faMoneyBill1,
 )
 
 import { faFacebookF, faInstagram } from '@fortawesome/free-brands-svg-icons'
