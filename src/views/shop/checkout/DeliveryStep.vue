@@ -34,7 +34,7 @@ const {
   deleteAddress,
 } = useAddress()
 
-const selectedMethod = ref<'delivery' | 'pickup'>('delivery')
+const selectedMethod = ref<'shipment' | 'store_pickup'>('shipment')
 
 const createModalRef = ref<InstanceType<typeof AddressModalCreate> | null>(null)
 const editModalRef = ref<InstanceType<typeof AddressModalEdit> | null>(null)
@@ -43,7 +43,7 @@ const editModalRef = ref<InstanceType<typeof AddressModalEdit> | null>(null)
 const autoSelectFavorite = () => {
   // ✅ Solo auto-seleccionar si NO hay dirección ya seleccionada
   if (
-    selectedMethod.value === 'delivery' &&
+    selectedMethod.value === 'shipment' &&
     favoriteAddress.value &&
     !deliveryInfo.value?.address_id
   ) {
@@ -60,12 +60,12 @@ onMounted(async () => {
   await Promise.all([loadAddresses(), loadFavoriteAddress(), loadAvailableBranches()])
 
   // ✅ Sincronizar el método seleccionado con el estado del store
-  if (deliveryInfo.value?.shipping_method) {
-    selectedMethod.value = deliveryInfo.value.shipping_method
+  if (deliveryInfo.value?.delivery_type) {
+    selectedMethod.value = deliveryInfo.value.delivery_type
   } else {
     // Solo establecer por defecto si no hay nada guardado
-    console.log('⚠️ No hay método de envío guardado, estableciendo "delivery" por defecto')
-    setShippingMethod('delivery')
+    console.log('⚠️ No hay método de envío guardado, estableciendo "shipment" por defecto')
+    setShippingMethod('shipment')
   }
 
   // ✅ Auto-seleccionar favorita SOLO si no hay dirección ya seleccionada
@@ -146,34 +146,34 @@ const handleAddressSaved = async () => {
       <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">Método de envío</h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Delivery -->
+        <!-- Shipment -->
         <label
           class="relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-md"
           :class="[
-            selectedMethod === 'delivery'
+            selectedMethod === 'shipment'
               ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20'
               : 'border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600',
           ]"
         >
-          <input type="radio" v-model="selectedMethod" value="delivery" class="sr-only" />
+          <input type="radio" v-model="selectedMethod" value="shipment" class="sr-only" />
           <div class="flex items-center gap-3 w-full">
             <div
               class="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
               :class="
-                selectedMethod === 'delivery' ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
+                selectedMethod === 'shipment' ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
               "
             >
               <font-awesome-icon
                 icon="fa-solid fa-truck-fast"
                 class="text-xl"
-                :class="selectedMethod === 'delivery' ? 'text-white' : 'text-gray-500'"
+                :class="selectedMethod === 'shipment' ? 'text-white' : 'text-gray-500'"
               />
             </div>
             <div class="flex-1">
               <p
                 class="font-bold"
                 :class="
-                  selectedMethod === 'delivery'
+                  selectedMethod === 'shipment'
                     ? 'text-blue-600 dark:text-blue-400'
                     : 'text-gray-900 dark:text-gray-100'
                 "
@@ -183,39 +183,39 @@ const handleAddressSaved = async () => {
               <p class="text-sm text-gray-600 dark:text-gray-400">Recibe en tu dirección</p>
             </div>
             <font-awesome-icon
-              v-if="selectedMethod === 'delivery'"
+              v-if="selectedMethod === 'shipment'"
               icon="fa-solid fa-check-circle"
               class="text-2xl text-blue-600 dark:text-blue-400"
             />
           </div>
         </label>
 
-        <!-- Pickup -->
+        <!-- store_pickup -->
         <label
           class="relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-md"
           :class="[
-            selectedMethod === 'pickup'
+            selectedMethod === 'store_pickup'
               ? 'border-green-500 bg-green-50 dark:bg-green-900/20 shadow-lg shadow-green-500/20'
               : 'border-gray-300 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-600',
           ]"
         >
-          <input type="radio" v-model="selectedMethod" value="pickup" class="sr-only" />
+          <input type="radio" v-model="selectedMethod" value="store_pickup" class="sr-only" />
           <div class="flex items-center gap-3 w-full">
             <div
               class="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-              :class="selectedMethod === 'pickup' ? 'bg-green-600' : 'bg-gray-200 dark:bg-gray-700'"
+              :class="selectedMethod === 'store_pickup' ? 'bg-green-600' : 'bg-gray-200 dark:bg-gray-700'"
             >
               <font-awesome-icon
                 icon="fa-solid fa-shop"
                 class="text-xl"
-                :class="selectedMethod === 'pickup' ? 'text-white' : 'text-gray-500'"
+                :class="selectedMethod === 'store_pickup' ? 'text-white' : 'text-gray-500'"
               />
             </div>
             <div class="flex-1">
               <p
                 class="font-bold"
                 :class="
-                  selectedMethod === 'pickup'
+                  selectedMethod === 'store_pickup'
                     ? 'text-green-600 dark:text-green-400'
                     : 'text-gray-900 dark:text-gray-100'
                 "
@@ -225,7 +225,7 @@ const handleAddressSaved = async () => {
               <p class="text-sm text-gray-600 dark:text-gray-400">Retira en nuestro local</p>
             </div>
             <font-awesome-icon
-              v-if="selectedMethod === 'pickup'"
+              v-if="selectedMethod === 'store_pickup'"
               icon="fa-solid fa-check-circle"
               class="text-2xl text-green-600 dark:text-green-400"
             />
@@ -234,8 +234,8 @@ const handleAddressSaved = async () => {
       </div>
     </div>
 
-    <!-- Sección de direcciones (si es delivery) -->
-    <div v-if="selectedMethod === 'delivery'" class="space-y-4">
+    <!-- Sección de direcciones (si es shipment) -->
+    <div v-if="selectedMethod === 'shipment'" class="space-y-4">
       <div
         class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md border border-gray-200 dark:border-gray-700"
       >
@@ -286,8 +286,8 @@ const handleAddressSaved = async () => {
       </div>
     </div>
 
-    <!-- Sección de sucursales (si es pickup) -->
-    <div v-if="selectedMethod === 'pickup'" class="space-y-4">
+    <!-- Sección de sucursales (si es store_pickup) -->
+    <div v-if="selectedMethod === 'store_pickup'" class="space-y-4">
       <div
         class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md border border-gray-200 dark:border-gray-700"
       >

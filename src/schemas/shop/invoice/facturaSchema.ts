@@ -14,6 +14,5 @@ export const facturaSchema = object({
     .oneOf(['RUC'], 'Tipo de documento no válido'),
   document_number: string()
     .required('El RUC es obligatorio')
-    .matches(/^[0-9]+$/, 'El número de documento solo debe contener números')
-    .length(11, 'EL RUC debe tener exactamente 11 dígitos'),
+    .matches(/^(10|20)[0-9]{9}$/, 'El RUC debe comenzar con 10 o 20 y tener 11 dígitos'),
 })

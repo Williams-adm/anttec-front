@@ -11,9 +11,9 @@ const { deliveryInfo, canProceedToNextStep, nextStep, isCustomerInfoValid } = us
 const hasShippingDestinationSelected = computed(() => {
   if (!deliveryInfo.value) return false
 
-  if (deliveryInfo.value.shipping_method === 'delivery') {
+  if (deliveryInfo.value.delivery_type === 'shipment') {
     return deliveryInfo.value.address_id !== undefined
-  } else if (deliveryInfo.value.shipping_method === 'pickup') {
+  } else if (deliveryInfo.value.delivery_type === 'store_pickup') {
     return deliveryInfo.value.branch_id !== undefined
   }
 
@@ -22,12 +22,12 @@ const hasShippingDestinationSelected = computed(() => {
 
 // Mensaje dinámico del botón
 const buttonMessage = computed(() => {
-  if (!deliveryInfo.value?.shipping_method) {
+  if (!deliveryInfo.value?.delivery_type) {
     return 'Selecciona un método de envío'
   }
 
   if (!hasShippingDestinationSelected.value) {
-    if (deliveryInfo.value.shipping_method === 'delivery') {
+    if (deliveryInfo.value.delivery_type === 'shipment') {
       return 'Selecciona una dirección de entrega'
     } else {
       return 'Selecciona una sucursal'

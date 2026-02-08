@@ -85,17 +85,29 @@ const searchRUC = async () => {
 // ─── Cargar datos desde el store al montar ──────────
 onMounted(() => {
   const billing = checkoutState.value.billing
-  if (billing && billing.document_type === 'factura') {
-    // setValues carga todos los campos de una vez sin marcarlos como touched
+
+  // ✅ CORREGIDO: Validar que billing existe y es del tipo correcto
+  if (billing && billing.type_voucher === 'factura') {
     resetForm({
       values: {
         document_type: 'RUC',
         document_number: billing.document_number || '',
-        business_name: billing.business_name || '',
-        tax_address: billing.address || '',
-      }
+        business_name: billing.customer?.business_name || '', // ✅ Uso de optional chaining
+        tax_address: billing.customer?.tax_address || '', // ✅ Uso de optional chaining
+      },
+    })
+  } else {
+    // ✅ Si no hay billing válido, inicializar con valores por defecto
+    resetForm({
+      values: {
+        document_type: 'RUC',
+        document_number: '',
+        business_name: '',
+        tax_address: '',
+      },
     })
   }
+
   setTimeout(() => {
     isMounted.value = true
   }, 0)
@@ -110,10 +122,12 @@ watch(
 
     checkoutState.value.billing = {
       ...checkoutState.value.billing,
-      document_type: 'factura',
+      type_voucher: 'factura',
       document_number: documentNumber.value,
-      business_name: businessName.value,
-      address: taxAddress.value,
+      customer: {
+        business_name: businessName.value,
+        tax_address: taxAddress.value,
+      },
     }
     saveToLocalStorage()
   },

@@ -54,6 +54,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
 
   // Getters
   const deliveryInfo = computed(() => checkoutState.value.delivery)
+  const billingInfo = computed(() => checkoutState.value.billing)
   const shippingCost = computed(() => deliveryInfo.value?.shipping_cost || 0)
 
   const summary = computed((): CheckoutSummarySI => {
@@ -75,7 +76,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     if (!customer) return false
 
     if (
-      !customer.first_name?.trim() ||
+      !customer.name?.trim() ||
       !customer.last_name?.trim() ||
       !customer.document_number?.trim() ||
       !customer.phone?.trim() ||
@@ -89,7 +90,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
       return false
     }
 
-    if (customer.first_name.length < 3 || customer.first_name.length > 100) {
+    if (customer.name.length < 3 || customer.name.length > 100) {
       return false
     }
 
@@ -130,13 +131,13 @@ export const useCheckoutStore = defineStore('checkout', () => {
     const delivery = deliveryInfo.value
     if (!delivery) return false
 
-    if (!delivery.shipping_method) return false
+    if (!delivery.delivery_type) return false
 
     if (!isCustomerInfoValid.value) return false
 
-    if (delivery.shipping_method === 'delivery') {
+    if (delivery.delivery_type === 'shipment') {
       return delivery.address_id !== undefined && delivery.shipping_cost !== undefined
-    } else if (delivery.shipping_method === 'pickup') {
+    } else if (delivery.delivery_type === 'store_pickup') {
       return delivery.branch_id !== undefined
     }
 
@@ -182,9 +183,9 @@ export const useCheckoutStore = defineStore('checkout', () => {
   const setShippingMethod = (method: ShippingMethodType) => {
     if (!checkoutState.value.delivery) {
       checkoutState.value.delivery = {
-        shipping_method: method,
+        delivery_type: method,
         reciber: {
-          first_name: '',
+          name: '',
           last_name: '',
           document_type: 'DNI',
           document_number: '',
@@ -192,9 +193,9 @@ export const useCheckoutStore = defineStore('checkout', () => {
         },
       }
     } else {
-      checkoutState.value.delivery.shipping_method = method
+      checkoutState.value.delivery.delivery_type = method
 
-      if (method === 'delivery') {
+      if (method === 'shipment') {
         delete checkoutState.value.delivery.branch_id
       } else {
         delete checkoutState.value.delivery.address_id
@@ -229,7 +230,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
   const setCustomerData = (customer: CustomerDataSI) => {
     if (!checkoutState.value.delivery) {
       checkoutState.value.delivery = {
-        shipping_method: 'delivery',
+        delivery_type: 'shipment',
         reciber: customer,
       }
     } else {
@@ -322,9 +323,9 @@ export const useCheckoutStore = defineStore('checkout', () => {
     // Solo inicializar si NO hay delivery info
     if (!checkoutState.value.delivery) {
       checkoutState.value.delivery = {
-        shipping_method: 'delivery',
+        delivery_type: 'shipment',
         reciber: {
-          first_name: '',
+          name: '',
           last_name: '',
           document_type: 'DNI',
           document_number: '',
@@ -355,30 +356,30 @@ export const useCheckoutStore = defineStore('checkout', () => {
     // ========================================
     // Validación para BOLETA (boletaSchema)
     // ========================================
-    if (billing.document_type === 'boleta') {
+    if (billing.type_voucher === 'boleta') {
       // 1. Verificar que existan todos los campos requeridos
       if (
-        !billing.customer_document_type ||
+        !billing.document_type ||
         !billing.document_number?.trim() ||
-        !billing.name?.trim() ||
-        !billing.last_name?.trim()
+        !billing.customer.name?.trim() ||
+        !billing.customer.last_name?.trim()
       ) {
         return false
       }
 
       // 2. Validar tipo de documento (solo DNI o CE)
-      const validDocumentTypes = ['DNI', 'CE'] as const
-      if (!validDocumentTypes.includes(billing.customer_document_type)) {
+      const validDocumentTypes = ['DNI', 'CE', 'RUC'] as const
+      if (!validDocumentTypes.includes(billing.document_type)) {
         return false
       }
 
       // 3. Validar nombre (min 3, max 100)
-      if (billing.name.length < 3 || billing.name.length > 100) {
+      if (billing.customer.name.length < 3 || billing.customer.name.length > 100) {
         return false
       }
 
       // 4. Validar apellido (min 3, max 100)
-      if (billing.last_name.length < 3 || billing.last_name.length > 100) {
+      if (billing.customer.last_name.length < 3 || billing.customer.last_name.length > 100) {
         return false
       }
 
@@ -389,12 +390,12 @@ export const useCheckoutStore = defineStore('checkout', () => {
       }
 
       // 6. Validar longitud según tipo de documento
-      if (billing.customer_document_type === 'DNI') {
+      if (billing.document_type === 'DNI') {
         // DNI debe tener exactamente 8 dígitos
         if (billing.document_number.length !== 8) {
           return false
         }
-      } else if (billing.customer_document_type === 'CE') {
+      } else if (billing.document_type === 'CE') {
         // CE debe tener exactamente 12 dígitos
         if (billing.document_number.length !== 12) {
           return false
@@ -407,34 +408,29 @@ export const useCheckoutStore = defineStore('checkout', () => {
     // ========================================
     // Validación para FACTURA (facturaSchema)
     // ========================================
-    if (billing.document_type === 'factura') {
+    if (billing.type_voucher === 'factura') {
       // 1. Verificar que existan todos los campos requeridos
       if (
         !billing.document_number?.trim() ||
-        !billing.business_name?.trim() ||
-        !billing.address?.trim()
+        !billing.customer.business_name?.trim() ||
+        !billing.customer.tax_address?.trim()
       ) {
         return false
       }
 
       // 2. Validar razón social (min 3, max 100)
-      if (billing.business_name.length < 3 || billing.business_name.length > 100) {
+      if (billing.customer.business_name.length < 3 || billing.customer.business_name.length > 100) {
         return false
       }
 
       // 3. Validar dirección fiscal (min 1, max 150)
-      if (billing.address.length < 1 || billing.address.length > 150) {
+      if (billing.customer.tax_address.length < 1 || billing.customer.tax_address.length > 150) {
         return false
       }
 
       // 4. Validar formato de RUC (solo números)
-      const rucRegex = /^[0-9]+$/
+      const rucRegex = /^(10|20)[0-9]{9}$/
       if (!rucRegex.test(billing.document_number)) {
-        return false
-      }
-
-      // 5. Validar longitud de RUC (exactamente 11 dígitos)
-      if (billing.document_number.length !== 11) {
         return false
       }
 
@@ -452,6 +448,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     isLoadingBranches,
 
     deliveryInfo,
+    billingInfo,
     shippingCost,
     summary,
     stepValidation,

@@ -1,94 +1,197 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, nextTick, watch, onMounted } from 'vue'
 import { useCheckout } from '@/composables/usecheckout'
 import CheckoutSummaryBase from '../CheckoutSummaryBase.vue'
+import NiubizPaymentButton from './NiubizPaymentButton.vue'
+import PaymentSService from '@/services/shop/PaymentSService'
+import type { NiubizConfig } from '@/interfaces/shop/NiubizInterface'
+import OverlayLoader from '../common/OverlayLoader.vue'
 
-const { checkoutState, isBillingInfoValid, canProceedToNextStep, prepareOrderData } = useCheckout()
+const { checkoutState, isBillingInfoValid, canProceedToNextStep, deliveryInfo, billingInfo } = useCheckout()
 
-// Estado local para el paso de pago
-const isProcessingPayment = ref(false)
+const paymentSService = new PaymentSService()
+const niubizButtonRef = ref<InstanceType<typeof NiubizPaymentButton> | null>(null)
 
-// El botón se habilitará solo cuando:
-// 1. Los datos de facturación sean válidos (isBillingInfoValid)
-// 2. No se esté procesando un pago
-const canProceedToPayment = computed(() => {
-  return canProceedToNextStep.value && !isProcessingPayment.value
+// Estados
+const isLoadingToken = ref(false)
+const sessionToken = ref<string | null>(null)
+const order_id = ref<string>('')
+const total = ref<number>(0.00)
+const showPaymentButton = ref(false)
+const niubizScriptLoaded = ref(false)
+const niubizInitialized = ref(false)
+
+  // ⬇️ PRECARGAR SCRIPT DE NIUBIZ INMEDIATAMENTE
+const loadNiubizScript = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (window.VisanetCheckout) {
+      niubizScriptLoaded.value = true
+      resolve()
+      return
+    }
+
+    const script = document.createElement('script')
+    script.src = import.meta.env.VITE_NIUBIZ_URL_JS
+    script.async = true
+    script.onload = () => {
+      niubizScriptLoaded.value = true
+      resolve()
+    }
+    script.onerror = () => {
+      reject(new Error('Error al cargar el script de Niubiz'))
+    }
+    document.head.appendChild(script)
+  })
+}
+
+const isLocal =
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1'
+
+const merchantLogo = isLocal
+  ? 'img/comercio.png'
+  : window.location.origin + '/logo-dark.png'
+
+// ⬇️ NUEVO: Pre-inicializar Niubiz con configuración dummy
+const preInitializeNiubiz = () => {
+  if (!window.VisanetCheckout || niubizInitialized.value) return
+
+  try {
+    // Configurar con datos dummy para que Niubiz cargue todos sus servicios
+    const dummyConfig: NiubizConfig = {
+      sessiontoken: 'dummy-token',
+      channel: 'web',
+      merchantid: import.meta.env.VITE_NIUBIZ_MERCHANT_ID,
+      purchasenumber: 'INIT-0000',
+      amount: 1,
+      expirationminutes: '20',
+      timeouturl: window.location.origin + '/checkout/payment/timeout',
+      merchantname: 'ANTTEC',
+      merchantlogo: merchantLogo,
+      formbuttoncolor: '#753089',
+      method: 'POST',
+      action: window.location.origin + '/checkout/payment/callback',
+      complete: () => {}
+    }
+
+    window.VisanetCheckout.configure(dummyConfig)
+
+    niubizInitialized.value = true
+  } catch (error) {
+    console.warn('⚠️ Error en pre-inicialización:', error)
+  }
+}
+
+onMounted(async () => {
+  try {
+    await loadNiubizScript()
+    // Esperar un momento y luego pre-inicializar
+    setTimeout(() => {
+      preInitializeNiubiz()
+    }, 500)
+  } catch (error) {
+    console.error('❌ Error al precargar Niubiz:', error)
+  }
 })
 
-// Mensaje dinámico del botón
-const buttonMessage = computed(() => {
-  if (isProcessingPayment.value) {
-    return 'Procesando...'
-  }
 
-  if (!checkoutState.value.billing?.document_type) {
+const canGetToken = computed(() => {
+  return canProceedToNextStep.value && !isLoadingToken.value && !showPaymentButton.value
+})
+
+const buttonMessage = computed(() => {
+  if (isLoadingToken.value) {
+    return 'Espere...'
+  }
+  if (showPaymentButton.value) {
+    return 'Listo'
+  }
+  if (!checkoutState.value.billing?.type_voucher) {
     return 'Selecciona un tipo de comprobante'
   }
-
   if (!isBillingInfoValid.value) {
-    if (checkoutState.value.billing.document_type === 'boleta') {
+    if (checkoutState.value.billing.type_voucher === 'boleta') {
       return 'Completa los datos de la boleta'
     } else {
       return 'Completa los datos de la factura'
     }
   }
-
-  return 'Proceder al pago'
+  return 'Pagar'
 })
 
-const handleProceedToPayment = async () => {
-  if (!canProceedToPayment.value) return
+// Observar cambios en la validez de los datos de facturación
+watch(
+  () => isBillingInfoValid.value,
+  (isValid) => {
+    // Si los datos dejan de ser válidos, resetear el estado del pago
+    if (!isValid && showPaymentButton.value) {
+      console.log('⚠️ Datos de facturación inválidos - reseteando estado de pago')
+      showPaymentButton.value = false
+      sessionToken.value = null
+    }
+  }
+)
+
+const handleGetToken = async () => {
+  if (!canGetToken.value) return
 
   try {
-    isProcessingPayment.value = true
+    isLoadingToken.value = true
+    const address_id = deliveryInfo.value?.address_id ?? deliveryInfo.value?.branch_id ?? 1
+    // Obtener solo el session token
+    const res = await paymentSService.createOrderSessionToken({
+      type_voucher: billingInfo.value?.type_voucher ?? 'boleta',
+      delivery_type: deliveryInfo.value?.delivery_type,
+      document_type: billingInfo.value?.document_type,
+      document_number: billingInfo.value?.document_number,
+      customer: billingInfo.value?.customer,
+      receiver_info: deliveryInfo.value?.reciber,
+      address_id: address_id
+    })
 
-    // Preparar datos de la orden
-    const orderData = prepareOrderData()
+    sessionToken.value = res.session_token
+    order_id.value = String(res.order_id)
+    total.value = Number(Number(res.total).toFixed(2))
 
-    console.log('📦 Datos completos de la orden:', orderData)
-    console.log('🚚 Delivery:', orderData.delivery)
-    console.log('🧾 Billing:', orderData.billing)
-    console.log('💰 Summary:', orderData.summary)
+    // Mostrar el botón de pago
+    showPaymentButton.value = true
 
-    // TODO: Aquí implementarás la lógica para:
-    // 1. Crear la orden en el backend
-    // const response = await orderService.createOrder(orderData)
-    // 2. Redirigir a la pasarela de pago
-    // window.location.href = response.payment_url
-
-    // Simulación temporal
-    await new Promise(resolve => setTimeout(resolve, 2000))
-
-    alert('¡Orden preparada! (Implementa aquí la integración con tu backend)')
+    // Esperar a que el componente se monte y luego abrir automáticamente
+    await nextTick()
+    niubizButtonRef.value?.openPaymentForm()
 
   } catch (error) {
-    console.error('❌ Error al procesar el pago:', error)
-    alert('Error al procesar el pago. Por favor, intenta nuevamente.')
+    console.error('❌ Error:', error)
   } finally {
-    isProcessingPayment.value = false
+    isLoadingToken.value = false
   }
 }
 </script>
 
 <template>
+  <OverlayLoader
+    :show="isLoadingToken"
+    message="Preparando pago"
+    variant="primary"
+  />
+
   <CheckoutSummaryBase
     :button-text="buttonMessage"
-    :button-disabled="!canProceedToPayment"
-    button-variant="green"
-    @button-click="handleProceedToPayment"
+    :button-disabled="!canGetToken"
+    :button-variant="showPaymentButton ? 'blue' : 'green'"
+    :show-button="!showPaymentButton"
+    @button-click="handleGetToken"
   >
-    <!-- Contenido adicional después del botón -->
     <template #after-button>
-      <!-- Indicador de procesamiento -->
-      <div
-        v-if="isProcessingPayment"
-        class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mt-4"
-      >
-        <div class="flex items-center gap-2 text-blue-700 dark:text-blue-300 text-sm">
-          <font-awesome-icon icon="fa-solid fa-spinner" spin class="shrink-0" />
-          <p>Procesando tu solicitud...</p>
-        </div>
-      </div>
+      <!-- Botón de Niubiz visible cuando hay token -->
+      <NiubizPaymentButton
+        v-if="showPaymentButton && sessionToken"
+        ref="niubizButtonRef"
+        :session-token="sessionToken"
+        :purchase-number="order_id"
+        :amount="total"
+        :script-loaded="niubizScriptLoaded"
+      />
     </template>
   </CheckoutSummaryBase>
 </template>

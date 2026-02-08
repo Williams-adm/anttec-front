@@ -24,7 +24,7 @@ const { deliveryInfo } = useCheckout()
           <span class="text-gray-600 dark:text-gray-400">Método:</span>
           <span class="font-medium text-gray-900 dark:text-gray-100">
             {{
-              deliveryInfo?.shipping_method === 'delivery'
+              deliveryInfo?.delivery_type === 'shipment'
                 ? 'Envío a domicilio'
                 : 'Recojo en tienda'
             }}
@@ -33,7 +33,7 @@ const { deliveryInfo } = useCheckout()
         <div class="flex items-center gap-2 text-sm">
           <span class="text-gray-600 dark:text-gray-400">Receptor:</span>
           <span class="font-medium text-gray-900 dark:text-gray-100">
-            {{ deliveryInfo?.reciber?.first_name }} {{ deliveryInfo?.reciber?.last_name }}
+            {{ deliveryInfo?.reciber.name }} {{ deliveryInfo?.reciber?.last_name }}
           </span>
         </div>
         <div class="flex items-center gap-2 text-sm">

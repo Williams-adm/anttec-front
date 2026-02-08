@@ -111,7 +111,7 @@ const searchDNI = async () => {
 onMounted(() => {
   if (deliveryInfo.value?.reciber) {
     setValues({
-      name: deliveryInfo.value.reciber.first_name || '',
+      name: deliveryInfo.value.reciber.name || '',
       last_name: deliveryInfo.value.reciber.last_name || '',
       phone: deliveryInfo.value.reciber.phone || '',
       document_type: deliveryInfo.value.reciber.document_type || 'DNI',
@@ -125,7 +125,7 @@ watch(
   [name, lastName, phone, documentType, documentNumber],
   () => {
     updateCustomerData({
-      first_name: name.value,
+      name: name.value,
       last_name: lastName.value,
       phone: phone.value,
       document_type: documentType.value as 'DNI' | 'CE',
@@ -138,7 +138,7 @@ watch(
 
 const onSubmit = handleSubmit(async (values) => {
   updateCustomerData({
-    first_name: values.name,
+    name: values.name,
     last_name: values.last_name,
     phone: values.phone,
     document_type: values.document_type as 'DNI' | 'CE',

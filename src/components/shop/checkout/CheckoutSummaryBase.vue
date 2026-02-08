@@ -42,9 +42,9 @@ const handleImageError = (itemId: number) => {
 const hasShippingDestinationSelected = computed(() => {
   if (!deliveryInfo.value) return false
 
-  if (deliveryInfo.value.shipping_method === 'delivery') {
+  if (deliveryInfo.value.delivery_type === 'shipment') {
     return deliveryInfo.value.address_id !== undefined
-  } else if (deliveryInfo.value.shipping_method === 'pickup') {
+  } else if (deliveryInfo.value.delivery_type === 'store_pickup') {
     return deliveryInfo.value.branch_id !== undefined
   }
 
@@ -198,7 +198,7 @@ const handleButtonClick = () => {
         v-if="showButton"
         @click="handleButtonClick"
         :disabled="buttonDisabled"
-        class="w-full px-6 py-4 bg-linear-to-r text-white font-bold rounded-xl transition-all disabled:opacity-50 shadow-lg text-lg mt-4 cursor-pointer disabled:cursor-not-allowed"
+        class="w-full px-6 py-4 bg-linear-to-r text-white font-bold rounded-xl transition-all disabled:opacity-50 shadow-lg text-lg mt-4 disabled:cursor-not-allowed cursor-pointer"
         :class="buttonClasses"
       >
         <span class="text-sm md:text-base">

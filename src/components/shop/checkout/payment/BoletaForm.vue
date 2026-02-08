@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { boletaSchema } from '@/schemas/shop/invoice/boletaSchema'
-import { useForm } from 'vee-validate'
-import { computed, onMounted, ref, watch } from 'vue'
 import { useCheckout } from '@/composables/usecheckout'
 import { useSweetAlert } from '@/composables/useSweetAlert'
+import { boletaSchema } from '@/schemas/shop/invoice/boletaSchema'
 import CustomerSService from '@/services/shop/CustomerSService'
 import axios from 'axios'
 import Swal from 'sweetalert2'
+import { useForm } from 'vee-validate'
+import { computed, onMounted, ref, watch } from 'vue'
 
 // ─── Store ───────────────────────────────────────────
 const { checkoutState, saveToLocalStorage } = useCheckout()
@@ -100,13 +100,24 @@ watch(documentType, () => {
 onMounted(() => {
   const billing = checkoutState.value.billing
 
-  if (billing && billing.document_type === 'boleta') {
+  // ✅ CORREGIDO: Validar que billing existe y es del tipo correcto
+  if (billing && billing.type_voucher === 'boleta') {
     resetForm({
       values: {
-        document_type: billing.customer_document_type || 'DNI',
+        document_type: billing.document_type || 'DNI',
         document_number: billing.document_number || '',
-        name: billing.name || '',
-        last_name: billing.last_name || '',
+        name: billing.customer?.name || '', // ✅ Uso de optional chaining
+        last_name: billing.customer?.last_name || '', // ✅ Uso de optional chaining
+      },
+    })
+  } else {
+    // ✅ Si no hay billing válido, inicializar con valores por defecto
+    resetForm({
+      values: {
+        document_type: 'DNI',
+        document_number: '',
+        name: '',
+        last_name: '',
       },
     })
   }
@@ -124,11 +135,13 @@ watch(
 
     checkoutState.value.billing = {
       ...checkoutState.value.billing,
-      document_type: 'boleta',
-      customer_document_type: documentType.value as 'DNI' | 'CE',
+      type_voucher: 'boleta',
+      document_type: documentType.value as 'DNI' | 'CE',
       document_number: documentNumber.value,
-      name: name.value,
-      last_name: lastName.value,
+      customer: {
+        name: name.value,
+        last_name: lastName.value,
+      },
     }
     saveToLocalStorage()
   },
@@ -158,10 +171,7 @@ watch(
           <option value="DNI">DNI</option>
           <option value="CE">CE</option>
         </select>
-        <span
-          v-if="errors.document_type"
-          class="text-sm text-red-500 mt-1 flex items-center gap-1"
-        >
+        <span v-if="errors.document_type" class="text-sm text-red-500 mt-1 flex items-center gap-1">
           {{ errors.document_type }}
         </span>
       </div>

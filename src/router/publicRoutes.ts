@@ -159,6 +159,14 @@ const publicRoutes = [
       },
     ],
   },
+  {
+    path: '/checkout/payment/timeout',
+    name: 'shop.checkout.paymentTimeout',
+    component: () => import('@/views/errors/PaymentTimeout.vue'),
+    meta: {
+      title: 'Tiempo agotado - Pago',
+    },
+  },
 ]
 
 export default publicRoutes

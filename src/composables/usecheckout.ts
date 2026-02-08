@@ -11,6 +11,7 @@ export const useCheckout = () => {
     availableBranches,
     isLoadingBranches,
     deliveryInfo,
+    billingInfo,
     shippingCost,
     summary,
     stepValidation,
@@ -48,6 +49,7 @@ export const useCheckout = () => {
 
     // Getters
     deliveryInfo,
+    billingInfo,
     shippingCost,
     summary,
     stepValidation,

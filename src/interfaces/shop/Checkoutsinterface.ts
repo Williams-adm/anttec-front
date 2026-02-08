@@ -2,7 +2,7 @@ import type { ShippingMethodType } from './Shippingsinterface '
 
 // Datos del cliente para el pedido
 export interface CustomerDataSI {
-  first_name: string
+  name: string
   last_name: string
   document_type: 'DNI' | 'CE'
   document_number: string
@@ -11,7 +11,7 @@ export interface CustomerDataSI {
 
 // Información de entrega
 export interface DeliveryInfoSI {
-  shipping_method: ShippingMethodType
+  delivery_type: ShippingMethodType
 
   // Para delivery
   address_id?: number
@@ -43,13 +43,17 @@ export interface CheckoutStateSI {
 }
 
 export interface BillingInfoSI {
-  document_type: 'boleta' | 'factura'
-  customer_document_type?: 'DNI' | 'CE'
+  type_voucher: 'boleta' | 'factura'
+  document_type?: 'DNI' | 'CE' | 'RUC'
   document_number?: string
+  customer: customerBillingInfoSI
+}
+
+export interface customerBillingInfoSI {
   name?: string
   last_name?: string
   business_name?: string
-  address?: string
+  tax_address?: string
 }
 
 // Resumen del checkout

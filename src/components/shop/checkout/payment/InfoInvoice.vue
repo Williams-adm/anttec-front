@@ -9,13 +9,33 @@ const { checkoutState, saveToLocalStorage } = useCheckout()
 
 // Estado del formulario
 const documentType = ref<'boleta' | 'factura'>(
-  checkoutState.value.billing?.document_type || 'boleta',
+  checkoutState.value.billing?.type_voucher || 'boleta',
 )
 
 // Al cambiar tipo de comprobante, resetear billing en el store
 // Los formularios hijos se montan frescos y cargan desde el store
-watch(documentType, () => {
-  checkoutState.value.billing = { document_type: documentType.value }
+watch(documentType, (newType) => {
+  if (newType === 'boleta') {
+    checkoutState.value.billing = {
+      type_voucher: 'boleta',
+      document_type: 'DNI',
+      document_number: '',
+      customer: {
+        name: '',
+        last_name: '',
+      },
+    }
+  } else {
+    checkoutState.value.billing = {
+      type_voucher: 'factura',
+      document_type: 'RUC',
+      document_number: '',
+      customer: {
+        business_name: '',
+        tax_address: '',
+      },
+    }
+  }
   saveToLocalStorage()
 })
 </script>

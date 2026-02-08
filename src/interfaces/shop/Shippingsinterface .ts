@@ -1,5 +1,5 @@
 // Tipos de método de envío
-export type ShippingMethodType = 'pickup' | 'delivery'
+export type ShippingMethodType = 'shipment' | 'store_pickup'
 
 // Interface para método de envío
 export interface ShippingMethodSI {
