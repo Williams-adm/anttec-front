@@ -1,4 +1,4 @@
-import { date, object, string, ref } from 'yup'
+import { object, string, ref } from 'yup'
 
 export const registerSchema = object({
   name: string()
@@ -19,30 +19,4 @@ export const registerSchema = object({
     .required('Debes confirmar tu contraseña')
     .min(8, 'Debe de contener más de 8 caracteres')
     .oneOf([ref('password')], 'Las contraseñas no coinciden'),
-  date_birth: date()
-    .nullable()
-    .transform((value, originalValue) => (originalValue === '' ? null : value))
-    .test('is-before-today', 'La fecha debe ser anterior a hoy', (value) => {
-      if (!value) return true
-      return new Date(value) < new Date()
-    })
-    .test('min-year', 'La fecha no puede ser anterior a 1940', (value) => {
-      if (!value) return true
-      const birthDate = new Date(value)
-      return birthDate.getFullYear() >= 1940
-    })
-    .test('min-age', 'Debes ser mayor de 13 años', (value) => {
-      if (!value) return true
-      const today = new Date()
-      const birthDate = new Date(value)
-      const age = today.getFullYear() - birthDate.getFullYear()
-      const monthDiff = today.getMonth() - birthDate.getMonth()
-      const dayDiff = today.getDate() - birthDate.getDate()
-
-      // Ajustar si aún no ha cumplido años este año
-      if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-        return age - 1 >= 13
-      }
-      return age >= 13
-    }),
 })

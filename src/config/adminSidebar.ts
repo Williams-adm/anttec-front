@@ -7,6 +7,28 @@ export const adminSidebarLinks: adminAsideInterface[] = [
     route: 'admin.dashboard',
   },
   {
+    name: 'Ventas',
+    icon: 'fa-solid fa-cash-register',
+    route: 'admin.sales',
+  },
+  {
+    name: 'Usuarios',
+    icon: 'fa-solid fa-users',
+    route: 'admin.users',
+    children: [
+      {
+        name: 'Empleados',
+        icon: 'fa-solid fa-user-tie',
+        route: 'admin.users.employees',
+      },
+      {
+        name: 'Clientes',
+        icon: 'fa-solid fa-user-group',
+        route: 'admin.users.customers',
+      },
+    ],
+  },
+  {
     header: 'Administrar página',
   },
   {

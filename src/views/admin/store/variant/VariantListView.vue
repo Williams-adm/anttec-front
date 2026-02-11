@@ -9,12 +9,14 @@ import { useSweetAlert } from '@/composables/useSweetAlert'
 import type { BarcodeItemI } from '@/interfaces/admin/variant/BarcodeInterface'
 import type { variantI, variantsI } from '@/interfaces/admin/variant/variantInterface'
 import VariantService from '@/services/admin/VariantService'
+import IaService from '@/services/ia/IaService'
 import Swal from 'sweetalert2'
 import { computed, onMounted, ref, watch } from 'vue'
-import BarcodeQuantityModal from './components/BarcodeQuantityModal.vue'
 import BarcodeCartModal from './components/BarcodeCartModal.vue'
+import BarcodeQuantityModal from './components/BarcodeQuantityModal.vue'
 
 const variantService = new VariantService()
+const iaService = new IaService()
 
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Inventario' }])
 
@@ -108,6 +110,26 @@ const handleBarcodeConfirm = (variantId: number | string, quantity: number) => {
 const openCart = () => {
   barcodeCartModalRef.value?.open()
 }
+
+const syncCatalog = async () => {
+  try {
+    useSweetAlert({
+      title: 'Sincronizando...',
+      text: 'Sincronizando el catálogo con la IA',
+      icon: 'loading',
+    })
+    await iaService.syncCatalog()
+    Swal.close()
+    useSweetAlert({
+      title: 'Sincronización Exitosa',
+      text: 'Catálogo sincronizado exitosamente',
+      icon: 'success',
+    })
+  } catch (error) {
+    useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
+    console.log(error)
+  }
+}
 </script>
 
 <template>
@@ -130,6 +152,15 @@ const openCart = () => {
       <font-awesome-icon icon="fa-solid fa-barcode" size="lg" />
       <span class="text-sm">Ver códigos ({{ cartItemsCount }})</span>
     </button>
+
+    <div class="flex justify-end items-center mb-4">
+      <button
+        @click="syncCatalog"
+        class="px-6 py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 rounded-lg transition-colors duration-200 dark:bg-indigo-500 dark:hover:bg-indigo-600 dark:focus:ring-indigo-800 cursor-pointer"
+      >
+        Sincronizar catálogo con la IA
+      </button>
+    </div>
 
     <AnimationLoader v-if="isLoading" />
     <div v-else-if="variantsList.length != 0">
@@ -254,7 +285,7 @@ const openCart = () => {
         </table>
       </div>
     </div>
-    <InfoAlert v-else message="Todavía no hay productos registrados" />
+    <InfoAlert v-else message="Todavía no hay variantes registradas" />
 
     <!-- ✅ Modales -->
     <BarcodeQuantityModal ref="barcodeQuantityModalRef" @confirm="handleBarcodeConfirm" />

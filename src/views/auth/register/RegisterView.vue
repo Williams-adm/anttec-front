@@ -8,10 +8,9 @@ import { registerSchema } from '@/schemas/auth/registerValidationSchema'
 import AuthService from '@/services/auth/AuthService'
 import { useAuthStore } from '@/stores/useAuthStore'
 import axios from 'axios'
-import { Datepicker } from 'flowbite'
 import Swal from 'sweetalert2'
 import { useForm } from 'vee-validate'
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const authService = new AuthService()
@@ -24,11 +23,6 @@ const isLoading = ref(true)
 const serverErrors = ref<Record<string, string[]>>({})
 const showPassword = ref(false)
 const showPasswordConfirmation = ref(false)
-const dateBirthDatepickerEl = ref<HTMLInputElement | null>(null)
-
-type DatepickerChangeEvent = CustomEvent<{
-  date: Date | null
-}>
 
 const { meta, handleSubmit, errors, defineField, setErrors } = useForm({
   validationSchema: registerSchema,
@@ -39,7 +33,6 @@ const [last_name, lastNameAttrs] = defineField('last_name')
 const [email, emailAttrs] = defineField('email')
 const [password, passwordAttrs] = defineField('password')
 const [password_confirmation, passwordConfirmationAttrs] = defineField('password_confirmation')
-const [date_birth] = defineField('date_birth')
 
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value
@@ -47,24 +40,6 @@ const togglePasswordVisibility = () => {
 
 const togglePasswordConfirmationVisibility = () => {
   showPasswordConfirmation.value = !showPasswordConfirmation.value
-}
-
-const initDatepicker = async () => {
-  await nextTick()
-
-  if (dateBirthDatepickerEl.value) {
-    new Datepicker(dateBirthDatepickerEl.value, {
-      format: 'yyyy-mm-dd',
-      autohide: true,
-      maxDate: new Date().toISOString(), // No permite fechas futuras
-      minDate: new Date('1940-01-01').toISOString(),
-    })
-
-    dateBirthDatepickerEl.value.addEventListener('changeDate', (e: Event) => {
-      const event = e as DatepickerChangeEvent
-      date_birth.value = event.detail.date ? event.detail.date.toISOString().split('T')[0] : ''
-    })
-  }
 }
 
 const onSubmit = handleSubmit(async (values) => {
@@ -143,10 +118,6 @@ onMounted(async () => {
   await new Promise((resolve) => setTimeout(resolve, 200))
   isLoading.value = false
 })
-
-watch(isLoading, (val) => {
-  if (!val) initDatepicker()
-})
 </script>
 
 <template>
@@ -205,31 +176,6 @@ watch(isLoading, (val) => {
           class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1"
         />
         <span v-if="errors.email" class="text-sm text-red-400">{{ errors.email }}</span>
-      </div>
-
-      <!-- Fecha de Nacimiento (Opcional) -->
-      <div>
-        <label for="date_birth" class="block mb-2 font-medium text-gray-700 dark:text-gray-300">
-          Fecha de Nacimiento <span class="text-sm text-gray-500">(Opcional)</span>
-        </label>
-        <div class="relative w-full">
-          <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-            <font-awesome-icon
-              icon="fa-solid fa-calendar"
-              size="lg"
-              class="text-gray-500 dark:text-gray-400"
-            />
-          </div>
-          <input
-            id="date_birth"
-            ref="dateBirthDatepickerEl"
-            type="text"
-            autocomplete="off"
-            class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-indigo-600 dark:focus:border-indigo-600 focus:outline-none focus:ring-1 ps-12 p-2.5"
-            placeholder="Selecciona tu fecha de nacimiento"
-          />
-        </div>
-        <span v-if="errors.date_birth" class="text-sm text-red-400">{{ errors.date_birth }}</span>
       </div>
 
       <!-- Contraseña -->

@@ -1,28 +1,28 @@
 <script setup lang="ts">
 import AnimationLoader from '@/components/AnimationLoader.vue'
 import BadgeStatus from '@/components/Admin/BadgeStatus.vue'
-import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import ButtonCreate from '@/components/Admin/ButtonCreate.vue'
 import InfoAlert from '@/components/Admin/InfoAlert.vue'
-import { useSweetAlert } from '@/composables/useSweetAlert'
-import type { SpecificationsI } from '@/interfaces/admin/SpecificationInterface'
-import SpecificationService from '@/services/admin/SpecificationService'
-import { computed, onMounted, ref } from 'vue'
 import ToggleSwitch from '@/components/Admin/ToggleSwitch.vue'
-import Swal from 'sweetalert2'
+import { useBreadcrumb } from '@/composables/useBreadcrumb';
+import { useSweetAlert } from '@/composables/useSweetAlert';
+import type { employeesShortI } from '@/interfaces/admin/employee/employeeShortInterface';
+import EmployeeService from '@/services/admin/EmployeeService';
+import Swal from 'sweetalert2';
+import { computed, onMounted, ref } from 'vue';
 
-const specificationService = new SpecificationService()
+const employeeService = new EmployeeService()
 
-useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Especificaciones' }])
+useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Empleados' }])
 
-const specifications = ref<SpecificationsI | null>(null)
+const employees = ref<employeesShortI | null>(null)
 const error = ref<string | null>(null)
-const specificationsList = computed(() => specifications.value?.data ?? [])
+const employeesList = computed(() => employees.value?.data ?? [])
 const isLoading = ref(true)
 
-const loadSpecifications = async () => {
+const loadEmployees = async () => {
   try {
-    specifications.value = await specificationService.getAll()
+    employees.value = await employeeService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'
@@ -33,7 +33,7 @@ const loadSpecifications = async () => {
 }
 
 onMounted(() => {
-  loadSpecifications()
+  loadEmployees()
 })
 
 const updateStatus = async (id: number, currentStatus: boolean) => {
@@ -44,9 +44,9 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
       text: 'Actualizando estado',
       icon: 'loading',
     })
-    await specificationService.update({ status: newStatus }, String(id))
+    await employeeService.update({ status: newStatus }, String(id))
 
-    const category = specificationsList.value.find((c) => c.id === id)
+    const category = employeesList.value.find((c) => c.id === id)
     if (category) {
       category.status = newStatus
     }
@@ -57,14 +57,15 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
     console.log(error)
   }
 }
+
 </script>
 
 <template>
   <div class="flex justify-end">
-    <ButtonCreate route="admin.catalog.specifications.create" />
+    <ButtonCreate route="admin.users.employees.create" />
   </div>
   <AnimationLoader v-if="isLoading" />
-  <div v-else-if="specificationsList.length != 0">
+  <div v-else-if="employeesList.length != 0">
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
       <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
         <thead
@@ -72,7 +73,10 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
         >
           <tr>
             <th scope="col" class="px-6 py-3">#</th>
-            <th scope="col" class="px-6 py-3">Nombre</th>
+            <th scope="col" class="px-6 py-3">Nombres</th>
+            <th scope="col" class="px-6 py-3">Apellidos</th>
+            <th scope="col" class="px-6 py-3">Teléfono</th>
+            <th scope="col" class="px-6 py-3">Rol</th>
             <th scope="col" class="px-6 py-3">Estado</th>
             <th scope="col" class="px-6 py-3">Acciones</th>
           </tr>
@@ -81,11 +85,11 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
           <tr
             :class="[
               'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900',
-              index != specificationsList.length - 1
+              index != employeesList.length - 1
                 ? 'border-b dark:border-gray-700 border-gray-200'
                 : '',
             ]"
-            v-for="(specification, index) in specificationsList"
+            v-for="(employee, index) in employeesList"
             :key="index"
           >
             <th
@@ -95,19 +99,28 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
               {{ index + 1 }}
             </th>
             <td class="px-6 py-4">
-              {{ specification.name }}
+              {{ employee.user.name }}
+            </td>
+            <td class="px-6 py-4">
+              {{ employee.user.last_name }}
+            </td>
+            <td class="px-6 py-4">
+              {{ employee.phone.number }}
+            </td>
+            <td class="px-6 py-4">
+              {{ employee.rol }}
             </td>
             <td>
-              <BadgeStatus :status="specification.status" />
+              <BadgeStatus :status="employee.status" />
             </td>
             <td class="px-6 py-4 text-right">
               <div class="flex justify-around">
                 <router-link
-                  :to="{
-                    name: 'admin.catalog.specifications.edit',
-                    params: { id: specification.id },
-                  }"
-                >
+                    :to="{ name: 'admin.users.employees.show', params: { id: employee.id } }"
+                  >
+                    <font-awesome-icon icon="fa-solid fa-eye" size="xl" class="text-green-400" />
+                  </router-link>
+                <router-link :to="{ name: 'admin.users.employees.edit', params: { id: employee.id } }">
                   <font-awesome-icon
                     icon="fa-solid fa-pen-to-square"
                     size="xl"
@@ -115,8 +128,9 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
                   />
                 </router-link>
                 <ToggleSwitch
-                  :status="specification.status"
-                  @update:status="() => updateStatus(specification.id, specification.status)"
+                 v-if="employee.rol != 'Administrador'"
+                  :status="employee.status"
+                  @update:status="() => updateStatus(employee.id, employee.status)"
                 />
               </div>
             </td>
@@ -125,5 +139,5 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
       </table>
     </div>
   </div>
-  <InfoAlert v-else message="Todavía no hay especificaciones registradas" />
+  <InfoAlert v-else message="Todavía no hay categorías registradas" />
 </template>

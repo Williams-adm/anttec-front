@@ -126,5 +126,5 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
       </table>
     </div>
   </div>
-  <InfoAlert v-else message="Todavía no hay categorías registradas" />
+  <InfoAlert v-else message="Todavía no hay subcategorías registradas" />
 </template>

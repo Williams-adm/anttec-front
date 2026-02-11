@@ -12,6 +12,46 @@ const adminRoutes = [
         component: () => import('@/views/admin/DashboardView.vue'),
       },
       {
+        path: 'sales',
+        name: 'admin.sales',
+        component: () => import('@/views/admin/Sale/SaleListView.vue'),
+      },
+      {
+        path: 'users',
+        children: [
+          {
+            path: 'employees',
+            children: [
+              {
+                path: '',
+                name: 'admin.users.employees',
+                component: () => import('@/views/admin/Employee/EmployeeListView.vue'),
+              },
+              {
+                path: 'create',
+                name: 'admin.users.employees.create',
+                component: () => import('@/views/admin/Employee/EmployeeCreateView.vue'),
+              },
+              {
+                path: 'show/:id',
+                name: 'admin.users.employees.show',
+                component: () => import('@/views/admin/Employee/EmployeeShowView.vue'),
+              },
+              {
+                path: 'edit/:id',
+                name: 'admin.users.employees.edit',
+                component: () => import('@/views/admin/Employee/EmployeeEditView.vue'),
+              },
+            ],
+          },
+          {
+            path: 'customers',
+            name: 'admin.users.customers',
+            component: () => import('@/views/admin/Customer/CustomerListView.vue'),
+          },
+        ],
+      },
+      {
         path: 'categories',
         children: [
           {

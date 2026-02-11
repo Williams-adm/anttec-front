@@ -118,5 +118,5 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
       </table>
     </div>
   </div>
-  <InfoAlert v-else message="Todavía no hay especificaciones registradas" />
+  <InfoAlert v-else message="Todavía no hay marcas registradas" />
 </template>

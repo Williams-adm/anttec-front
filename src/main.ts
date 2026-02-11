@@ -63,7 +63,14 @@ import {
   faClock,
   faCreditCard,
   faPen,
-  faMoneyBill1
+  faMoneyBill1,
+  faCashRegister,
+  faReceipt,
+  faUserTie,
+  faUsers,
+  faUserGroup,
+  faPaperPlane,
+  faArrowRotateLeft,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(
@@ -121,10 +128,17 @@ library.add(
   faCreditCard,
   faPen,
   faMoneyBill1,
+  faCashRegister,
+  faReceipt,
+  faUserTie,
+  faUsers,
+  faUserGroup,
+  faPaperPlane,
+  faArrowRotateLeft,
 )
 
-import { faFacebookF, faInstagram } from '@fortawesome/free-brands-svg-icons'
-library.add(faFacebookF, faInstagram)
+import { faFacebookF, faInstagram, faBilibili } from '@fortawesome/free-brands-svg-icons'
+library.add(faFacebookF, faInstagram, faBilibili)
 
 const app = createApp(App)
 
