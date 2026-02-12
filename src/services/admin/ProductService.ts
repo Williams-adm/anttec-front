@@ -17,8 +17,13 @@ class ProductService {
     return httpStrict
   }
 
-  async getAll(): Promise<ProductsI> {
-    const res = await this.api.get<ProductsI>('/admin/products')
+  async getAll(page: number = 1, perPage: number = 15): Promise<ProductsI> {
+    const res = await this.api.get<ProductsI>('/admin/products', {
+      params: {
+        page,
+        per_page: perPage,
+      },
+    })
     console.log(res.data.message)
     return res.data
   }

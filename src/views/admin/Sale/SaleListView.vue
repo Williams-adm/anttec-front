@@ -8,6 +8,7 @@ import SaleService from '@/services/admin/SaleService'
 import ReportService from '@/services/admin/ReportService'
 import { computed, onMounted, ref } from 'vue'
 import Swal from 'sweetalert2'
+import PaginationControls from '@/components/Admin/PaginationControls.vue'
 
 const saleService = new SaleService()
 const reportService = new ReportService()
@@ -19,6 +20,10 @@ const error = ref<string | null>(null)
 const salesList = computed(() => sales.value?.data ?? [])
 const isLoading = ref(true)
 
+// ✅ NUEVO: Estados de paginación
+const currentPage = ref(1)
+const perPage = ref(15)
+
 // Estados para el modal de reporte
 const showReportModal = ref(false)
 const reportDateFrom = ref('')
@@ -26,9 +31,15 @@ const reportDateTo = ref('')
 const reportFormat = ref<'pdf' | 'excel'>('pdf')
 const isGeneratingReport = ref(false)
 
+// ✅ NUEVO: Función para calcular el índice global
+const getGlobalIndex = (localIndex: number) => {
+  return (currentPage.value - 1) * perPage.value + localIndex + 1
+}
+
 const loadSales = async () => {
   try {
-    sales.value = await saleService.getAll()
+    isLoading.value = true
+    sales.value = await saleService.getAll(currentPage.value, perPage.value)
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las ventas.'
@@ -36,6 +47,18 @@ const loadSales = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+// ✅ NUEVO: Handlers de paginación
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+  loadSales()
+}
+
+const handlePerPageChange = (newPerPage: number) => {
+  perPage.value = newPerPage
+  currentPage.value = 1
+  loadSales()
 }
 
 const openReportModal = () => {
@@ -164,7 +187,7 @@ onMounted(() => {
                 scope="row"
                 class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                {{ index + 1 }}
+                {{ getGlobalIndex(index) }}
               </th>
               <td class="px-6 py-4">
                 {{ sale.type_voucher }}
@@ -195,6 +218,14 @@ onMounted(() => {
           </tbody>
         </table>
       </div>
+      <!-- ✅ NUEVO: Componente de paginación -->
+      <PaginationControls
+        v-if="sales?.meta"
+        :meta="sales.meta"
+        :per-page="perPage"
+        @update:page="handlePageChange"
+        @update:per-page="handlePerPageChange"
+      />
     </div>
     <InfoAlert v-else message="Todavía no hay ventas registradas" />
 

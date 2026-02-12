@@ -10,6 +10,7 @@ import ToggleSwitch from '@/components/Admin/ToggleSwitch.vue'
 import Swal from 'sweetalert2'
 import BadgeStatus from '@/components/Admin/BadgeStatus.vue'
 import type { ProductsI } from '@/interfaces/admin/product/ProductInterface'
+import PaginationControls from '@/components/Admin/PaginationControls.vue'
 
 const productService = new ProductService()
 
@@ -20,9 +21,20 @@ const error = ref<string | null>(null)
 const productsList = computed(() => products.value?.data ?? [])
 const isLoading = ref(true)
 
+
+// ✅ NUEVO: Estados de paginación
+const currentPage = ref(1)
+const perPage = ref(15)
+
+// ✅ NUEVO: Función para calcular el índice global
+const getGlobalIndex = (localIndex: number) => {
+  return (currentPage.value - 1) * perPage.value + localIndex + 1
+}
+
 const loadProducts = async () => {
   try {
-    products.value = await productService.getAll()
+    isLoading.value = true
+    products.value = await productService.getAll(currentPage.value, perPage.value)
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar los productos.'
@@ -30,6 +42,18 @@ const loadProducts = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+// ✅ NUEVO: Handlers de paginación
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+  loadProducts()
+}
+
+const handlePerPageChange = (newPerPage: number) => {
+  perPage.value = newPerPage
+  currentPage.value = 1
+  loadProducts()
 }
 
 onMounted(() => {
@@ -95,7 +119,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              {{ index + 1 }}
+              {{ getGlobalIndex(index) }}
             </th>
             <td class="px-6 py-4">
               {{ product.name }}
@@ -138,6 +162,14 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
         </tbody>
       </table>
     </div>
+    <!-- ✅ NUEVO: Componente de paginación -->
+      <PaginationControls
+        v-if="products?.meta"
+        :meta="products.meta"
+        :per-page="perPage"
+        @update:page="handlePageChange"
+        @update:per-page="handlePerPageChange"
+      />
   </div>
   <InfoAlert v-else message="Todavía no hay productos registrados" />
 </template>

@@ -13,8 +13,13 @@ class VariantService {
     return httpStrict
   }
 
-  async getAll(): Promise<variantsI> {
-    const res = await this.api.get<variantsI>('/admin/variants')
+  async getAll(page: number = 1, perPage: number = 15): Promise<variantsI> {
+    const res = await this.api.get<variantsI>('/admin/variants', {
+      params: {
+        page,
+        per_page: perPage,
+      },
+    })
     console.log(res.data.message)
     return res.data
   }

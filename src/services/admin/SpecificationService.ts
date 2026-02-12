@@ -14,8 +14,13 @@ class SpecificationService {
     return httpStrict
   }
 
-  async getAll(): Promise<SpecificationsI> {
-    const res = await this.api.get<SpecificationsI>('/admin/specifications')
+  async getAll(page: number = 1, perPage: number = 15): Promise<SpecificationsI> {
+    const res = await this.api.get<SpecificationsI>('/admin/specifications', {
+      params: {
+        page,
+        per_page: perPage,
+      },
+    })
     console.log(res.data.message)
     return res.data
   }

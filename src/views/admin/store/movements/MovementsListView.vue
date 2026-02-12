@@ -6,6 +6,7 @@ import { useSweetAlert } from '@/composables/useSweetAlert'
 import type { movementsShortI } from '@/interfaces/admin/movement/MovementShortInterface'
 import MovementsService from '@/services/admin/MovementsService'
 import { computed, onMounted, ref } from 'vue'
+import PaginationControls from '@/components/Admin/PaginationControls.vue'
 
 const movementsService = new MovementsService()
 
@@ -16,9 +17,19 @@ const error = ref<string | null>(null)
 const movementsList = computed(() => movements.value?.data ?? [])
 const isLoading = ref(true)
 
+// ✅ NUEVO: Estados de paginación
+const currentPage = ref(1)
+const perPage = ref(15)
+
+// ✅ NUEVO: Función para calcular el índice global
+const getGlobalIndex = (localIndex: number) => {
+  return (currentPage.value - 1) * perPage.value + localIndex + 1
+}
+
 const loadMovements = async () => {
   try {
-    movements.value = await movementsService.getAll()
+    isLoading.value = true
+    movements.value = await movementsService.getAll(currentPage.value, perPage.value)
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar los movimientos.'
@@ -26,6 +37,18 @@ const loadMovements = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+// ✅ NUEVO: Handlers de paginación
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+  loadMovements()
+}
+
+const handlePerPageChange = (newPerPage: number) => {
+  perPage.value = newPerPage
+  currentPage.value = 1
+  loadMovements()
 }
 
 onMounted(() => {
@@ -73,7 +96,7 @@ onMounted(() => {
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              {{ index + 1 }}
+              {{ getGlobalIndex(index) }}
             </th>
             <td class="px-6 py-4">
               {{ movement.type }}
@@ -100,6 +123,14 @@ onMounted(() => {
         </tbody>
       </table>
     </div>
+    <!-- ✅ NUEVO: Componente de paginación -->
+      <PaginationControls
+        v-if="movements?.meta"
+        :meta="movements.meta"
+        :per-page="perPage"
+        @update:page="handlePageChange"
+        @update:per-page="handlePerPageChange"
+      />
   </div>
   <InfoAlert v-else message="Todavía no hay movimientos registrados" />
 </template>

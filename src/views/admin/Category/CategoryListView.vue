@@ -10,6 +10,7 @@ import { useSweetAlert } from '@/composables/useSweetAlert'
 import Swal from 'sweetalert2'
 import BadgeStatus from '@/components/Admin/BadgeStatus.vue'
 import type { categoriesI } from '@/interfaces/admin/CategoryInterface'
+import PaginationControls from '@/components/Admin/PaginationControls.vue'
 
 const categoryService = new CategoryService()
 
@@ -20,9 +21,19 @@ const error = ref<string | null>(null)
 const categoriesList = computed(() => categories.value?.data ?? [])
 const isLoading = ref(true)
 
+// ✅ NUEVO: Estados de paginación
+const currentPage = ref(1)
+const perPage = ref(15)
+
+// ✅ NUEVO: Función para calcular el índice global
+const getGlobalIndex = (localIndex: number) => {
+  return (currentPage.value - 1) * perPage.value + localIndex + 1
+}
+
 const loadCategories = async () => {
   try {
-    categories.value = await categoryService.getAll()
+    isLoading.value = true
+    categories.value = await categoryService.getAll(currentPage.value, perPage.value)
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las categorías.'
@@ -30,6 +41,18 @@ const loadCategories = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+// ✅ NUEVO: Handlers de paginación
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+  loadCategories()
+}
+
+const handlePerPageChange = (newPerPage: number) => {
+  perPage.value = newPerPage
+  currentPage.value = 1
+  loadCategories()
 }
 
 onMounted(() => {
@@ -92,7 +115,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              {{ index + 1 }}
+              {{ getGlobalIndex(index) }}
             </th>
             <td class="px-6 py-4">
               {{ category.name }}
@@ -119,6 +142,14 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
         </tbody>
       </table>
     </div>
+    <!-- ✅ NUEVO: Componente de paginación -->
+      <PaginationControls
+        v-if="categories?.meta"
+        :meta="categories.meta"
+        :per-page="perPage"
+        @update:page="handlePageChange"
+        @update:per-page="handlePerPageChange"
+      />
   </div>
   <InfoAlert v-else message="Todavía no hay categorías registradas" />
 </template>

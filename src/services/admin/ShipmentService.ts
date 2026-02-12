@@ -8,17 +8,22 @@ class ShipmentService {
     return httpAdmin
   }
 
-  async getAll(): Promise<shipmentsI> {
-    const res = await this.api.get<shipmentsI>('/admin/shipments')
+  async getAll(page: number = 1, perPage: number = 15): Promise<shipmentsI> {
+    const res = await this.api.get<shipmentsI>('/admin/shipments', {
+      params: {
+        page,
+        per_page: perPage,
+      },
+    })
     console.log(res.data.message)
     return res.data
   }
 
   async update(data: shipmentUpdateDTO, id: string | number): Promise<shipmentI> {
-      const res = await this.api.patch<ApiListResponseI<shipmentI>>(`/admin/shipments/${id}`, data)
-      console.log(res.data.message)
-      return res.data.data
-    }
+    const res = await this.api.patch<ApiListResponseI<shipmentI>>(`/admin/shipments/${id}`, data)
+    console.log(res.data.message)
+    return res.data.data
+  }
 }
 
 export default ShipmentService

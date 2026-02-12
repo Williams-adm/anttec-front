@@ -13,9 +13,14 @@ class BrandService {
   private get apiStrict() {
     return httpStrict
   }
+  async getAll(page: number = 1, perPage: number = 15): Promise<brandsI> {
 
-  async getAll(): Promise<brandsI> {
-    const res = await this.api.get<brandsI>('/admin/brands')
+    const res = await this.api.get<brandsI>('/admin/brands', {
+      params: {
+        page,
+        per_page: perPage,
+      },
+    })
     console.log(res.data.message)
     return res.data
   }

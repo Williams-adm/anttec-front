@@ -13,8 +13,13 @@ class OrderService {
     return httpStrict
   }
 
-  async getAll(): Promise<ordersI> {
-    const res = await this.api.get<ordersI>('/admin/orders')
+  async getAll(page: number = 1, perPage: number = 15): Promise<ordersI> {
+    const res = await this.api.get<ordersI>('/admin/orders', {
+      params: {
+        page,
+        per_page: perPage,
+      },
+    })
     console.log(res.data.message)
     return res.data
   }

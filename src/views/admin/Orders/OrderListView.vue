@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import pdfSvg from '@/assets/svg/pdf.svg'
 import InfoAlert from '@/components/Admin/InfoAlert.vue'
+import PaginationControls from '@/components/Admin/PaginationControls.vue'
 import AnimationLoader from '@/components/AnimationLoader.vue'
 import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import { useSweetAlert } from '@/composables/useSweetAlert'
@@ -19,9 +20,19 @@ const error = ref<string | null>(null)
 const ordersList = computed(() => orders.value?.data ?? [])
 const isLoading = ref(true)
 
+// ✅ NUEVO: Estados de paginación
+const currentPage = ref(1)
+const perPage = ref(15)
+
+// ✅ NUEVO: Función para calcular el índice global
+const getGlobalIndex = (localIndex: number) => {
+  return (currentPage.value - 1) * perPage.value + localIndex + 1
+}
+
 const loadOrders = async () => {
   try {
-    orders.value = await orderService.getAll()
+    isLoading.value = true
+    orders.value = await orderService.getAll(currentPage.value, perPage.value)
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar las órdenes.'
@@ -29,6 +40,18 @@ const loadOrders = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+// ✅ NUEVO: Handlers de paginación
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+  loadOrders()
+}
+
+const handlePerPageChange = (newPerPage: number) => {
+  perPage.value = newPerPage
+  currentPage.value = 1
+  loadOrders()
 }
 
 const handleDownloadPdf = async (orderId: string | number) => {
@@ -56,21 +79,25 @@ const handleDownloadPdf = async (orderId: string | number) => {
       title: 'Descargado',
       text: 'PDF descargado exitosamente',
       icon: 'success',
-      timer: 2000
+      timer: 2000,
     })
   } catch (error) {
     useSweetAlert({
       title: 'Error',
       text: 'No se pudo descargar el PDF',
       icon: 'error',
-      timer: 0
+      timer: 0,
     })
     console.error('Error descargando PDF:', error)
   }
 }
 
 // Función para actualizar el estado de la orden
-const updateOrderStatus = async (orderId: number | string, status: orderUpdateDTO['status'], successMessage: string) => {
+const updateOrderStatus = async (
+  orderId: number | string,
+  status: orderUpdateDTO['status'],
+  successMessage: string,
+) => {
   try {
     isLoading.value = true
     await orderService.update({ status }, orderId)
@@ -88,7 +115,7 @@ const updateOrderStatus = async (orderId: number | string, status: orderUpdateDT
       title: 'Error',
       text: 'No se pudo actualizar el estado',
       icon: 'error',
-      timer: 0
+      timer: 0,
     })
     console.error(err)
   } finally {
@@ -158,7 +185,7 @@ onMounted(() => {
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              {{ index + 1 }}
+              {{ getGlobalIndex(index) }}
             </th>
             <td class="px-6 py-4">
               {{ order.order_number }}
@@ -167,7 +194,9 @@ onMounted(() => {
               <span
                 :class="[
                   'px-2 py-1 rounded text-xs font-medium',
-                  order.delivery_type === 'shipment' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                  order.delivery_type === 'shipment'
+                    ? 'bg-purple-100 text-purple-800'
+                    : 'bg-blue-100 text-blue-800',
                 ]"
               >
                 {{ order.delivery_type === 'shipment' ? 'Envío' : 'Recojo' }}
@@ -198,7 +227,7 @@ onMounted(() => {
                     'bg-green-100 text-green-800': order.status_en === 'completed',
                     'bg-red-100 text-red-800': order.status_en === 'refunded',
                     'bg-red-200 text-red-700': order.status_en === 'cancelled',
-                  }
+                  },
                 ]"
               >
                 {{ order.status }}
@@ -230,6 +259,14 @@ onMounted(() => {
         </tbody>
       </table>
     </div>
+    <!-- ✅ NUEVO: Componente de paginación -->
+    <PaginationControls
+      v-if="orders?.meta"
+      :meta="orders.meta"
+      :per-page="perPage"
+      @update:page="handlePageChange"
+      @update:per-page="handlePerPageChange"
+    />
   </div>
   <InfoAlert v-else message="Todavía no hay órdenes confirmadas" />
 </template>

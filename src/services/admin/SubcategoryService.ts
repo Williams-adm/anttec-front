@@ -14,8 +14,13 @@ class SubcategoryService {
     return httpStrict
   }
 
-  async getAll(): Promise<subcategoriesI> {
-    const res = await this.api.get<subcategoriesI>('/admin/subcategories')
+  async getAll(page: number = 1, perPage: number = 15): Promise<subcategoriesI> {
+    const res = await this.api.get<subcategoriesI>('/admin/subcategories', {
+      params: {
+        page,
+        per_page: perPage,
+      },
+    })
     console.log(res.data.message)
     return res.data
   }

@@ -8,6 +8,7 @@ import type { shipmentUpdateDTO } from '@/DTOs/admin/ShipmentUpdateDTO'
 import ShipmentService from '@/services/admin/ShipmentService'
 import { computed, onMounted, ref } from 'vue'
 import AssignCourierModal from './AssignCourierModal.vue'
+import PaginationControls from '@/components/Admin/PaginationControls.vue'
 
 const shipmentService = new ShipmentService()
 
@@ -18,12 +19,22 @@ const error = ref<string | null>(null)
 const shipmentsList = computed(() => shipments.value?.data ?? [])
 const isLoading = ref(true)
 
+// ✅ NUEVO: Estados de paginación
+const currentPage = ref(1)
+const perPage = ref(15)
+
+// ✅ NUEVO: Función para calcular el índice global
+const getGlobalIndex = (localIndex: number) => {
+  return (currentPage.value - 1) * perPage.value + localIndex + 1
+}
+
 // Modal ref
 const modalRef = ref<InstanceType<typeof AssignCourierModal> | null>(null)
 
 const loadShipments = async () => {
   try {
-    shipments.value = await shipmentService.getAll()
+    isLoading.value = true
+    shipments.value = await shipmentService.getAll(currentPage.value, perPage.value)
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
     error.value = 'No se pudieron cargar los envíos.'
@@ -31,6 +42,18 @@ const loadShipments = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+// ✅ NUEVO: Handlers de paginación
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+  loadShipments()
+}
+
+const handlePerPageChange = (newPerPage: number) => {
+  perPage.value = newPerPage
+  currentPage.value = 1
+  loadShipments()
 }
 
 // Actualizar estado del shipment
@@ -187,7 +210,7 @@ onMounted(() => {
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              {{ index + 1 }}
+              {{ getGlobalIndex(index) }}
             </th>
             <td class="px-6 py-4">
               {{ shipment.order_number }}
@@ -307,7 +330,13 @@ onMounted(() => {
         </tbody>
       </table>
     </div>
-
+    <PaginationControls
+      v-if="shipments?.meta"
+      :meta="shipments.meta"
+      :per-page="perPage"
+      @update:page="handlePageChange"
+      @update:per-page="handlePerPageChange"
+    />
     <!-- Modal para asignar courier -->
     <AssignCourierModal ref="modalRef" @updated="loadShipments" />
   </div>

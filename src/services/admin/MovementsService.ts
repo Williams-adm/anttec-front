@@ -14,8 +14,13 @@ class MovementsService {
     return httpStrict
   }
 
-  async getAll(): Promise<movementsShortI> {
-    const res = await this.api.get<movementsShortI>('/admin/movements')
+  async getAll(page: number = 1, perPage: number = 15): Promise<movementsShortI> {
+    const res = await this.api.get<movementsShortI>('/admin/movements', {
+      params: {
+        page,
+        per_page: perPage,
+      },
+    })
     console.log(res.data.message)
     return res.data
   }

@@ -15,6 +15,7 @@ import Swal from 'sweetalert2'
 import { computed, onMounted, ref, watch } from 'vue'
 import BarcodeCartModal from './components/BarcodeCartModal.vue'
 import BarcodeQuantityModal from './components/BarcodeQuantityModal.vue'
+import PaginationControls from '@/components/Admin/PaginationControls.vue'
 
 const variantService = new VariantService()
 const reportService = new ReportService()
@@ -53,8 +54,18 @@ watch(
   { deep: true, immediate: true },
 )
 
+// ✅ NUEVO: Estados de paginación
+const currentPage = ref(1)
+const perPage = ref(15)
+
+// ✅ NUEVO: Función para calcular el índice global
+const getGlobalIndex = (localIndex: number) => {
+  return (currentPage.value - 1) * perPage.value + localIndex + 1
+}
+
 const loadVariants = async () => {
   try {
+    isLoading.value = true
     variants.value = await variantService.getAll()
   } catch (err) {
     useSweetAlert({ title: 'Algo salió mal', text: 'Intenta de nuevo', icon: 'error', timer: 0 })
@@ -63,6 +74,19 @@ const loadVariants = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+
+// ✅ NUEVO: Handlers de paginación
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+  loadVariants()
+}
+
+const handlePerPageChange = (newPerPage: number) => {
+  perPage.value = newPerPage
+  currentPage.value = 1
+  loadVariants()
 }
 
 onMounted(() => {
@@ -257,7 +281,7 @@ const generateLowStockReport = async () => {
                 scope="row"
                 class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                {{ index + 1 }}
+                {{ getGlobalIndex(index) }}
               </th>
               <td class="px-6 py-4">
                 <div class="flex items-center gap-4">
@@ -427,5 +451,13 @@ const generateLowStockReport = async () => {
         </div>
       </div>
     </div>
+    <!-- ✅ NUEVO: Componente de paginación -->
+      <PaginationControls
+        v-if="variants?.meta"
+        :meta="variants.meta"
+        :per-page="perPage"
+        @update:page="handlePageChange"
+        @update:per-page="handlePerPageChange"
+      />
   </div>
 </template>
