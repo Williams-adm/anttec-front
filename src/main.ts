@@ -71,6 +71,8 @@ import {
   faUserGroup,
   faPaperPlane,
   faArrowRotateLeft,
+  faCartArrowDown,
+  faDolly,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(
@@ -135,6 +137,8 @@ library.add(
   faUserGroup,
   faPaperPlane,
   faArrowRotateLeft,
+  faCartArrowDown,
+  faDolly,
 )
 
 import { faFacebookF, faInstagram, faBilibili } from '@fortawesome/free-brands-svg-icons'

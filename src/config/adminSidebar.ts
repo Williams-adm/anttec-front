@@ -130,4 +130,19 @@ export const adminSidebarLinks: adminAsideInterface[] = [
       },
     ],
   },
+  {
+    name: 'Couriers',
+    icon: 'fa-solid fa-dolly',
+    route: 'admin.couriers',
+  },
+  {
+    name: 'Órdenes',
+    icon: 'fa-solid fa-cart-arrow-down',
+    route: 'admin.orders',
+  },
+  {
+    name: ' Envios',
+    icon: 'fa-solid fa-truck-fast',
+    route: 'admin.shipments',
+  },
 ]

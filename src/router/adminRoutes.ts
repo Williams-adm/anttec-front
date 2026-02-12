@@ -348,6 +348,46 @@ const adminRoutes = [
         ],
       },
       {
+        path: 'orders',
+        children: [
+          {
+            path: '',
+            name: 'admin.orders',
+            component: () => import('@/views/admin/Orders/OrderListView.vue'),
+          },
+        ],
+      },
+      {
+        path: 'shipments',
+        children: [
+          {
+            path: '',
+            name: 'admin.shipments',
+            component: () => import('@/views/admin/Shipment/ShipmentListView.vue'),
+          },
+        ],
+      },
+      {
+        path: 'couriers',
+        children: [
+          {
+            path: '',
+            name: 'admin.couriers',
+            component: () => import('@/views/admin/Couriers/CourierListView.vue'),
+          },
+          {
+            path: 'create',
+            name: 'admin.couriers.create',
+            component: () => import('@/views/admin/Couriers/CourierCreateView.vue'),
+          },
+          {
+            path: 'edit/:id',
+            name: 'admin.couriers.edit',
+            component: () => import('@/views/admin/Couriers/CourierEditView.vue'),
+          },
+        ],
+      },
+      {
         path: 'payment-methods',
         children: [
           {
