@@ -3,6 +3,7 @@ import type { variantI, variantsI } from '@/interfaces/admin/variant/variantInte
 import type { variantShortsI } from '@/interfaces/admin/variant/variantShortInterface'
 import httpAdmin from '../httpAdmin'
 import httpStrict from '../httpStrict'
+import type { variantEditDTO } from '@/DTOs/admin/editVariantDTO'
 
 class VariantService {
   private get api() {
@@ -42,15 +43,11 @@ class VariantService {
     return res.data.data
   }
 
-  /* async update(data: FormData, id: string): Promise<any> {
-    const res = await this.api.post<ApiListResponseI<any>>(`/admin/variants/${id}`, data, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
+  async update(data: variantEditDTO, id: string): Promise<variantI> {
+    const res = await this.api.patch<ApiListResponseI<variantI>>(`/admin/variants/${id}`, data)
     console.log(res.data.message)
     return res.data.data
-  } */
+  }
 
   async create(data: FormData): Promise<variantI> {
     const res = await this.api.post<ApiListResponseI<variantI>>('/admin/variants', data, {

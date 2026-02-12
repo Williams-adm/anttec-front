@@ -353,7 +353,7 @@ const generateLowStockReport = async () => {
                     <font-awesome-icon icon="fa-solid fa-eye" size="xl" class="text-green-400" />
                   </router-link>
                   <router-link
-                    :to="{ name: 'admin.catalog.products.edit', params: { id: variant.id } }"
+                    :to="{ name: 'admin.store.variants.edit', params: { id: variant.id } }"
                   >
                     <font-awesome-icon
                       icon="fa-solid fa-pen-to-square"

@@ -227,6 +227,11 @@ const adminRoutes = [
                 name: 'admin.store.variants.show',
                 component: () => import('@/views/admin/store/variant/VariantShowView.vue'),
               },
+              {
+                path: 'edit/:id',
+                name: 'admin.store.variants.edit',
+                component: () => import('@/views/admin/store/variant/VariantEditView.vue'),
+              },
             ],
           },
           {
