@@ -20,6 +20,7 @@
     "@tailwindcss/vite": "^4.1.11",
     "@vee-validate/yup": "^4.15.1",
     "axios": "^1.11.0",
+    "chart.js": "^4.5.1",
     "filepond": "^4.32.10",
     "filepond-plugin-file-poster": "^2.5.2",
     "filepond-plugin-file-validate-size": "^2.2.8",
@@ -34,6 +35,7 @@
     "tailwindcss": "^4.1.11",
     "vee-validate": "^4.15.1",
     "vue": "^3.5.17",
+    "vue-chartjs": "^5.3.3",
     "vue-filepond": "^7.0.4",
     "vue-router": "^4.5.1",
     "vuedraggable": "^4.1.0"
