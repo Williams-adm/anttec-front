@@ -73,7 +73,7 @@ const updateStatus = async (id: number, currentStatus: boolean) => {
           <tr>
             <th scope="col" class="px-6 py-3">#</th>
             <th scope="col" class="px-6 py-3">Nombre</th>
-            <th scope="col" class="px-6 py-3">Phone</th>
+            <th scope="col" class="px-6 py-3">Teléfono</th>
             <th scope="col" class="px-6 py-3">Email</th>
             <th scope="col" class="px-6 py-3">Calle</th>
             <th scope="col" class="px-6 py-3">Estado</th>

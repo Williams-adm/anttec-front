@@ -9,6 +9,7 @@ import { useSweetAlert } from '@/composables/useSweetAlert'
 import type { BarcodeItemI } from '@/interfaces/admin/variant/BarcodeInterface'
 import type { variantI, variantsI } from '@/interfaces/admin/variant/variantInterface'
 import VariantService from '@/services/admin/VariantService'
+import ReportService from '@/services/admin/ReportService'
 import IaService from '@/services/ia/IaService'
 import Swal from 'sweetalert2'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -16,6 +17,7 @@ import BarcodeCartModal from './components/BarcodeCartModal.vue'
 import BarcodeQuantityModal from './components/BarcodeQuantityModal.vue'
 
 const variantService = new VariantService()
+const reportService = new ReportService()
 const iaService = new IaService()
 
 useBreadcrumb([{ name: 'Dashboard', route: 'admin.dashboard' }, { name: 'Inventario' }])
@@ -32,6 +34,11 @@ const barcodeCartModalRef = ref<InstanceType<typeof BarcodeCartModal> | null>(nu
 
 // ✅ Variable reactiva para contar items
 const cartItemsCount = ref(0)
+
+// Estados para el modal de reporte de stock bajo
+const showLowStockModal = ref(false)
+const lowStockFormat = ref<'pdf' | 'excel'>('pdf')
+const isGeneratingReport = ref(false)
 
 // ✅ SOLUCIÓN CLAVE: Watch automático para sincronizar el contador
 watch(
@@ -104,7 +111,6 @@ const handleBarcodeConfirm = (variantId: number | string, quantity: number) => {
   }
 
   barcodeCartModalRef.value?.addItem(item)
-  // ✅ Ya NO necesitas updateCartCount() - el watch lo hace automáticamente
 }
 
 const openCart = () => {
@@ -130,6 +136,54 @@ const syncCatalog = async () => {
     console.log(error)
   }
 }
+
+// ✅ Funciones para reporte de stock bajo
+const openLowStockModal = () => {
+  showLowStockModal.value = true
+}
+
+const closeLowStockModal = () => {
+  showLowStockModal.value = false
+}
+
+const generateLowStockReport = async () => {
+  try {
+    isGeneratingReport.value = true
+    useSweetAlert({
+      title: 'Generando reporte...',
+      text: 'Por favor espera',
+      icon: 'loading',
+    })
+
+    const response = await reportService.generateLowStockReport({
+      format: lowStockFormat.value,
+    })
+
+    Swal.close()
+
+    // Descargar el archivo
+    reportService.downloadFile(response.file, response.filename)
+
+    useSweetAlert({
+      title: '¡Reporte generado!',
+      text: 'El archivo se ha descargado correctamente',
+      icon: 'success',
+      timer: 2000,
+    })
+
+    closeLowStockModal()
+  } catch (err) {
+    useSweetAlert({
+      title: 'Error al generar reporte',
+      text: 'Intenta de nuevo',
+      icon: 'error',
+      timer: 0,
+    })
+    console.error(err)
+  } finally {
+    isGeneratingReport.value = false
+  }
+}
 </script>
 
 <template>
@@ -153,7 +207,16 @@ const syncCatalog = async () => {
       <span class="text-sm">Ver códigos ({{ cartItemsCount }})</span>
     </button>
 
-    <div class="flex justify-end items-center mb-4">
+    <div class="flex justify-between items-center mb-4">
+      <!-- Botón de Reporte de Stock Bajo -->
+      <button
+        @click="openLowStockModal"
+        class="px-6 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 rounded-lg transition-colors duration-200 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800 cursor-pointer flex items-center gap-2"
+      >
+        <font-awesome-icon icon="fa-solid fa-triangle-exclamation" />
+        <span>Reporte Stock Bajo</span>
+      </button>
+
       <button
         @click="syncCatalog"
         class="px-6 py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 rounded-lg transition-colors duration-200 dark:bg-indigo-500 dark:hover:bg-indigo-600 dark:focus:ring-indigo-800 cursor-pointer"
@@ -290,5 +353,79 @@ const syncCatalog = async () => {
     <!-- ✅ Modales -->
     <BarcodeQuantityModal ref="barcodeQuantityModalRef" @confirm="handleBarcodeConfirm" />
     <BarcodeCartModal ref="barcodeCartModalRef" />
+
+    <!-- Modal de Reporte de Stock Bajo -->
+    <div
+      v-if="showLowStockModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      @click.self="closeLowStockModal"
+    >
+      <div
+        class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md mx-4 transform transition-all"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+            Reporte de Stock Bajo
+          </h3>
+          <button
+            @click="closeLowStockModal"
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          >
+            <font-awesome-icon icon="fa-solid fa-times" size="lg" />
+          </button>
+        </div>
+
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Genera un reporte de todas las variantes con stock igual o menor al stock mínimo.
+        </p>
+
+        <div class="space-y-4">
+          <!-- Formato -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Formato
+            </label>
+            <div class="flex gap-4">
+              <label class="flex items-center cursor-pointer">
+                <input
+                  v-model="lowStockFormat"
+                  type="radio"
+                  value="pdf"
+                  class="mr-2 cursor-pointer"
+                />
+                <span class="text-sm text-gray-700 dark:text-gray-300">PDF</span>
+              </label>
+              <label class="flex items-center cursor-pointer">
+                <input
+                  v-model="lowStockFormat"
+                  type="radio"
+                  value="excel"
+                  class="mr-2 cursor-pointer"
+                />
+                <span class="text-sm text-gray-700 dark:text-gray-300">Excel</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-3 mt-6">
+          <button
+            @click="closeLowStockModal"
+            :disabled="isGeneratingReport"
+            class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="generateLowStockReport"
+            :disabled="isGeneratingReport"
+            class="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <font-awesome-icon v-if="isGeneratingReport" icon="fa-solid fa-spinner" spin />
+            <span>{{ isGeneratingReport ? 'Generando...' : 'Generar' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>

@@ -7,6 +7,7 @@ import { useSweetAlert } from '@/composables/useSweetAlert'
 import type { orderUpdateDTO } from '@/DTOs/admin/OrderUpdateDTO'
 import type { ordersI } from '@/interfaces/admin/OrderInterface'
 import OrderService from '@/services/admin/OrderService'
+import Swal from 'sweetalert2'
 import { computed, onMounted, ref } from 'vue'
 
 const orderService = new OrderService()
@@ -32,6 +33,13 @@ const loadOrders = async () => {
 
 const handleDownloadPdf = async (orderId: string | number) => {
   try {
+    // ✅ Mostrar loading mientras descarga
+    useSweetAlert({
+      title: 'Descargando...',
+      text: 'Generando PDF',
+      icon: 'loading',
+    })
+
     const blob = await orderService.getPdf(orderId)
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -41,11 +49,21 @@ const handleDownloadPdf = async (orderId: string | number) => {
     link.click()
     document.body.removeChild(link)
     window.URL.revokeObjectURL(url)
+
+    // ✅ Cerrar el loading y mostrar éxito
+    Swal.close()
+    useSweetAlert({
+      title: 'Descargado',
+      text: 'PDF descargado exitosamente',
+      icon: 'success',
+      timer: 2000
+    })
   } catch (error) {
     useSweetAlert({
       title: 'Error',
       text: 'No se pudo descargar el PDF',
-      icon: 'error'
+      icon: 'error',
+      timer: 0
     })
     console.error('Error descargando PDF:', error)
   }

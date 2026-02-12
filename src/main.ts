@@ -73,6 +73,8 @@ import {
   faArrowRotateLeft,
   faCartArrowDown,
   faDolly,
+  faFileExport,
+  faTriangleExclamation,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(
@@ -139,6 +141,8 @@ library.add(
   faArrowRotateLeft,
   faCartArrowDown,
   faDolly,
+  faFileExport,
+  faTriangleExclamation,
 )
 
 import { faFacebookF, faInstagram, faBilibili } from '@fortawesome/free-brands-svg-icons'
